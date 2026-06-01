@@ -128,19 +128,6 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      {/* Social Login */}
-      <div className="grid grid-cols-2 gap-4">
-        <Button type="button" variant="outline" className="h-11 rounded-lg">
-          <span className="mr-2 text-lg font-bold text-primary">G</span>
-          Google
-        </Button>
-
-        <Button type="button" variant="outline" className="h-11 rounded-lg">
-          <Facebook className="mr-2 h-4 w-4 text-primary" />
-          Facebook
-        </Button>
-      </div>
-
       {/* Signup */}
       <p className="pt-4 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}
