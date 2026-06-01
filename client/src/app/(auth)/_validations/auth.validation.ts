@@ -3,7 +3,10 @@ import z from "zod";
 
 export const registerPatientValidationZodSchema = z.object({
     name: z.string().min(1, { message: "Name is required" }),
-    email: z.email({ message: "Valid email is required" }),
+    email: z.string().email({ message: "Valid email is required" }),
+    role: z.enum(["PROJECT_MANAGER", "TEAM_MEMBER"], {
+        message: "Role is required",
+    }),
     password: z.string().min(6, {
         error: "Password must be at least 6 characters long",
     }).max(100, {

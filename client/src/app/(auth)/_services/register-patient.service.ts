@@ -11,6 +11,7 @@ export const registerPatient = async (_currentState: any, formData: any): Promis
         const payload = {
             name: formData.get('name'),
             email: formData.get('email'),
+            role: formData.get('role'),
             password: formData.get('password'),
             confirmPassword: formData.get('confirmPassword'),
         }
@@ -23,6 +24,7 @@ export const registerPatient = async (_currentState: any, formData: any): Promis
         const registerData = {
             name: validatedPayload.name,
             email: validatedPayload.email,
+            role: validatedPayload.role,
             password: validatedPayload.password,
         }
 

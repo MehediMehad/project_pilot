@@ -6,6 +6,13 @@ import { registerPatient } from "@/app/(auth)/_services/register-patient.service
 import InputFieldError from "@/components/common/InputFieldError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -15,6 +22,8 @@ import {
   LockKeyhole,
   Mail,
   User,
+  Briefcase,
+  Users2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -22,6 +31,7 @@ const RegisterForm = () => {
   const [state, formAction, isPending] = useActionState(registerPatient, null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     if (state && !state.success && state.message) {
@@ -78,6 +88,33 @@ const RegisterForm = () => {
           </div>
 
           <InputFieldError field="email" state={state} />
+        </div>
+
+        {/* Role Selection */}
+        <div className="space-y-2">
+          <label
+            htmlFor="role"
+            className="text-sm font-semibold text-foreground"
+          >
+            Role
+          </label>
+
+          <div className="relative">
+            <Users2 className="absolute left-4 top-1/2 h-10 w-4 -translate-y-1/2 text-muted-foreground z-10" />
+
+            <Select onValueChange={setRole} value={role}>
+              <SelectTrigger className="h-12 w-full rounded-lg border-input bg-background pl-11 text-sm text-slate-800 focus:ring-2 focus:ring-primary/20">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="PROJECT_MANAGER">Project Manager</SelectItem>
+                <SelectItem value="TEAM_MEMBER">Team Member</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <input type="hidden" name="role" value={role} />
+
+          <InputFieldError field="role" state={state} />
         </div>
 
         {/* Password */}
