@@ -1,0 +1,9 @@
+import MyProfile from "@/app/(dashboardLayout)/settings/profile/_components/MyProfile";
+import { getUserInfo } from "@/app/(auth)/_services/user-info.service";
+
+const MyProfilePage = async () => {
+  const userInfo = await getUserInfo();
+  return <MyProfile userInfo={userInfo} />;
+};
+
+export default MyProfilePage;
