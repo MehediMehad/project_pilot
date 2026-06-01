@@ -267,7 +267,7 @@ const getMe = async (user: any) => {
       name: true,
       email: true,
       role: true,
-      profilePhoto: true,
+      image: true,
       status: true,
       createdAt: true,
       updatedAt: true,

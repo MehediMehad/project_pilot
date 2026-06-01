@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.get('/', auth(UserRole.ADMIN), userController.getAllFromDB);
 
-router.get('/me', auth(UserRole.ADMIN, UserRole.USER), userController.getMyProfile);
+router.get('/me', auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER), userController.getMyProfile);
 
 router.post(
   '/register',
@@ -30,7 +30,7 @@ router.patch(
 
 router.patch(
   '/update-my-profile',
-  auth(UserRole.ADMIN, UserRole.USER),
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
   fileUploader.upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);

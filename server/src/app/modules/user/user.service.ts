@@ -25,8 +25,8 @@ const registerUser = async (req: Request): Promise<User> => {
       name: req.body.name,
       email: req.body.email,
       password: hashedPassword,
-      role: UserRole.USER,
-      profilePhoto,
+      role: req.body.role || UserRole.TEAM_MEMBER,
+      image: profilePhoto,
       status: UserStatus.ACTIVE,
     },
   });
@@ -82,7 +82,7 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
       email: true,
       role: true,
       status: true,
-      profilePhoto: true,
+      image: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -127,7 +127,7 @@ const getMyProfile = async (user: IAuthUser) => {
       email: true,
       role: true,
       status: true,
-      profilePhoto: true,
+      image: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -145,7 +145,7 @@ const updateMyProfile = async (user: IAuthUser, req: Request) => {
   });
 
   const file = req.file;
-  let profilePhoto = userInfo.profilePhoto;
+  let profilePhoto = userInfo.image;
   if (file) {
     const uploadToCloudinary = await fileUploader.uploadToCloudinary(file);
     profilePhoto = uploadToCloudinary?.secure_url;
@@ -153,7 +153,7 @@ const updateMyProfile = async (user: IAuthUser, req: Request) => {
 
   const updatedData = {
     name: req.body.name,
-    profilePhoto,
+    image: profilePhoto,
   };
 
   const result = await prisma.user.update({

@@ -12,7 +12,7 @@ router.post('/refresh-token', AuthController.refreshToken);
 
 router.post(
   '/change-password',
-  auth(UserRole.ADMIN, UserRole.USER),
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
   AuthController.changePassword,
 );
 
@@ -22,7 +22,7 @@ router.post(
   '/reset-password',
   (req: Request, res: Response, next: NextFunction) => {
     if (!req.headers.authorization && req.cookies.accessToken) {
-      auth(UserRole.ADMIN, UserRole.USER)(req, res, next);
+      auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER)(req, res, next);
     } else {
       next();
     }
