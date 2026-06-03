@@ -21,7 +21,7 @@ type DemoRole = "ADMIN" | "PROJECT_MANAGER" | "TEAM_MEMBER";
 
 const DEMO_ACCOUNTS: Record<DemoRole, { email: string; name: string }> = {
   ADMIN: {
-    email: "admin.demo@gmail.com",
+    email: "admin@gmail.com",
     name: "Admin",
   },
   PROJECT_MANAGER: {
@@ -190,11 +190,10 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
               type="button"
               variant={activeDemoRole === role ? "default" : "outline"}
               onClick={() => handleSelectDemoRole(role)}
-              className={`rounded-xl py-3 px-1 text-[10px] font-bold uppercase tracking-wider transition-all min-h-[42px] cursor-pointer ${
-                activeDemoRole === role
+              className={`rounded-xl py-3 px-1 text-[10px] font-bold uppercase tracking-wider transition-all min-h-[42px] cursor-pointer ${activeDemoRole === role
                   ? "bg-primary border-primary text-white shadow-md shadow-primary/25 hover:bg-primary/95"
                   : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-              }`}
+                }`}
             >
               {role.replace("_", " ")}
             </Button>
