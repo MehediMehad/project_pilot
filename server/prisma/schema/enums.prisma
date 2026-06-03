@@ -9,6 +9,8 @@ enum UserStatus {
   BLOCKED
 }
 
-// admin.demo@gmail.com
-// project.manager.demo@gmail.com
-// team.member.demo@gmail.com
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  ON_HOLD
+}
