@@ -9,8 +9,11 @@ model User {
 
   // Relations
   createdProjects Project[]       @relation("CreatedProjects")
+  assignedTasks   Task[]          @relation("AssignedTasks")
   projectMembers  ProjectMember[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("users")
 }

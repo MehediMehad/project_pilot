@@ -14,3 +14,15 @@ enum ProjectStatus {
   COMPLETED
   ON_HOLD
 }
+
+enum TaskPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
+}
