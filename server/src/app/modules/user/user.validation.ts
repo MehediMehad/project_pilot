@@ -18,8 +18,15 @@ const updateStatus = z.object({
   }),
 });
 
+const updateRole = z.object({
+  body: z.object({
+    role: z.enum(['ADMIN', 'PROJECT_MANAGER', 'TEAM_MEMBER']),
+  }),
+});
+
 export const userValidation = {
   registerUser,
   updateUser,
   updateStatus,
+  updateRole,
 };

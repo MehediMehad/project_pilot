@@ -17,8 +17,13 @@ export const adminProtectedRoutes: RouteConfig = {
     exact: [],
 }
 
-export const userProtectedRoutes: RouteConfig = {
-    patterns: [/^\/user/],
+export const projectManagerProtectedRoutes: RouteConfig = {
+    patterns: [/^\/project-manager/],
+    exact: [],
+}
+
+export const teamMemberProtectedRoutes: RouteConfig = {
+    patterns: [/^\/team-member/],
     exact: [],
 }
 
@@ -33,12 +38,15 @@ export const isRouteMatches = (pathname: string, routes: RouteConfig): boolean =
     return routes.patterns.some((pattern: RegExp) => pattern.test(pathname))
 }
 
-export const getRouteOwner = (pathname: string): "ADMIN" | "USER" | "COMMON" | null => {
+export const getRouteOwner = (pathname: string): "ADMIN" | "PROJECT_MANAGER" | "TEAM_MEMBER" | "COMMON" | null => {
     if (isRouteMatches(pathname, adminProtectedRoutes)) {
         return "ADMIN";
     }
-    if (isRouteMatches(pathname, userProtectedRoutes)) {
-        return "USER";
+    if (isRouteMatches(pathname, projectManagerProtectedRoutes)) {
+        return "PROJECT_MANAGER";
+    }
+    if (isRouteMatches(pathname, teamMemberProtectedRoutes)) {
+        return "TEAM_MEMBER";
     }
     if (isRouteMatches(pathname, commonProtectedRoutes)) {
         return "COMMON";

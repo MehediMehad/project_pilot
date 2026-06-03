@@ -38,4 +38,17 @@ router.patch(
   },
 );
 
+router.get(
+  '/:id',
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
+  userController.getSingleUser,
+);
+
+router.patch(
+  '/:id/role',
+  auth(UserRole.ADMIN),
+  validateRequest(userValidation.updateRole),
+  userController.updateUserRole,
+);
+
 export const userRoutes = router;

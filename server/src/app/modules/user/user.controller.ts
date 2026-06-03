@@ -70,10 +70,36 @@ const updateMyProfile = catchAsync(async (req: Request & { user?: IAuthUser }, r
   });
 });
 
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await userService.getSingleUser(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User profile fetched successfully!',
+    data: result,
+  });
+});
+
+const updateUserRole = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await userService.updateUserRole(id, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User role updated successfully!',
+    data: result,
+  });
+});
+
 export const userController = {
   registerUser,
   getAllFromDB,
   changeProfileStatus,
   getMyProfile,
   updateMyProfile,
+  getSingleUser,
+  updateUserRole,
 };

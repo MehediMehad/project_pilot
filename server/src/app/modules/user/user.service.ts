@@ -166,10 +166,45 @@ const updateMyProfile = async (user: IAuthUser, req: Request) => {
   return result;
 };
 
+const getSingleUser = async (id: string): Promise<Partial<User>> => {
+  const result = await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      status: true,
+      image: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  return result;
+};
+
+const updateUserRole = async (id: string, payload: { role: UserRole }) => {
+  const result = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      role: payload.role,
+    },
+  });
+
+  return result;
+};
+
 export const userService = {
   registerUser,
   getAllFromDB,
   changeProfileStatus,
   getMyProfile,
   updateMyProfile,
+  getSingleUser,
+  updateUserRole,
 };
