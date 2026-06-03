@@ -10,6 +10,7 @@ model User {
   // Relations
   createdProjects Project[]       @relation("CreatedProjects")
   assignedTasks   Task[]          @relation("AssignedTasks")
+  comments        Comment[]
   projectMembers  ProjectMember[]
 
   createdAt DateTime @default(now())
