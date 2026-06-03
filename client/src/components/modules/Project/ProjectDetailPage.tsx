@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { IProjectDetail, IProjectSummary } from "@/types";
+import { IProjectDetail, IProjectSummary, ITask } from "@/types";
 import { UserRole } from "@/lib/auth/auth-utils";
 import {
   getSingleProject,
   deleteProject,
   getProjectSummary,
 } from "@/services/project/projectManagement";
+import { getAllTasks } from "@/services/task/taskManagement";
 import ProjectMemberManager from "./ProjectMemberManager";
 import ProjectFormDialog from "./ProjectFormDialog";
+import TaskCard from "../Task/TaskCard";
+import TaskFormDialog from "../Task/TaskFormDialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -38,6 +41,7 @@ import {
   ListTodo,
   FolderKanban,
   User,
+  Plus,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -77,9 +81,12 @@ export default function ProjectDetailPage({
   const router = useRouter();
   const [project, setProject] = useState<IProjectDetail | null>(null);
   const [summary, setSummary] = useState<IProjectSummary | null>(null);
+  const [tasks, setTasks] = useState<ITask[]>([]);
   const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<ITask | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   const canEdit = userRole === "ADMIN" || userRole === "PROJECT_MANAGER";
@@ -87,9 +94,10 @@ export default function ProjectDetailPage({
   const fetchProject = useCallback(async () => {
     setLoading(true);
     try {
-      const [projectRes, summaryRes] = await Promise.all([
+      const [projectRes, summaryRes, tasksRes] = await Promise.all([
         getSingleProject(projectId),
         getProjectSummary(projectId),
+        getAllTasks({ projectId, limit: 100 }),
       ]);
 
       if (projectRes.success) {
@@ -100,6 +108,10 @@ export default function ProjectDetailPage({
 
       if (summaryRes.success) {
         setSummary(summaryRes.data);
+      }
+
+      if (tasksRes.success && tasksRes.data) {
+        setTasks(tasksRes.data.data);
       }
     } catch (error) {
       console.error(error);
@@ -431,6 +443,63 @@ export default function ProjectDetailPage({
           </div>
         </div>
       )}
+
+      {/* Project Tasks Section */}
+      <div className="mt-8 pt-4">
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <ListTodo className="h-5 w-5 text-gray-500" />
+            <h3 className="text-lg font-bold text-gray-900">Project Tasks</h3>
+          </div>
+          {canEdit && (
+            <Button
+              size="sm"
+              onClick={() => {
+                setEditingTask(null);
+                setTaskDialogOpen(true);
+              }}
+              className="flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="h-4 w-4" />
+              Add Task
+            </Button>
+          )}
+        </div>
+
+        {tasks.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 border rounded-xl bg-gray-50/50 border-dashed text-gray-400">
+            <ListTodo className="h-8 w-8 mb-2" />
+            <p className="font-semibold text-sm">No tasks created yet</p>
+            {canEdit && (
+              <p className="text-xs mt-1">Get started by adding a task to this project.</p>
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {tasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                userRole={userRole}
+                onEdit={(t) => {
+                  setEditingTask(t);
+                  setTaskDialogOpen(true);
+                }}
+                onDeleteSuccess={fetchProject}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Task Creation/Editing Dialog */}
+      <TaskFormDialog
+        open={taskDialogOpen}
+        onOpenChange={setTaskDialogOpen}
+        onSuccess={fetchProject}
+        task={editingTask}
+        preSelectedProjectId={projectId}
+      />
 
       {/* Edit Dialog */}
       {project && (

@@ -6,6 +6,7 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
 
     // Build the projects path based on role
     const projectsPath = `${defaultDashboard}/projects`;
+    const tasksPath = `${defaultDashboard}/tasks`;
 
     return [
         {
@@ -26,6 +27,12 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
                     title: "Projects",
                     href: projectsPath,
                     icon: "FolderKanban",
+                    roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],
+                },
+                {
+                    title: "Tasks",
+                    href: tasksPath,
+                    icon: "ListTodo",
                     roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],
                 },
                 {
