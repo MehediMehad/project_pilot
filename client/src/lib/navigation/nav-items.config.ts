@@ -4,6 +4,9 @@ import { getDefaultDashboardRoute, UserRole } from "../auth/auth-utils";
 export const getCommonNavItems = (role: UserRole): NavSection[] => {
     const defaultDashboard = getDefaultDashboardRoute(role);
 
+    // Build the projects path based on role
+    const projectsPath = `${defaultDashboard}/projects`;
+
     return [
         {
             items: [
@@ -18,6 +21,12 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
                     href: defaultDashboard,
                     icon: "LayoutDashboard",
                     roles: ["PROJECT_MANAGER", "TEAM_MEMBER", "ADMIN"],
+                },
+                {
+                    title: "Projects",
+                    href: projectsPath,
+                    icon: "FolderKanban",
+                    roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],
                 },
                 {
                     title: "User Management",

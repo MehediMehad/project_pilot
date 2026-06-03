@@ -21,7 +21,14 @@ export const getAllUsers = async (
     });
 
     const result = await res.json();
-    return result;
+    return {
+      success: result.success,
+      message: result.message,
+      data: {
+        data: result.data,
+        meta: result.meta,
+      },
+    };
   } catch (error) {
     console.error("Error in getAllUsers action:", error);
     return {
