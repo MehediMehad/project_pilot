@@ -131,7 +131,7 @@ export default function ProjectMemberManager({
               className="flex items-center justify-between rounded-xl border border-gray-100 p-4 bg-white shadow-sm"
             >
               <div className="flex items-center gap-3.5">
-                <div className="h-10 w-10 rounded-full bg-indigo-50/80 text-indigo-600 flex items-center justify-center shrink-0">
+                <div className="h-10 w-10 rounded-full bg-indigo-50/80 text-primary flex items-center justify-center shrink-0">
                   <span className="text-sm font-bold">
                     {member.user.name.charAt(0).toUpperCase()}
                   </span>
@@ -142,7 +142,7 @@ export default function ProjectMemberManager({
                       {member.user.name}
                     </p>
                     {isCreator && (
-                      <Badge className="bg-indigo-50 text-indigo-700 text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-indigo-100 hover:bg-indigo-50/80 shadow-none">
+                      <Badge className="bg-indigo-50 text-primary text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-indigo-100 hover:bg-indigo-50/80 shadow-none">
                         Creator
                       </Badge>
                     )}

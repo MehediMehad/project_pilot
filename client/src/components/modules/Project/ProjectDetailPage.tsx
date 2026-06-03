@@ -136,7 +136,7 @@ export default function ProjectDetailPage({
     return (
       <div className="flex h-64 items-center justify-center rounded-xl border border-gray-100 bg-white text-gray-400 shadow-sm">
         <div className="flex flex-col items-center gap-2">
-          <span className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+          <span className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           <span className="text-sm font-medium">
             Loading project details...
           </span>
@@ -180,7 +180,7 @@ export default function ProjectDetailPage({
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href={backPath}
-          className="text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5 font-bold transition-all text-sm"
+          className="text-primary hover:text-primary/80 flex items-center gap-1.5 font-bold transition-all text-sm"
         >
           <ArrowLeft className="h-4.5 w-4.5" />
           Back to Projects
@@ -238,7 +238,7 @@ export default function ProjectDetailPage({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-50">
           {/* Deadline */}
           <div className="flex items-center gap-3">
-            <div className="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl">
+            <div className="bg-indigo-50 text-primary p-2.5 rounded-xl">
               <Calendar className="h-5 w-5" />
             </div>
             <div>
@@ -253,7 +253,7 @@ export default function ProjectDetailPage({
 
           {/* Total Tasks */}
           <div className="flex items-center gap-3">
-            <div className="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl">
+            <div className="bg-indigo-50 text-primary p-2.5 rounded-xl">
               <ClipboardList className="h-5 w-5" />
             </div>
             <div>
@@ -302,9 +302,9 @@ export default function ProjectDetailPage({
       {summary && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {/* Card 1: Total Tasks */}
-          <div className="border-t-[3px] border-t-indigo-500 bg-white rounded-xl border-l border-r border-b border-gray-100 p-5 flex items-center gap-4 shadow-sm">
+          <div className="border-t-[3px] border-t-primary bg-white rounded-xl border-l border-r border-b border-gray-100 p-5 flex items-center gap-4 shadow-sm">
             <div className="h-10 w-10 rounded-xl bg-indigo-50/80 flex items-center justify-center shrink-0">
-              <ClipboardList className="h-5 w-5 text-indigo-600" />
+              <ClipboardList className="h-5 w-5 text-primary" />
             </div>
             <div>
               <p className="text-2xl font-black text-gray-900 leading-none">
@@ -388,7 +388,7 @@ export default function ProjectDetailPage({
                 className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm flex flex-col justify-between"
               >
                 <div className="flex items-center gap-3.5 mb-5">
-                  <div className="h-10 w-10 rounded-full bg-indigo-50/80 text-indigo-600 flex items-center justify-center font-bold text-sm shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-indigo-50/80 text-primary flex items-center justify-center font-bold text-sm shrink-0">
                     {mw.user.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
