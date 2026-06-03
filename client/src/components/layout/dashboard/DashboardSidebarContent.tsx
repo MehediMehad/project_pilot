@@ -9,7 +9,7 @@ import { UserInfo } from "@/app/(auth)/_types/user.type";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import logo from "@/assets/logos/navlog.png";
+// import logo from "@/assets/logos/navlog.png";
 import Image from "next/image";
 
 interface DashboardSidebarContentProps {
@@ -29,7 +29,8 @@ const DashboardSidebarContent = ({
       {/* Logo/Brand */}
       <div className="flex h-16 items-center border-b px-6">
         <Link href={dashboardHome} className="flex items-center space-x-2">
-          <Image src={logo} alt="Logo" width={200} height={100} />
+          {/* <Image src={logo} alt="Logo" width={200} height={100} /> */}
+          <span className="text-lg font-semibold">Project Pilot</span>
         </Link>
       </div>
 

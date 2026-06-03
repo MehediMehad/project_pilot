@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { NavSection } from "@/app/(dashboardLayout)/admin/_types/dashboard.type";
 import { UserInfo } from "@/app/(auth)/_types/user.type";
 import Image from "next/image";
-import log from "@/assets/logos/navlog.png";
+// import log from "@/assets/logos/navlog.png";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -30,7 +30,8 @@ const DashboardMobileSidebar = ({
       {/* Logo */}
       <div className="flex h-16 items-center border-b">
         <Link href={dashboardHome}>
-          <Image src={log} alt="Logo" width={64} height={64} className="" />
+          {/* <Image src={log} alt="Logo" width={64} height={64} className="" /> */}
+          <span className="text-lg font-semibold">Project Pilot</span>
         </Link>
       </div>
       <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
