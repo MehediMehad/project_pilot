@@ -42,9 +42,23 @@ const assignTask = z.object({
   }),
 });
 
+const createComment = z.object({
+  body: z.object({
+    content: z.string().min(1, 'Comment content cannot be empty'),
+  }),
+});
+
+const updateComment = z.object({
+  body: z.object({
+    content: z.string().min(1, 'Comment content cannot be empty'),
+  }),
+});
+
 export const taskValidation = {
   createTask,
   updateTask,
   changeStatus,
   assignTask,
+  createComment,
+  updateComment,
 };

@@ -40,3 +40,29 @@ export interface ITaskQueryParams {
   sortBy?: string;
   sortOrder?: string;
 }
+
+export interface IComment {
+  id: string;
+  content: string;
+  taskId: string;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    image: string | null;
+    role: UserRole;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IAttachment {
+  id: string;
+  fileName: string;
+  fileUrl: string;
+  fileType: string | null;
+  publicId: string | null;
+  taskId: string;
+  createdAt: string;
+}

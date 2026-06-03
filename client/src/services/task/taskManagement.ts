@@ -249,3 +249,136 @@ export const deleteTask = async (
     return { success: false, message: "Failed to delete task" };
   }
 };
+
+export const createComment = async (
+  taskId: string,
+  payload: { content: string }
+): Promise<{ success: boolean; message: string; data?: any }> => {
+  try {
+    const res = await serverFetch.post(`/task/${taskId}/comments`, {
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      revalidateTag(`task-comments-${taskId}`, { expire: 0 });
+    }
+    return result;
+  } catch (error) {
+    console.error("Error in createComment:", error);
+    return { success: false, message: "Failed to create comment" };
+  }
+};
+
+export const getTaskComments = async (
+  taskId: string
+): Promise<IApiResponse<any[]>> => {
+  try {
+    const res = await serverFetch.get(`/task/${taskId}/comments`, {
+      next: { tags: [`task-comments-${taskId}`] },
+      cache: "no-store",
+    });
+
+    const result = await res.json();
+    return result;
+  } catch (error) {
+    console.error("Error in getTaskComments:", error);
+    return { success: false, message: "Failed to fetch comments", data: [] };
+  }
+};
+
+export const updateComment = async (
+  taskId: string,
+  commentId: string,
+  payload: { content: string }
+): Promise<{ success: boolean; message: string; data?: any }> => {
+  try {
+    const res = await serverFetch.patch(`/task/comments/${commentId}`, {
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      revalidateTag(`task-comments-${taskId}`, { expire: 0 });
+    }
+    return result;
+  } catch (error) {
+    console.error("Error in updateComment:", error);
+    return { success: false, message: "Failed to update comment" };
+  }
+};
+
+export const deleteComment = async (
+  taskId: string,
+  commentId: string
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const res = await serverFetch.delete(`/task/comments/${commentId}`);
+
+    const result = await res.json();
+    if (result.success) {
+      revalidateTag(`task-comments-${taskId}`, { expire: 0 });
+    }
+    return result;
+  } catch (error) {
+    console.error("Error in deleteComment:", error);
+    return { success: false, message: "Failed to delete comment" };
+  }
+};
+
+export const createAttachment = async (
+  taskId: string,
+  formData: FormData
+): Promise<{ success: boolean; message: string; data?: any }> => {
+  try {
+    const res = await serverFetch.post(`/task/${taskId}/attachments`, {
+      body: formData,
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      revalidateTag(`task-attachments-${taskId}`, { expire: 0 });
+    }
+    return result;
+  } catch (error) {
+    console.error("Error in createAttachment:", error);
+    return { success: false, message: "Failed to upload attachment" };
+  }
+};
+
+export const getTaskAttachments = async (
+  taskId: string
+): Promise<IApiResponse<any[]>> => {
+  try {
+    const res = await serverFetch.get(`/task/${taskId}/attachments`, {
+      next: { tags: [`task-attachments-${taskId}`] },
+      cache: "no-store",
+    });
+
+    const result = await res.json();
+    return result;
+  } catch (error) {
+    console.error("Error in getTaskAttachments:", error);
+    return { success: false, message: "Failed to fetch attachments", data: [] };
+  }
+};
+
+export const deleteAttachment = async (
+  taskId: string,
+  attachmentId: string
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const res = await serverFetch.delete(`/task/attachments/${attachmentId}`);
+
+    const result = await res.json();
+    if (result.success) {
+      revalidateTag(`task-attachments-${taskId}`, { expire: 0 });
+    }
+    return result;
+  } catch (error) {
+    console.error("Error in deleteAttachment:", error);
+    return { success: false, message: "Failed to delete attachment" };
+  }
+};

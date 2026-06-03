@@ -4,6 +4,7 @@ import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { taskController } from './task.controller';
 import { taskValidation } from './task.validation';
+import { fileUploader } from '../../../helpers/fileUploader';
 
 const router = express.Router();
 
@@ -57,6 +58,53 @@ router.delete(
   '/:id',
   auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER),
   taskController.deleteTask,
+);
+
+// Comment Routes
+router.post(
+  '/:taskId/comments',
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
+  validateRequest(taskValidation.createComment),
+  taskController.createComment,
+);
+
+router.get(
+  '/:taskId/comments',
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
+  taskController.getTaskComments,
+);
+
+router.patch(
+  '/comments/:commentId',
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
+  validateRequest(taskValidation.updateComment),
+  taskController.updateComment,
+);
+
+router.delete(
+  '/comments/:commentId',
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
+  taskController.deleteComment,
+);
+
+// Attachment Routes
+router.post(
+  '/:taskId/attachments',
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
+  fileUploader.upload.single('file'),
+  taskController.createAttachment,
+);
+
+router.get(
+  '/:taskId/attachments',
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
+  taskController.getTaskAttachments,
+);
+
+router.delete(
+  '/attachments/:attachmentId',
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
+  taskController.deleteAttachment,
 );
 
 export const taskRoutes = router;

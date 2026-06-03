@@ -171,6 +171,116 @@ const deleteTask = catchAsync(
   },
 );
 
+const createComment = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const { taskId } = req.params;
+    const result = await taskService.createComment(
+      taskId,
+      req.body,
+      req.user as IAuthUser,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: 'Comment created successfully!',
+      data: result,
+    });
+  },
+);
+
+const getTaskComments = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const { taskId } = req.params;
+    const result = await taskService.getTaskComments(taskId, req.user as IAuthUser);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Comments fetched successfully!',
+      data: result,
+    });
+  },
+);
+
+const updateComment = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const { commentId } = req.params;
+    const result = await taskService.updateComment(
+      commentId,
+      req.body,
+      req.user as IAuthUser,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Comment updated successfully!',
+      data: result,
+    });
+  },
+);
+
+const deleteComment = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const { commentId } = req.params;
+    const result = await taskService.deleteComment(commentId, req.user as IAuthUser);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Comment deleted successfully!',
+      data: result,
+    });
+  },
+);
+
+const createAttachment = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const { taskId } = req.params;
+    const result = await taskService.createAttachment(
+      taskId,
+      req,
+      req.user as IAuthUser,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: 'Attachment uploaded successfully!',
+      data: result,
+    });
+  },
+);
+
+const getTaskAttachments = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const { taskId } = req.params;
+    const result = await taskService.getTaskAttachments(taskId, req.user as IAuthUser);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Attachments fetched successfully!',
+      data: result,
+    });
+  },
+);
+
+const deleteAttachment = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const { attachmentId } = req.params;
+    const result = await taskService.deleteAttachment(attachmentId, req.user as IAuthUser);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Attachment deleted successfully!',
+      data: result,
+    });
+  },
+);
+
 export const taskController = {
   createTask,
   getAllTasks,
@@ -180,4 +290,11 @@ export const taskController = {
   getSingleTask,
   updateTask,
   deleteTask,
+  createComment,
+  getTaskComments,
+  updateComment,
+  deleteComment,
+  createAttachment,
+  getTaskAttachments,
+  deleteAttachment,
 };

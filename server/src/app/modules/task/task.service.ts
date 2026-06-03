@@ -1,5 +1,8 @@
 import { Prisma, Task, UserRole } from '@prisma/client';
+import { v2 as cloudinary } from 'cloudinary';
 import httpStatus from 'http-status';
+import config from '../../../config';
+import { fileUploader } from '../../../helpers/fileUploader';
 import { paginationHelper } from '../../../helpers/paginationHelper';
 import prisma from '../../../shared/prisma';
 import ApiError from '../../errors/ApiError';
@@ -447,10 +450,268 @@ const deleteTask = async (id: string, user: IAuthUser) => {
   return { message: 'Task deleted successfully' };
 };
 
+const checkTaskAccess = async (taskId: string, user: IAuthUser) => {
+  if (!user) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  }
+
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: { email: user.email },
+  });
+
+  const task = await prisma.task.findUniqueOrThrow({
+    where: { id: taskId },
+  });
+
+  if (userData.role !== UserRole.ADMIN) {
+    const isMember = await prisma.projectMember.findUnique({
+      where: {
+        projectId_userId: {
+          projectId: task.projectId,
+          userId: userData.id,
+        },
+      },
+    });
+
+    if (!isMember) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        'You are not authorized to access this task',
+      );
+    }
+  }
+
+  return { task, userData };
+};
+
+const createComment = async (taskId: string, payload: { content: string }, user: IAuthUser) => {
+  const { userData } = await checkTaskAccess(taskId, user);
+
+  const result = await prisma.comment.create({
+    data: {
+      content: payload.content,
+      taskId,
+      userId: userData.id,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
+const getTaskComments = async (taskId: string, user: IAuthUser) => {
+  await checkTaskAccess(taskId, user);
+
+  const result = await prisma.comment.findMany({
+    where: { taskId },
+    orderBy: { createdAt: 'desc' },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
+const updateComment = async (commentId: string, payload: { content: string }, user: IAuthUser) => {
+  if (!user) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  }
+
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: { email: user.email },
+  });
+
+  const comment = await prisma.comment.findUniqueOrThrow({
+    where: { id: commentId },
+  });
+
+  if (userData.role !== UserRole.ADMIN && comment.userId !== userData.id) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'You are not authorized to update this comment',
+    );
+  }
+
+  const result = await prisma.comment.update({
+    where: { id: commentId },
+    data: { content: payload.content },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
+const deleteComment = async (commentId: string, user: IAuthUser) => {
+  if (!user) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  }
+
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: { email: user.email },
+  });
+
+  const comment = await prisma.comment.findUniqueOrThrow({
+    where: { id: commentId },
+  });
+
+  if (userData.role !== UserRole.ADMIN && comment.userId !== userData.id) {
+    const task = await prisma.task.findUnique({
+      where: { id: comment.taskId },
+    });
+    if (task) {
+      const isProjectMember = await prisma.projectMember.findUnique({
+        where: {
+          projectId_userId: {
+            projectId: task.projectId,
+            userId: userData.id,
+          },
+        },
+      });
+      if (!isProjectMember || userData.role !== UserRole.PROJECT_MANAGER) {
+        throw new ApiError(
+          httpStatus.FORBIDDEN,
+          'You are not authorized to delete this comment',
+        );
+      }
+    }
+  }
+
+  await prisma.comment.delete({
+    where: { id: commentId },
+  });
+
+  return { message: 'Comment deleted successfully' };
+};
+
+const createAttachment = async (taskId: string, req: any, user: IAuthUser) => {
+  const file = req.file;
+  if (!file) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'File is required');
+  }
+
+  await checkTaskAccess(taskId, user);
+
+  const uploadResult = await fileUploader.uploadToCloudinary(file);
+
+  const result = await prisma.attachment.create({
+    data: {
+      fileName: file.originalname,
+      fileUrl: uploadResult.secure_url,
+      fileType: file.mimetype,
+      publicId: uploadResult.public_id,
+      taskId,
+    },
+  });
+
+  return result;
+};
+
+const getTaskAttachments = async (taskId: string, user: IAuthUser) => {
+  await checkTaskAccess(taskId, user);
+
+  const result = await prisma.attachment.findMany({
+    where: { taskId },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return result;
+};
+
+const deleteAttachment = async (attachmentId: string, user: IAuthUser) => {
+  if (!user) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated');
+  }
+
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: { email: user.email },
+  });
+
+  const attachment = await prisma.attachment.findUniqueOrThrow({
+    where: { id: attachmentId },
+  });
+
+  const task = await prisma.task.findUniqueOrThrow({
+    where: { id: attachment.taskId },
+  });
+
+  if (userData.role !== UserRole.ADMIN) {
+    const isMember = await prisma.projectMember.findUnique({
+      where: {
+        projectId_userId: {
+          projectId: task.projectId,
+          userId: userData.id,
+        },
+      },
+    });
+
+    if (!isMember) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        'You are not authorized to delete attachments in this project',
+      );
+    }
+  }
+
+  if (attachment.publicId) {
+    try {
+      cloudinary.config({
+        cloud_name: config.cloudinary.cloud_name,
+        api_key: config.cloudinary.api_key,
+        api_secret: config.cloudinary.api_secret,
+      });
+      await cloudinary.uploader.destroy(attachment.publicId);
+    } catch (e) {
+      console.error('Failed to delete attachment from Cloudinary:', e);
+    }
+  }
+
+  await prisma.attachment.delete({
+    where: { id: attachmentId },
+  });
+
+  return { message: 'Attachment deleted successfully' };
+};
+
 export const taskService = {
   createTask,
   getAllTasks,
   getSingleTask,
   updateTask,
   deleteTask,
+  createComment,
+  getTaskComments,
+  updateComment,
+  deleteComment,
+  createAttachment,
+  getTaskAttachments,
+  deleteAttachment,
 };

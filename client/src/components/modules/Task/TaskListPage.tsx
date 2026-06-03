@@ -14,6 +14,7 @@ import TaskFormDialog from "./TaskFormDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, RefreshCw, ChevronLeft, ChevronRight, ListTodo } from "lucide-react";
+import { getUserInfo } from "@/services/auth/user-info.service";
 
 interface TaskListPageProps {
   userRole: UserRole;
@@ -22,10 +23,21 @@ interface TaskListPageProps {
 
 type TabType = "all" | "my" | "overdue" | "upcoming";
 
-export default function TaskListPage({ userRole, currentUserId }: TaskListPageProps) {
+export default function TaskListPage({ userRole, currentUserId: propCurrentUserId }: TaskListPageProps) {
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0 });
   const [activeTab, setActiveTab] = useState<TabType>("all");
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(propCurrentUserId);
+
+  useEffect(() => {
+    if (!currentUserId) {
+      getUserInfo().then((user) => {
+        if (user?.id) {
+          setCurrentUserId(user.id);
+        }
+      });
+    }
+  }, [currentUserId, propCurrentUserId]);
 
   // Filters
   const [searchTerm, setSearchTerm] = useState("");
