@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { ITask, IComment, IAttachment, TaskStatus } from "@/types";
+import {
+  ITask,
+  IComment,
+  IAttachment,
+  TaskStatus,
+  TaskPriority,
+} from "@/types";
 import { UserRole } from "@/lib/auth/auth-utils";
 import {
   Dialog,
@@ -11,7 +17,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import {
   Calendar,
   User2,
@@ -26,7 +31,11 @@ import {
   Image as ImageIcon,
   File as FileIcon,
   Download,
-  X,
+  Folder,
+  Tag,
+  CheckCircle2,
+  Circle,
+  AlertTriangle,
 } from "lucide-react";
 import {
   getTaskComments,
@@ -36,6 +45,7 @@ import {
   getTaskAttachments,
   createAttachment,
   deleteAttachment,
+  updateTask,
 } from "@/services/task/taskManagement";
 import { toast } from "sonner";
 
@@ -49,18 +59,22 @@ interface TaskDetailsDialogProps {
 }
 
 export default function TaskDetailsDialog({
-  task,
+  task: initialTask,
   isOpen,
   onOpenChange,
   userRole,
   currentUserId,
   onStatusChange,
 }: TaskDetailsDialogProps) {
-  const [activeTab, setActiveTab] = useState<"comments" | "attachments">("comments");
+  const [task, setTask] = useState<ITask>(initialTask);
+  const [activeTab, setActiveTab] = useState<"comments" | "attachments">(
+    "comments",
+  );
   const [comments, setComments] = useState<IComment[]>([]);
   const [attachments, setAttachments] = useState<IAttachment[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [isLoadingAttachments, setIsLoadingAttachments] = useState(false);
+  const [isUpdatingState, setIsUpdatingState] = useState(false);
 
   // Comment state
   const [newComment, setNewComment] = useState("");
@@ -71,6 +85,13 @@ export default function TaskDetailsDialog({
   // Attachment state
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync initialTask changes
+  useEffect(() => {
+    if (initialTask) {
+      setTask(initialTask);
+    }
+  }, [initialTask]);
 
   // Fetch comments and attachments
   useEffect(() => {
@@ -110,6 +131,48 @@ export default function TaskDetailsDialog({
     }
   };
 
+  // Task inline state updates
+  const handleUpdateStatus = async (newStatus: TaskStatus) => {
+    setIsUpdatingState(true);
+    try {
+      const res = await updateTask(task.id, task.projectId, {
+        status: newStatus,
+      });
+      if (res.success) {
+        setTask((prev) => ({ ...prev, status: newStatus }));
+        if (onStatusChange) onStatusChange(newStatus);
+        toast.success("Task status updated!");
+      } else {
+        toast.error("Failed to update status");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating status");
+    } finally {
+      setIsUpdatingState(false);
+    }
+  };
+
+  const handleUpdatePriority = async (newPriority: TaskPriority) => {
+    setIsUpdatingState(true);
+    try {
+      const res = await updateTask(task.id, task.projectId, {
+        priority: newPriority,
+      });
+      if (res.success) {
+        setTask((prev) => ({ ...prev, priority: newPriority }));
+        toast.success("Task priority updated!");
+      } else {
+        toast.error("Failed to update priority");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating priority");
+    } finally {
+      setIsUpdatingState(false);
+    }
+  };
+
   // Comments CRUD
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +200,9 @@ export default function TaskDetailsDialog({
     if (!editCommentText.trim()) return;
 
     try {
-      const res = await updateComment(task.id, commentId, { content: editCommentText });
+      const res = await updateComment(task.id, commentId, {
+        content: editCommentText,
+      });
       if (res.success) {
         setEditingCommentId(null);
         setEditCommentText("");
@@ -212,141 +277,188 @@ export default function TaskDetailsDialog({
     }
   };
 
-  // Get attachment icon based on type
   const getAttachmentIcon = (fileType: string | null) => {
-    if (!fileType) return <FileIcon className="h-5 w-5 text-slate-500" />;
+    if (!fileType) return <FileIcon className="h-6 w-6 text-slate-500" />;
     if (fileType.startsWith("image/")) {
-      return <ImageIcon className="h-5 w-5 text-blue-500" />;
+      return <ImageIcon className="h-6 w-6 text-blue-600" />;
     }
-    if (fileType.includes("pdf") || fileType.includes("document") || fileType.includes("text")) {
-      return <FileText className="h-5 w-5 text-emerald-500" />;
+    if (
+      fileType.includes("pdf") ||
+      fileType.includes("document") ||
+      fileType.includes("text")
+    ) {
+      return <FileText className="h-6 w-6 text-emerald-600" />;
     }
-    return <FileIcon className="h-5 w-5 text-slate-500" />;
+    return <FileIcon className="h-6 w-6 text-slate-500" />;
   };
 
   const formattedDueDate = new Date(task.dueDate).toLocaleDateString("en-US", {
-    month: "short",
+    month: "long",
     day: "numeric",
     year: "numeric",
   });
 
-  const priorityColors = {
-    HIGH: "bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-400 border-rose-200 dark:border-rose-800/30",
-    MEDIUM: "bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border-amber-200 dark:border-amber-800/30",
-    LOW: "bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-800/30",
+  const priorityStyles = {
+    HIGH: "bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400 border-rose-200 dark:border-rose-900/30",
+    MEDIUM:
+      "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border-amber-200 dark:border-amber-900/30",
+    LOW: "bg-slate-50 text-slate-700 dark:bg-slate-800/50 dark:text-slate-300 border-slate-200 dark:border-slate-800",
   };
 
-  const statusBgColors = {
-    TODO: "bg-orange-50 text-orange-700 dark:bg-orange-950/20 dark:text-orange-400 border-orange-200 dark:border-orange-800/30",
-    IN_PROGRESS: "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/30",
-    COMPLETED: "bg-green-50 text-green-700 dark:bg-green-950/20 dark:text-green-400 border-green-200 dark:border-green-800/30",
+  const statusStyles = {
+    TODO: "bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400 border-orange-200 dark:border-orange-900/30",
+    IN_PROGRESS:
+      "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400 border-indigo-200 dark:border-indigo-900/30",
+    COMPLETED:
+      "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400 border-green-200 dark:border-green-900/30",
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col p-0 gap-0 rounded-xl bg-background border border-border">
-        {/* Header */}
-        <div className="p-6 border-b border-border bg-slate-50 dark:bg-slate-900/50">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <DialogTitle className="text-xl font-bold text-foreground">
+      <DialogContent className="sm:max-w-[950px] md:max-w-[1050px] w-[95vw] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0 rounded-2xl bg-background border border-border shadow-2xl transition-all duration-300">
+        {/* Top Header Card */}
+        <div className="relative p-6 border-b border-border bg-linear-to-r from-slate-50 to-white dark:from-slate-950 dark:to-slate-900/40">
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-5 pr-8">
+            <div className="space-y-1.5 flex-1">
+              <div className="flex items-center gap-2 text-xs text-primary font-bold tracking-wider uppercase">
+                <Folder className="h-3.5 w-3.5" />
+                <span>{task.project?.name || "Workspace Project"}</span>
+              </div>
+              <DialogTitle className="text-2xl font-extrabold text-foreground tracking-tight leading-snug">
                 {task.title}
               </DialogTitle>
-              {task.project && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Project: <span className="font-semibold text-foreground">{task.project.name}</span>
-                </p>
-              )}
             </div>
-            <div className="flex items-center gap-2">
-              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${priorityColors[task.priority]}`}>
-                {task.priority} Priority
-              </span>
-              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold border ${statusBgColors[task.status]}`}>
-                {task.status === "TODO" ? "To Do" : task.status === "IN_PROGRESS" ? "In Progress" : "Completed"}
-              </span>
-            </div>
+
+            {/* <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
+                  Status
+                </span>
+                <select
+                  value={task.status}
+                  onChange={(e) =>
+                    handleUpdateStatus(e.target.value as TaskStatus)
+                  }
+                  disabled={isUpdatingState}
+                  className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${statusStyles[task.status]}`}
+                >
+                  <option value="TODO">To Do</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="COMPLETED">Completed</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
+                  Priority
+                </span>
+                <select
+                  value={task.priority}
+                  onChange={(e) =>
+                    handleUpdatePriority(e.target.value as TaskPriority)
+                  }
+                  disabled={isUpdatingState}
+                  className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${priorityStyles[task.priority]}`}
+                >
+                  <option value="LOW">Low Priority</option>
+                  <option value="MEDIUM">Medium Priority</option>
+                  <option value="HIGH">High Priority</option>
+                </select>
+              </div>
+            </div> */}
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content (Left Column) */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Description */}
-            <div className="space-y-2">
-              <h5 className="text-sm font-semibold text-foreground uppercase tracking-wider">
+        {/* Scrollable Layout Content */}
+        <div className="flex-1 overflow-y-auto p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Body (Left 2 Columns) */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Description Card */}
+            <div className="space-y-3">
+              <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                <FileText className="h-4 w-4 text-primary" />
                 Description
               </h5>
-              <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-900/40 text-sm text-foreground leading-relaxed whitespace-pre-wrap border border-slate-100 dark:border-slate-800/50">
+              <div className="p-5 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-sm text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap border border-slate-200 dark:border-slate-800/80 shadow-xs">
                 {task.description || (
-                  <span className="italic text-muted-foreground">No description provided.</span>
+                  <span className="italic text-slate-500 dark:text-slate-400">
+                    No description provided for this task.
+                  </span>
                 )}
               </div>
             </div>
 
-            {/* Tabs for comments & attachments */}
-            <div className="space-y-4">
-              <div className="flex border-b border-border">
+            {/* Dynamic Tabs Block */}
+            <div className="space-y-6">
+              <div className="flex border-b border-border gap-2">
                 <button
                   onClick={() => setActiveTab("comments")}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-all -mb-[2px] ${
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${
                     activeTab === "comments"
                       ? "border-primary text-primary"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
+                      : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                   }`}
                 >
                   <MessageSquare className="h-4 w-4" />
-                  Comments ({comments.length})
+                  Comments
+                  <span className="ml-1 px-2.5 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-full font-bold text-slate-700 dark:text-slate-300">
+                    {comments.length}
+                  </span>
                 </button>
                 <button
                   onClick={() => setActiveTab("attachments")}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-all -mb-[2px] ${
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${
                     activeTab === "attachments"
                       ? "border-primary text-primary"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
+                      : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                   }`}
                 >
                   <Paperclip className="h-4 w-4" />
-                  Attachments ({attachments.length})
+                  Attachments
+                  <span className="ml-1 px-2.5 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-full font-bold text-slate-700 dark:text-slate-300">
+                    {attachments.length}
+                  </span>
                 </button>
               </div>
 
-              {/* Tab Content */}
+              {/* Comments Panel */}
               {activeTab === "comments" ? (
-                <div className="space-y-4">
-                  {/* Add Comment Form */}
-                  <form onSubmit={handleAddComment} className="flex gap-2">
+                <div className="space-y-6">
+                  {/* Styled Input Box */}
+                  <form
+                    onSubmit={handleAddComment}
+                    className="flex gap-3 items-start bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800"
+                  >
                     <Textarea
-                      placeholder="Write a comment..."
+                      placeholder="Write a clear, detailed comment..."
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
-                      className="min-h-[42px] max-h-[120px] rounded-lg border-input flex-1 focus-visible:ring-1 focus-visible:ring-primary"
+                      className="min-h-[50px] max-h-[140px] rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus-visible:ring-1 focus-visible:ring-primary shadow-xs resize-none text-slate-800 dark:text-slate-200"
                     />
                     <Button
                       type="submit"
                       disabled={isSubmittingComment || !newComment.trim()}
-                      className="h-[42px] px-4 self-end shrink-0"
+                      className="h-[50px] w-[50px] rounded-lg px-0 shrink-0 bg-primary hover:bg-primary/90 text-white font-bold cursor-pointer"
                     >
                       {isSubmittingComment ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <Loader2 className="h-5 w-5 animate-spin" />
                       ) : (
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-5 w-5" />
                       )}
                     </Button>
                   </form>
 
-                  {/* Comments List */}
+                  {/* List of Comments */}
                   {isLoadingComments ? (
-                    <div className="py-8 flex justify-center text-muted-foreground">
-                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    <div className="py-12 flex justify-center text-muted-foreground">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                   ) : comments.length === 0 ? (
-                    <div className="text-center py-8 text-sm text-muted-foreground italic bg-slate-50/50 dark:bg-slate-900/10 rounded-lg border border-dashed">
-                      No comments yet. Be the first to say something!
+                    <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                      No comments posted yet.
                     </div>
                   ) : (
-                    <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+                    <div className="space-y-4 max-h-[340px] overflow-y-auto pr-2">
                       {comments.map((comment) => {
                         const isOwner = comment.userId === currentUserId;
                         const isEditing = editingCommentId === comment.id;
@@ -354,10 +466,10 @@ export default function TaskDetailsDialog({
                         return (
                           <div
                             key={comment.id}
-                            className="p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 flex gap-3 group relative"
+                            className="p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 flex gap-4 transition-all duration-300 hover:shadow-xs group relative"
                           >
-                            {/* Avatar */}
-                            <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs uppercase overflow-hidden shrink-0 border">
+                            {/* User Avatar */}
+                            <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-sm uppercase overflow-hidden shrink-0 border border-slate-350 dark:border-slate-700">
                               {comment.user.image ? (
                                 <img
                                   src={comment.user.image}
@@ -369,19 +481,20 @@ export default function TaskDetailsDialog({
                               )}
                             </div>
 
-                            {/* Comment details */}
-                            <div className="flex-1 space-y-1">
+                            <div className="flex-1 space-y-1.5">
                               <div className="flex items-center justify-between">
-                                <div className="flex items-baseline gap-2">
-                                  <span className="text-xs font-bold text-foreground">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100">
                                     {comment.user.name}
                                   </span>
-                                  <span className="text-[10px] text-muted-foreground uppercase font-semibold">
-                                    ({comment.user.role.replace("_", " ")})
+                                  <span className="text-[9px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold uppercase tracking-wider">
+                                    {comment.user.role.replace("_", " ")}
                                   </span>
                                 </div>
-                                <span className="text-[10px] text-muted-foreground">
-                                  {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
+                                  {new Date(
+                                    comment.createdAt,
+                                  ).toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",
                                     hour: "2-digit",
@@ -394,54 +507,61 @@ export default function TaskDetailsDialog({
                                 <div className="space-y-2 pt-1">
                                   <Textarea
                                     value={editCommentText}
-                                    onChange={(e) => setEditCommentText(e.target.value)}
-                                    className="min-h-[60px]"
+                                    onChange={(e) =>
+                                      setEditCommentText(e.target.value)
+                                    }
+                                    className="min-h-[70px] text-slate-800 dark:text-slate-200"
                                   />
-                                  <div className="flex justify-end gap-1.5">
+                                  <div className="flex justify-end gap-2">
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => setEditingCommentId(null)}
-                                      className="h-7 px-2.5 text-xs"
+                                      className="h-8 px-3 text-xs cursor-pointer"
                                     >
                                       Cancel
                                     </Button>
                                     <Button
                                       size="sm"
-                                      onClick={() => handleUpdateComment(comment.id)}
-                                      className="h-7 px-2.5 text-xs"
+                                      onClick={() =>
+                                        handleUpdateComment(comment.id)
+                                      }
+                                      className="h-8 px-3 text-xs bg-primary hover:bg-primary/95 text-white cursor-pointer"
                                     >
                                       Save
                                     </Button>
                                   </div>
                                 </div>
                               ) : (
-                                <p className="text-sm text-slate-700 dark:text-slate-300 break-words leading-relaxed">
+                                <p className="text-sm text-slate-800 dark:text-slate-200 break-words leading-relaxed font-medium">
                                   {comment.content}
                                 </p>
                               )}
                             </div>
 
-                            {/* Action Buttons */}
-                            {!isEditing && (isOwner || userRole === "ADMIN") && (
-                              <div className="absolute right-2 bottom-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                  onClick={() => {
-                                    setEditingCommentId(comment.id);
-                                    setEditCommentText(comment.content);
-                                  }}
-                                  className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
-                                >
-                                  <Edit2 className="h-3 w-3" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteComment(comment.id)}
-                                  className="p-1 rounded text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </button>
-                              </div>
-                            )}
+                            {/* Comment Action Icons */}
+                            {!isEditing &&
+                              (isOwner || userRole === "ADMIN") && (
+                                <div className="absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                  <button
+                                    onClick={() => {
+                                      setEditingCommentId(comment.id);
+                                      setEditCommentText(comment.content);
+                                    }}
+                                    className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"
+                                  >
+                                    <Edit2 className="h-3.5 w-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      handleDeleteComment(comment.id)
+                                    }
+                                    className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </button>
+                                </div>
+                              )}
                           </div>
                         );
                       })}
@@ -449,11 +569,11 @@ export default function TaskDetailsDialog({
                   )}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {/* File Upload zone */}
+                <div className="space-y-6">
+                  {/* File Upload Zone */}
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-muted hover:border-primary/50 dark:hover:border-primary/40 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 bg-slate-50/50 hover:bg-slate-50 dark:bg-slate-900/10 dark:hover:bg-slate-900/20 flex flex-col items-center justify-center gap-2 group"
+                    className="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-primary/50 dark:hover:border-primary/40 rounded-xl p-8 text-center cursor-pointer transition-all duration-300 bg-slate-50 hover:bg-slate-100/50 dark:bg-slate-900/10 dark:hover:bg-slate-900/20 flex flex-col items-center justify-center gap-3 group"
                   >
                     <input
                       type="file"
@@ -463,46 +583,60 @@ export default function TaskDetailsDialog({
                     />
                     {isUploading ? (
                       <>
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-sm font-medium text-foreground">Uploading file...</p>
+                        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                          Uploading selected file...
+                        </p>
                       </>
                     ) : (
                       <>
-                        <div className="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:scale-110 transition-transform">
-                          <Plus className="h-5 w-5" />
+                        <div className="h-12 w-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 group-hover:scale-110 transition-transform shadow-xs">
+                          <Plus className="h-6 w-6 text-primary" />
                         </div>
-                        <p className="text-sm font-semibold text-foreground">Click to upload file</p>
-                        <p className="text-xs text-muted-foreground">PDF, PNG, JPG, or DOC (Max 10MB)</p>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                            Click to upload files
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
+                            Upload images, PDFs, spreadsheets, or documents (Max
+                            10MB)
+                          </p>
+                        </div>
                       </>
                     )}
                   </div>
 
                   {/* Attachments List */}
                   {isLoadingAttachments ? (
-                    <div className="py-8 flex justify-center text-muted-foreground">
-                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    <div className="py-12 flex justify-center text-muted-foreground">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                   ) : attachments.length === 0 ? (
-                    <div className="text-center py-8 text-sm text-muted-foreground italic bg-slate-50/50 dark:bg-slate-900/10 rounded-lg border border-dashed">
-                      No attachments uploaded yet.
+                    <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                      No documents or files uploaded yet.
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto pr-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[340px] overflow-y-auto pr-2">
                       {attachments.map((attachment) => (
                         <div
                           key={attachment.id}
-                          className="p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 flex items-center justify-between gap-3 group"
+                          className="p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 flex items-center justify-between gap-4 group hover:shadow-xs transition-shadow duration-300"
                         >
-                          <div className="flex items-center gap-2.5 overflow-hidden">
-                            <div className="h-9 w-9 rounded-lg bg-slate-50 dark:bg-slate-900 flex items-center justify-center border shrink-0">
+                          <div className="flex items-center gap-3 overflow-hidden">
+                            <div className="h-11 w-11 rounded-xl bg-slate-200/50 dark:bg-slate-900 flex items-center justify-center border border-slate-250 dark:border-slate-800 shrink-0">
                               {getAttachmentIcon(attachment.fileType)}
                             </div>
                             <div className="overflow-hidden">
-                              <p className="text-xs font-semibold text-foreground truncate" title={attachment.fileName}>
+                              <p
+                                className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate"
+                                title={attachment.fileName}
+                              >
                                 {attachment.fileName}
                               </p>
-                              <span className="text-[9px] text-muted-foreground">
-                                {new Date(attachment.createdAt).toLocaleDateString("en-US", {
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">
+                                {new Date(
+                                  attachment.createdAt,
+                                ).toLocaleDateString("en-US", {
                                   month: "short",
                                   day: "numeric",
                                 })}
@@ -510,21 +644,23 @@ export default function TaskDetailsDialog({
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                             <a
                               href={attachment.fileUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               download
-                              className="p-1.5 rounded text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800"
+                              className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-250 dark:hover:bg-slate-800 cursor-pointer"
                             >
-                              <Download className="h-3.5 w-3.5" />
+                              <Download className="h-4 w-4" />
                             </a>
                             <button
-                              onClick={() => handleDeleteAttachment(attachment.id)}
-                              className="p-1.5 rounded text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20"
+                              onClick={() =>
+                                handleDeleteAttachment(attachment.id)
+                              }
+                              className="p-2 rounded-lg text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
+                              <Trash2 className="h-4 w-4" />
                             </button>
                           </div>
                         </div>
@@ -536,42 +672,97 @@ export default function TaskDetailsDialog({
             </div>
           </div>
 
-          {/* Sidebar Info (Right Column) */}
-          <div className="p-5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/20 h-fit space-y-4">
-            <h5 className="text-xs font-semibold text-foreground uppercase tracking-wider">
+          {/* Sidebar Columns (Right Column) */}
+          <div className="space-y-6 lg:border-l lg:border-border lg:pl-8">
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              {/* Interactive Status Selector */}
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
+                  Status
+                </span>
+                <select
+                  value={task.status}
+                  onChange={(e) =>
+                    handleUpdateStatus(e.target.value as TaskStatus)
+                  }
+                  disabled={isUpdatingState}
+                  className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${statusStyles[task.status]}`}
+                >
+                  <option value="TODO">To Do</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="COMPLETED">Completed</option>
+                </select>
+              </div>
+
+              {/* Interactive Priority Selector */}
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
+                  Priority
+                </span>
+                <select
+                  value={task.priority}
+                  onChange={(e) =>
+                    handleUpdatePriority(e.target.value as TaskPriority)
+                  }
+                  disabled={isUpdatingState}
+                  className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${priorityStyles[task.priority]}`}
+                >
+                  <option value="LOW">Low Priority</option>
+                  <option value="MEDIUM">Medium Priority</option>
+                  <option value="HIGH">High Priority</option>
+                </select>
+              </div>
+            </div>
+            <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+              <Tag className="h-4 w-4 text-primary" />
               Task Details
             </h5>
 
-            <div className="space-y-3.5 text-sm">
-              {/* Due Date */}
-              <div className="flex items-center justify-between border-b pb-2.5 border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
+            <div className="space-y-4">
+              {/* Due Date Details */}
+              <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/20">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+                  <Calendar className="h-4 w-4 text-primary" />
                   <span>Due Date</span>
                 </div>
-                <span className="font-semibold text-foreground">{formattedDueDate}</span>
-              </div>
-
-              {/* Assignee */}
-              <div className="flex items-center justify-between border-b pb-2.5 border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <User2 className="h-4 w-4" />
-                  <span>Assignee</span>
-                </div>
-                <span className="font-semibold text-foreground">
-                  {task.assignedTo ? task.assignedTo.name : "Unassigned"}
+                <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 pl-6">
+                  {formattedDueDate}
                 </span>
               </div>
 
-              {/* Created At */}
-              <div className="flex items-center justify-between border-b pb-2.5 border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>Created</span>
+              {/* Assignee Details */}
+              <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/20">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+                  <User2 className="h-4 w-4 text-primary" />
+                  <span>Assignee</span>
                 </div>
-                <span className="font-medium text-foreground">
+                <div className="flex items-center gap-2.5 pl-6 mt-0.5">
+                  <div className="h-6 w-6 rounded-full bg-slate-350 dark:bg-slate-700 text-[10px] font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center uppercase overflow-hidden border border-slate-300">
+                    {task.assignedTo?.image ? (
+                      <img
+                        src={task.assignedTo.image}
+                        alt={task.assignedTo.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      task.assignedTo?.name.charAt(0) || "U"
+                    )}
+                  </div>
+                  <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
+                    {task.assignedTo ? task.assignedTo.name : "Unassigned"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Date Created Details */}
+              <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/20">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+                  <Clock className="h-4 w-4 text-primary" />
+                  <span>Created At</span>
+                </div>
+                <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 pl-6">
                   {new Date(task.createdAt).toLocaleDateString("en-US", {
-                    month: "short",
+                    month: "long",
                     day: "numeric",
                     year: "numeric",
                   })}
@@ -582,8 +773,12 @@ export default function TaskDetailsDialog({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-border flex justify-end bg-slate-50 dark:bg-slate-900/50 gap-2">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <div className="p-5 border-t border-border flex justify-end bg-slate-50 dark:bg-slate-950/40 gap-3">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="px-6 font-semibold cursor-pointer"
+          >
             Close
           </Button>
         </div>
