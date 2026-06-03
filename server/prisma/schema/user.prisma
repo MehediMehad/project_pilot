@@ -8,7 +8,8 @@ model User {
   status   UserStatus @default(ACTIVE)
 
   // Relations
-  createdProjects Project[] @relation("CreatedProjects")
+  createdProjects Project[]       @relation("CreatedProjects")
+  projectMembers  ProjectMember[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

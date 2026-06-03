@@ -8,6 +8,8 @@ model Project {
   createdById String
   createdBy   User   @relation("CreatedProjects", fields: [createdById], references: [id])
 
+  members ProjectMember[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
