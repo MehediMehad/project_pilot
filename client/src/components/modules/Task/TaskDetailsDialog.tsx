@@ -46,8 +46,10 @@ import {
   createAttachment,
   deleteAttachment,
   updateTask,
+  getTaskActivityLogs,
 } from "@/services/task/taskManagement";
 import { toast } from "sonner";
+import { formatDistanceToNow } from "date-fns";
 
 interface TaskDetailsDialogProps {
   task: ITask;
@@ -67,13 +69,15 @@ export default function TaskDetailsDialog({
   onStatusChange,
 }: TaskDetailsDialogProps) {
   const [task, setTask] = useState<ITask>(initialTask);
-  const [activeTab, setActiveTab] = useState<"comments" | "attachments">(
-    "comments",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "comments" | "attachments" | "activity"
+  >("comments");
   const [comments, setComments] = useState<IComment[]>([]);
   const [attachments, setAttachments] = useState<IAttachment[]>([]);
+  const [activityLogs, setActivityLogs] = useState<any[]>([]);
   const [isLoadingComments, setIsLoadingComments] = useState(false);
   const [isLoadingAttachments, setIsLoadingAttachments] = useState(false);
+  const [isLoadingActivity, setIsLoadingActivity] = useState(false);
   const [isUpdatingState, setIsUpdatingState] = useState(false);
 
   // Comment state
@@ -93,11 +97,12 @@ export default function TaskDetailsDialog({
     }
   }, [initialTask]);
 
-  // Fetch comments and attachments
+  // Fetch comments, attachments, and activity logs
   useEffect(() => {
     if (isOpen && task?.id) {
       fetchComments();
       fetchAttachments();
+      fetchActivityLogs();
     }
   }, [isOpen, task?.id]);
 
@@ -131,6 +136,68 @@ export default function TaskDetailsDialog({
     }
   };
 
+  const fetchActivityLogs = async () => {
+    setIsLoadingActivity(true);
+    try {
+      const res = await getTaskActivityLogs(task.id);
+      if (res.success) {
+        setActivityLogs(res.data || []);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to load activity logs");
+    } finally {
+      setIsLoadingActivity(false);
+    }
+  };
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case "TASK_CREATED":
+        return (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">
+            <Plus className="h-4 w-4" />
+          </div>
+        );
+      case "TASK_ASSIGNED":
+        return (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+            <User2 className="h-4 w-4" />
+          </div>
+        );
+      case "TASK_UPDATED":
+        return (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+            <Edit2 className="h-4 w-4" />
+          </div>
+        );
+      case "TASK_COMPLETED":
+        return (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+            <CheckCircle2 className="h-4 w-4" />
+          </div>
+        );
+      case "COMMENT_CREATED":
+        return (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-100 text-rose-700">
+            <MessageSquare className="h-4 w-4" />
+          </div>
+        );
+      case "ATTACHMENT_UPLOADED":
+        return (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-100 text-cyan-700">
+            <Paperclip className="h-4 w-4" />
+          </div>
+        );
+      default:
+        return (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-slate-700">
+            <Clock className="h-4 w-4" />
+          </div>
+        );
+    }
+  };
+
   // Task inline state updates
   const handleUpdateStatus = async (newStatus: TaskStatus) => {
     setIsUpdatingState(true);
@@ -142,6 +209,7 @@ export default function TaskDetailsDialog({
         setTask((prev) => ({ ...prev, status: newStatus }));
         if (onStatusChange) onStatusChange(newStatus);
         toast.success("Task status updated!");
+        fetchActivityLogs();
       } else {
         toast.error("Failed to update status");
       }
@@ -162,6 +230,7 @@ export default function TaskDetailsDialog({
       if (res.success) {
         setTask((prev) => ({ ...prev, priority: newPriority }));
         toast.success("Task priority updated!");
+        fetchActivityLogs();
       } else {
         toast.error("Failed to update priority");
       }
@@ -185,6 +254,7 @@ export default function TaskDetailsDialog({
         setNewComment("");
         toast.success("Comment added!");
         fetchComments();
+        fetchActivityLogs();
       } else {
         toast.error(res.message || "Failed to add comment");
       }
@@ -248,6 +318,7 @@ export default function TaskDetailsDialog({
       if (res.success) {
         toast.success("Attachment uploaded!");
         fetchAttachments();
+        fetchActivityLogs();
       } else {
         toast.error(res.message || "Failed to upload file");
       }
@@ -419,10 +490,24 @@ export default function TaskDetailsDialog({
                     {attachments.length}
                   </span>
                 </button>
+                <button
+                  onClick={() => setActiveTab("activity")}
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${
+                    activeTab === "activity"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                  }`}
+                >
+                  <Clock className="h-4 w-4" />
+                  Activity
+                  <span className="ml-1 px-2.5 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-full font-bold text-slate-700 dark:text-slate-300">
+                    {activityLogs.length}
+                  </span>
+                </button>
               </div>
 
               {/* Comments Panel */}
-              {activeTab === "comments" ? (
+              {activeTab === "comments" && (
                 <div className="space-y-6">
                   {/* Styled Input Box */}
                   <form
@@ -533,7 +618,10 @@ export default function TaskDetailsDialog({
                                   </div>
                                 </div>
                               ) : (
-                                <p className="text-sm text-slate-800 dark:text-slate-200 break-words leading-relaxed font-medium">
+                                <p
+                                  className="text-sm text-slate-800 dark:text-slate-200                 >
+ leading-relaxed font-medium"
+                                >
                                   {comment.content}
                                 </p>
                               )}
@@ -568,7 +656,9 @@ export default function TaskDetailsDialog({
                     </div>
                   )}
                 </div>
-              ) : (
+              )}
+
+              {activeTab === "attachments" && (
                 <div className="space-y-6">
                   {/* File Upload Zone */}
                   <div
@@ -662,6 +752,60 @@ export default function TaskDetailsDialog({
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === "activity" && (
+                <div className="space-y-6">
+                  {isLoadingActivity ? (
+                    <div className="py-12 flex justify-center text-muted-foreground">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : activityLogs.length === 0 ? (
+                    <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                      No activity logged yet.
+                    </div>
+                  ) : (
+                    <div className="relative pl-6 space-y-6 before:absolute before:inset-y-0 before:left-3.5 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-850 max-h-[380px] overflow-y-auto pr-2 py-2">
+                      {activityLogs.map((log) => (
+                        <div key={log.id} className="relative flex items-start gap-4 group">
+                          {/* Dot / Icon container */}
+                          <div className="absolute left-0 mt-0.5 shrink-0 z-10">
+                            {getActivityIcon(log.type)}
+                          </div>
+                          
+                          {/* Detail card */}
+                          <div className="flex-1 ml-10 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 flex items-center justify-between gap-3 shadow-xs">
+                            <div className="flex items-center gap-3">
+                              {/* Actor Avatar */}
+                              <div className="h-7 w-7 rounded-full bg-slate-200 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center uppercase overflow-hidden border border-slate-350 dark:border-slate-700 shrink-0">
+                                {log.user?.image ? (
+                                  <img
+                                    src={log.user.image}
+                                    alt={log.user.name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  log.user?.name?.charAt(0) || "U"
+                                )}
+                              </div>
+                              <div className="space-y-0.5">
+                                <p className="text-xs font-bold text-slate-850 dark:text-slate-250">
+                                  {log.message}
+                                </p>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                                  by {log.user?.name || "System"} • {log.user?.role?.replace("_", " ")}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-slate-450 dark:text-slate-450 font-semibold shrink-0">
+                              {formatDistanceToNow(new Date(log.createdAt), { addSuffix: true })}
+                            </span>
                           </div>
                         </div>
                       ))}

@@ -9,6 +9,7 @@ import ApiError from '../../errors/ApiError';
 import { IAuthUser } from '../../interfaces/common';
 import { IPaginationOptions } from '../../interfaces/pagination';
 import { taskSearchAbleFields } from './task.constant';
+import { notificationService } from '../notification/notification.service';
 
 const createTask = async (user: IAuthUser, payload: any): Promise<Task> => {
   if (!user) {
@@ -92,6 +93,16 @@ const createTask = async (user: IAuthUser, payload: any): Promise<Task> => {
 
     return task;
   });
+
+  // Notify assignee on task creation
+  if (result.assignedToId) {
+    await notificationService.sendNotification(
+      'New Task Assigned',
+      `You have been assigned to task "${result.title}"`,
+      'TASK_ASSIGNED',
+      result.assignedToId,
+    );
+  }
 
   return result;
 };
@@ -388,6 +399,38 @@ const updateTask = async (
     return updatedTask;
   });
 
+  // Trigger notifications on update
+  if (
+    payload.assignedToId !== undefined &&
+    payload.assignedToId !== task.assignedToId &&
+    result.assignedToId
+  ) {
+    await notificationService.sendNotification(
+      'New Task Assigned',
+      `You have been assigned to task "${result.title}"`,
+      'TASK_ASSIGNED',
+      result.assignedToId,
+    );
+  } else if (
+    result.assignedToId &&
+    result.assignedToId !== userData.id &&
+    (payload.status || payload.priority || payload.title || payload.description)
+  ) {
+    let updateMessage = `Task "${result.title}" details were updated`;
+    if (payload.status && payload.status !== task.status) {
+      updateMessage = `Task "${result.title}" status was changed to ${result.status}`;
+    } else if (payload.priority && payload.priority !== task.priority) {
+      updateMessage = `Task "${result.title}" priority was changed to ${result.priority}`;
+    }
+
+    await notificationService.sendNotification(
+      'Task Updated',
+      updateMessage,
+      'TASK_UPDATED',
+      result.assignedToId,
+    );
+  }
+
   return result;
 };
 
@@ -485,7 +528,7 @@ const checkTaskAccess = async (taskId: string, user: IAuthUser) => {
 };
 
 const createComment = async (taskId: string, payload: { content: string }, user: IAuthUser) => {
-  const { userData } = await checkTaskAccess(taskId, user);
+  const { task, userData } = await checkTaskAccess(taskId, user);
 
   const result = await prisma.comment.create({
     data: {
@@ -505,6 +548,27 @@ const createComment = async (taskId: string, payload: { content: string }, user:
       },
     },
   });
+
+  // Log Activity
+  await prisma.activityLog.create({
+    data: {
+      message: `New comment added by ${userData.name} on task "${task.title}"`,
+      type: 'COMMENT_CREATED',
+      userId: userData.id,
+      projectId: task.projectId,
+      taskId: taskId,
+    },
+  });
+
+  // Notify task assignee if someone else comments
+  if (task.assignedToId && task.assignedToId !== userData.id) {
+    await notificationService.sendNotification(
+      'New Comment Added',
+      `${userData.name} commented on task "${task.title}"`,
+      'COMMENT_ADDED',
+      task.assignedToId,
+    );
+  }
 
   return result;
 };
@@ -618,7 +682,7 @@ const createAttachment = async (taskId: string, req: any, user: IAuthUser) => {
     throw new ApiError(httpStatus.BAD_REQUEST, 'File is required');
   }
 
-  await checkTaskAccess(taskId, user);
+  const { task, userData } = await checkTaskAccess(taskId, user);
 
   const uploadResult = await fileUploader.uploadToCloudinary(file);
 
@@ -629,6 +693,17 @@ const createAttachment = async (taskId: string, req: any, user: IAuthUser) => {
       fileType: file.mimetype,
       publicId: uploadResult.public_id,
       taskId,
+    },
+  });
+
+  // Log Activity
+  await prisma.activityLog.create({
+    data: {
+      message: `Attachment "${file.originalname}" was uploaded`,
+      type: 'ATTACHMENT_UPLOADED',
+      userId: userData.id,
+      projectId: task.projectId,
+      taskId: taskId,
     },
   });
 
@@ -701,6 +776,25 @@ const deleteAttachment = async (attachmentId: string, user: IAuthUser) => {
   return { message: 'Attachment deleted successfully' };
 };
 
+const getTaskActivityLogs = async (taskId: string, user: IAuthUser) => {
+  await checkTaskAccess(taskId, user);
+  return await prisma.activityLog.findMany({
+    where: { taskId },
+    orderBy: { createdAt: 'desc' },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          role: true,
+        },
+      },
+    },
+  });
+};
+
 export const taskService = {
   createTask,
   getAllTasks,
@@ -714,4 +808,5 @@ export const taskService = {
   createAttachment,
   getTaskAttachments,
   deleteAttachment,
+  getTaskActivityLogs,
 };

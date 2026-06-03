@@ -382,3 +382,20 @@ export const deleteAttachment = async (
     return { success: false, message: "Failed to delete attachment" };
   }
 };
+
+export const getTaskActivityLogs = async (
+  taskId: string
+): Promise<IApiResponse<any[]>> => {
+  try {
+    const res = await serverFetch.get(`/task/${taskId}/activity`, {
+      next: { tags: [`task-activity-${taskId}`] },
+      cache: "no-store",
+    });
+
+    const result = await res.json();
+    return result;
+  } catch (error) {
+    console.error("Error in getTaskActivityLogs:", error);
+    return { success: false, message: "Failed to fetch activity logs", data: [] };
+  }
+};

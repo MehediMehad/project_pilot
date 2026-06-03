@@ -107,4 +107,10 @@ router.delete(
   taskController.deleteAttachment,
 );
 
+router.get(
+  '/:id/activity',
+  auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER),
+  taskController.getTaskActivityLogs,
+);
+
 export const taskRoutes = router;

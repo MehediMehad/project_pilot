@@ -4,6 +4,7 @@ import { userRoutes } from '../modules/user/user.routes';
 import { AuthRoutes } from '../modules/auth/auth.routes';
 import { projectRoutes } from '../modules/project/project.routes';
 import { taskRoutes } from '../modules/task/task.routes';
+import { notificationRoutes } from '../modules/notification/notification.routes';
 
 const router = express.Router();
 
@@ -25,6 +26,10 @@ const moduleRoutes = [
   {
     path: '/task',
     route: taskRoutes,
+  },
+  {
+    path: '/notification',
+    route: notificationRoutes,
   },
 ];
 

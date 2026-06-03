@@ -281,6 +281,20 @@ const deleteAttachment = catchAsync(
   },
 );
 
+const getTaskActivityLogs = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const { id } = req.params;
+    const result = await taskService.getTaskActivityLogs(id, req.user as IAuthUser);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Task activity logs fetched successfully!',
+      data: result,
+    });
+  },
+);
+
 export const taskController = {
   createTask,
   getAllTasks,
@@ -297,4 +311,5 @@ export const taskController = {
   createAttachment,
   getTaskAttachments,
   deleteAttachment,
+  getTaskActivityLogs,
 };

@@ -9,6 +9,11 @@ import {
 } from "react";
 import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
+import {
+  getNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
+} from "@/services/notification/notification";
 
 interface NotificationData {
   id?: string;
@@ -30,6 +35,7 @@ interface SocketContextType {
   clearNotification: (index: number) => void;
   clearAllNotifications: () => void;
   markAllAsRead: () => Promise<void>;
+  markAsRead: (id: string) => Promise<void>;
 }
 
 const SocketContext = createContext<SocketContextType>({
@@ -40,6 +46,7 @@ const SocketContext = createContext<SocketContextType>({
   clearNotification: () => {},
   clearAllNotifications: () => {},
   markAllAsRead: async () => {},
+  markAsRead: async () => {},
 });
 
 function getAccessTokenFromCookie(): string | null {
@@ -74,6 +81,22 @@ export function SocketProvider({ children, token: propToken }: SocketProviderPro
 
   const markAllAsRead = useCallback(async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    try {
+      await markAllNotificationsRead();
+    } catch (err) {
+      console.error("Error marking all notifications read:", err);
+    }
+  }, []);
+
+  const markAsRead = useCallback(async (id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+    );
+    try {
+      await markNotificationRead(id);
+    } catch (err) {
+      console.error(`Error marking notification ${id} read:`, err);
+    }
   }, []);
 
   useEffect(() => {
@@ -104,9 +127,30 @@ export function SocketProvider({ children, token: propToken }: SocketProviderPro
       reconnectionAttempts: 10,
     });
 
+    // Load initial notifications from database
+    const loadNotifications = async () => {
+      try {
+        const res = await getNotifications();
+        if (res.success && res.data) {
+          const formatted = res.data.map((n: any) => ({
+            id: n.id,
+            type: n.type,
+            title: n.title,
+            message: n.message,
+            timestamp: n.createdAt,
+            isRead: n.isRead,
+          }));
+          setNotifications(formatted);
+        }
+      } catch (err) {
+        console.error("Error loading notifications:", err);
+      }
+    };
+
     socketInstance.on("connect", () => {
       console.log("✅ Socket connected:", socketInstance.id);
       setIsConnected(true);
+      loadNotifications();
     });
 
     socketInstance.on("disconnect", (reason) => {
@@ -119,10 +163,20 @@ export function SocketProvider({ children, token: propToken }: SocketProviderPro
       setIsConnected(false);
     });
 
-    socketInstance.on("notification", (data: NotificationData) => {
+    socketInstance.on("notification", (data: any) => {
       console.log("📬 New notification:", data);
 
-      setNotifications((prev) => [{ ...data, isRead: false }, ...prev]);
+      setNotifications((prev) => [
+        {
+          id: data.id,
+          type: data.type,
+          title: data.title,
+          message: data.message,
+          timestamp: data.timestamp || new Date().toISOString(),
+          isRead: false,
+        },
+        ...prev,
+      ]);
 
       const toastType =
         data.priority === "HIGH"
@@ -167,6 +221,7 @@ export function SocketProvider({ children, token: propToken }: SocketProviderPro
         clearNotification,
         clearAllNotifications,
         markAllAsRead,
+        markAsRead,
       }}
     >
       {children}
