@@ -8,11 +8,10 @@ import {
   deleteProject,
   getProjectSummary,
 } from "@/services/project/projectManagement";
-import ProjectFormDialog from "./ProjectFormDialog";
 import ProjectMemberManager from "./ProjectMemberManager";
+import ProjectFormDialog from "./ProjectFormDialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
@@ -37,6 +36,8 @@ import {
   CheckCircle2,
   Clock,
   ListTodo,
+  FolderKanban,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -46,16 +47,26 @@ interface ProjectDetailPageProps {
   backPath: string; // e.g., "/admin/dashboard/projects"
 }
 
-const statusColors: Record<string, string> = {
-  ACTIVE: "bg-green-100 text-green-800 border-green-200",
-  COMPLETED: "bg-blue-100 text-blue-800 border-blue-200",
-  ON_HOLD: "bg-yellow-100 text-yellow-800 border-yellow-200",
-};
-
-const statusLabels: Record<string, string> = {
-  ACTIVE: "Active",
-  COMPLETED: "Completed",
-  ON_HOLD: "On Hold",
+const statusStyles: Record<
+  string,
+  { badge: string; icon: any; label: string }
+> = {
+  ACTIVE: {
+    badge:
+      "bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-50/85",
+    icon: CheckCircle2,
+    label: "Active",
+  },
+  COMPLETED: {
+    badge: "bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-50/85",
+    icon: CheckCircle2,
+    label: "Completed",
+  },
+  ON_HOLD: {
+    badge: "bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-50/85",
+    icon: Clock,
+    label: "On Hold",
+  },
 };
 
 export default function ProjectDetailPage({
@@ -123,10 +134,12 @@ export default function ProjectDetailPage({
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-md border bg-card text-muted-foreground">
+      <div className="flex h-64 items-center justify-center rounded-xl border border-gray-100 bg-white text-gray-400 shadow-sm">
         <div className="flex flex-col items-center gap-2">
-          <span className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <span>Loading project details...</span>
+          <span className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+          <span className="text-sm font-medium">
+            Loading project details...
+          </span>
         </div>
       </div>
     );
@@ -134,10 +147,13 @@ export default function ProjectDetailPage({
 
   if (!project) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center rounded-md border bg-card text-muted-foreground gap-3">
-        <p className="font-medium">Project not found</p>
+      <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-gray-100 bg-white text-gray-400 shadow-sm gap-3">
+        <p className="font-semibold text-gray-700">Project not found</p>
         <Link href={backPath}>
-          <Button variant="outline" className="gap-2">
+          <Button
+            variant="outline"
+            className="gap-2 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl"
+          >
             <ArrowLeft className="h-4 w-4" />
             Back to Projects
           </Button>
@@ -147,24 +163,27 @@ export default function ProjectDetailPage({
   }
 
   const deadlineDate = new Date(project.deadline);
-  const isOverdue =
-    deadlineDate < new Date() && project.status !== "COMPLETED";
+  const isOverdue = deadlineDate < new Date() && project.status !== "COMPLETED";
+
   const formattedDeadline = deadlineDate.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
+    month: "short",
     day: "numeric",
     year: "numeric",
   });
+
+  const statusConfig = statusStyles[project.status] || statusStyles.ACTIVE;
+  const StatusIcon = statusConfig.icon;
 
   return (
     <div className="space-y-6">
       {/* Back Button and Actions */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <Link href={backPath}>
-          <Button variant="ghost" size="sm" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Projects
-          </Button>
+        <Link
+          href={backPath}
+          className="text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5 font-bold transition-all text-sm"
+        >
+          <ArrowLeft className="h-4.5 w-4.5" />
+          Back to Projects
         </Link>
         {canEdit && (
           <div className="flex items-center gap-2">
@@ -191,168 +210,226 @@ export default function ProjectDetailPage({
       </div>
 
       {/* Project Info Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between gap-3">
-            <div className="space-y-1">
-              <CardTitle className="text-xl">{project.name}</CardTitle>
-              {project.description && (
-                <p className="text-sm text-muted-foreground">
-                  {project.description}
-                </p>
-              )}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between">
+        {/* Top Section */}
+        <div className="flex items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <h1 className="text-[20px] font-extrabold text-gray-900 tracking-tight leading-snug truncate">
+                {project.name}
+              </h1>
+              <Badge
+                variant="outline"
+                className={`shrink-0 text-[11px] font-semibold rounded-full px-3 py-1 flex items-center gap-1.5 border ${statusConfig.badge}`}
+              >
+                <StatusIcon className="h-3.5 w-3.5 shrink-0" />
+                {statusConfig.label}
+              </Badge>
             </div>
-            <Badge
-              variant="outline"
-              className={`shrink-0 ${statusColors[project.status]}`}
-            >
-              {statusLabels[project.status]}
-            </Badge>
+            {project.description && (
+              <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+                {project.description}
+              </p>
+            )}
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-6 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="h-4 w-4" />
-              <span className={isOverdue ? "text-red-600 font-medium" : ""}>
-                {isOverdue ? "Overdue: " : "Deadline: "}
-                {formattedDeadline}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <ClipboardList className="h-4 w-4" />
-              <span>{project._count.tasks} Tasks</span>
-            </div>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Users className="h-4 w-4" />
-              <span>{project._count.members} Members</span>
-            </div>
-            <div className="text-muted-foreground">
-              Created by{" "}
-              <span className="font-medium text-foreground">
-                {project.createdBy.name}
-              </span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Summary Stats */}
+        {/* Bottom Metrics Capsules */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-50">
+          {/* Deadline */}
+          <div className="flex items-center gap-3">
+            <div className="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl">
+              <Calendar className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none">
+                Deadline
+              </p>
+              <p className="text-[14px] font-extrabold text-gray-900 mt-1 leading-none">
+                {formattedDeadline}
+              </p>
+            </div>
+          </div>
+
+          {/* Total Tasks */}
+          <div className="flex items-center gap-3">
+            <div className="bg-indigo-50 text-indigo-600 p-2.5 rounded-xl">
+              <ClipboardList className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none">
+                Total Tasks
+              </p>
+              <p className="text-[14px] font-extrabold text-gray-900 mt-1 leading-none">
+                {project._count.tasks}
+              </p>
+            </div>
+          </div>
+
+          {/* Total Members */}
+          <div className="flex items-center gap-3">
+            <div className="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl">
+              <Users className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none">
+                Total Members
+              </p>
+              <p className="text-[14px] font-extrabold text-gray-900 mt-1 leading-none">
+                {project._count.members}
+              </p>
+            </div>
+          </div>
+
+          {/* Created By */}
+          <div className="flex items-center gap-3">
+            <div className="bg-purple-50 text-purple-600 p-2.5 rounded-xl">
+              <User className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none">
+                Created by
+              </p>
+              <p className="text-[14px] font-extrabold text-gray-900 mt-1 leading-none">
+                {project.createdBy.name}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary Stats Row */}
       {summary && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardContent className="flex items-center gap-4 pt-6">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <ClipboardList className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {summary.taskStats.total}
-                </p>
-                <p className="text-xs text-muted-foreground">Total Tasks</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 pt-6">
-              <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <ListTodo className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{summary.taskStats.todo}</p>
-                <p className="text-xs text-muted-foreground">To Do</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 pt-6">
-              <div className="h-10 w-10 rounded-lg bg-yellow-100 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {summary.taskStats.inProgress}
-                </p>
-                <p className="text-xs text-muted-foreground">In Progress</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-4 pt-6">
-              <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">
-                  {summary.taskStats.completed}
-                </p>
-                <p className="text-xs text-muted-foreground">Completed</p>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Card 1: Total Tasks */}
+          <div className="border-t-[3px] border-t-indigo-500 bg-white rounded-xl border-l border-r border-b border-gray-100 p-5 flex items-center gap-4 shadow-sm">
+            <div className="h-10 w-10 rounded-xl bg-indigo-50/80 flex items-center justify-center shrink-0">
+              <ClipboardList className="h-5 w-5 text-indigo-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-gray-900 leading-none">
+                {summary.taskStats.total}
+              </p>
+              <p className="text-[12px] font-semibold text-gray-400 mt-1">
+                Total Tasks
+              </p>
+            </div>
+          </div>
+
+          {/* Card 2: To Do */}
+          <div className="border-t-[3px] border-t-blue-500 bg-white rounded-xl border-l border-r border-b border-gray-100 p-5 flex items-center gap-4 shadow-sm">
+            <div className="h-10 w-10 rounded-xl bg-blue-50/80 flex items-center justify-center shrink-0">
+              <ListTodo className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-gray-900 leading-none">
+                {summary.taskStats.todo}
+              </p>
+              <p className="text-[12px] font-semibold text-gray-400 mt-1">
+                To Do
+              </p>
+            </div>
+          </div>
+
+          {/* Card 3: In Progress */}
+          <div className="border-t-[3px] border-t-amber-500 bg-white rounded-xl border-l border-r border-b border-gray-100 p-5 flex items-center gap-4 shadow-sm">
+            <div className="h-10 w-10 rounded-xl bg-amber-50/80 flex items-center justify-center shrink-0">
+              <Clock className="h-5 w-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-gray-900 leading-none">
+                {summary.taskStats.inProgress}
+              </p>
+              <p className="text-[12px] font-semibold text-gray-400 mt-1">
+                In Progress
+              </p>
+            </div>
+          </div>
+
+          {/* Card 4: Completed */}
+          <div className="border-t-[3px] border-t-emerald-500 bg-white rounded-xl border-l border-r border-b border-gray-100 p-5 flex items-center gap-4 shadow-sm">
+            <div className="h-10 w-10 rounded-xl bg-emerald-50/80 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-gray-900 leading-none">
+                {summary.taskStats.completed}
+              </p>
+              <p className="text-[12px] font-semibold text-gray-400 mt-1">
+                Completed
+              </p>
+            </div>
+          </div>
         </div>
       )}
 
-      <Separator />
+      {/* Team Members Section */}
+      <div className="mt-8">
+        <ProjectMemberManager
+          projectId={projectId}
+          members={project.members}
+          createdById={project.createdById}
+          userRole={userRole}
+          onMembersChanged={fetchProject}
+        />
+      </div>
 
-      {/* Members Section */}
-      <ProjectMemberManager
-        projectId={projectId}
-        members={project.members}
-        createdById={project.createdById}
-        userRole={userRole}
-        onMembersChanged={fetchProject}
-      />
-
-      {/* Member Workload */}
+      {/* Member Workload Section */}
       {summary && summary.memberWorkload.length > 0 && (
-        <>
-          <Separator />
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Member Workload</h3>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {summary.memberWorkload.map((mw) => (
-                <Card key={mw.user.id}>
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                        <span className="text-xs font-semibold text-primary">
-                          {mw.user.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{mw.user.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {mw.user.email}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex gap-4 text-xs">
-                      <div>
-                        <span className="font-bold text-lg">
-                          {mw.totalTasks}
-                        </span>
-                        <p className="text-muted-foreground">Total</p>
-                      </div>
-                      <div>
-                        <span className="font-bold text-lg text-green-600">
-                          {mw.completedTasks}
-                        </span>
-                        <p className="text-muted-foreground">Done</p>
-                      </div>
-                      <div>
-                        <span className="font-bold text-lg text-yellow-600">
-                          {mw.pendingTasks}
-                        </span>
-                        <p className="text-muted-foreground">Pending</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+        <div className="mt-8 pt-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="h-5 w-5 text-gray-500" />
+            <h3 className="text-lg font-bold text-gray-900">Member Workload</h3>
           </div>
-        </>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {summary.memberWorkload.map((mw) => (
+              <div
+                key={mw.user.id}
+                className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm flex flex-col justify-between"
+              >
+                <div className="flex items-center gap-3.5 mb-5">
+                  <div className="h-10 w-10 rounded-full bg-indigo-50/80 text-indigo-600 flex items-center justify-center font-bold text-sm shrink-0">
+                    {mw.user.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 leading-none">
+                      {mw.user.name}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {mw.user.email}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-2 pt-4 border-t border-gray-50 text-center">
+                  <div className="border-r border-gray-100">
+                    <span className="text-[18px] font-extrabold text-gray-900">
+                      {mw.totalTasks}
+                    </span>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
+                      Total
+                    </p>
+                  </div>
+                  <div className="border-r border-gray-100">
+                    <span className="text-[18px] font-extrabold text-emerald-600">
+                      {mw.completedTasks}
+                    </span>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
+                      Done
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-[18px] font-extrabold text-amber-500">
+                      {mw.pendingTasks}
+                    </span>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
+                      Pending
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Edit Dialog */}

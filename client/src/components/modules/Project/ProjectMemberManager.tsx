@@ -108,18 +108,13 @@ export default function ProjectMemberManager({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-muted-foreground" />
-          <h3 className="text-lg font-semibold">
+          <Users className="h-5 w-5 text-gray-500" />
+          <h3 className="text-lg font-bold text-gray-900">
             Team Members ({members.length})
           </h3>
         </div>
         {canManageMembers && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setAddDialogOpen(true)}
-            className="gap-2"
-          >
+          <Button onClick={() => setAddDialogOpen(true)} className="gap-2">
             <UserPlus className="h-4 w-4" />
             Add Member
           </Button>
@@ -127,33 +122,35 @@ export default function ProjectMemberManager({
       </div>
 
       {/* Members List */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         {members.map((member) => {
           const isCreator = member.userId === createdById;
           return (
             <div
               key={member.id}
-              className="flex items-center justify-between rounded-lg border p-3 bg-card"
+              className="flex items-center justify-between rounded-xl border border-gray-100 p-4 bg-white shadow-sm"
             >
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                  <span className="text-sm font-semibold text-primary">
+              <div className="flex items-center gap-3.5">
+                <div className="h-10 w-10 rounded-full bg-indigo-50/80 text-indigo-600 flex items-center justify-center shrink-0">
+                  <span className="text-sm font-bold">
                     {member.user.name.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium">{member.user.name}</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-bold text-gray-900 leading-none">
+                      {member.user.name}
+                    </p>
                     {isCreator && (
-                      <Badge variant="secondary" className="text-[10px]">
+                      <Badge className="bg-indigo-50 text-indigo-700 text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-indigo-100 hover:bg-indigo-50/80 shadow-none">
                         Creator
                       </Badge>
                     )}
-                    <Badge variant="outline" className="text-[10px]">
+                    <Badge className="bg-gray-50 text-gray-600 text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-gray-100 hover:bg-gray-50/80 shadow-none">
                       {member.user.role.replace("_", " ")}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-gray-400 mt-1">
                     {member.user.email}
                   </p>
                 </div>
@@ -163,7 +160,7 @@ export default function ProjectMemberManager({
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="h-8 w-8 text-muted-foreground hover:text-red-600"
+                  className="h-8 w-8 text-gray-400 hover:text-red-600 transition-colors"
                   onClick={() => handleRemoveMember(member.userId)}
                   disabled={removingId === member.userId}
                 >
