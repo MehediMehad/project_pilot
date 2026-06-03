@@ -44,6 +44,7 @@ import {
   Plus,
 } from "lucide-react";
 import Link from "next/link";
+import { useSocket } from "@/contexts/SocketContext";
 
 interface ProjectDetailPageProps {
   projectId: string;
@@ -79,6 +80,7 @@ export default function ProjectDetailPage({
   backPath,
 }: ProjectDetailPageProps) {
   const router = useRouter();
+  const { socket } = useSocket();
   const [project, setProject] = useState<IProjectDetail | null>(null);
   const [summary, setSummary] = useState<IProjectSummary | null>(null);
   const [tasks, setTasks] = useState<ITask[]>([]);
@@ -124,6 +126,34 @@ export default function ProjectDetailPage({
   useEffect(() => {
     fetchProject();
   }, [fetchProject]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    // Join the project room
+    socket.emit("join:project", projectId);
+
+    const handleSocketUpdate = () => {
+      fetchProject();
+    };
+
+    socket.on("task:created", handleSocketUpdate);
+    socket.on("task:updated", handleSocketUpdate);
+    socket.on("task:deleted", handleSocketUpdate);
+    socket.on("stats:updated", (data: any) => {
+      if (data && data.projectId === projectId) {
+        handleSocketUpdate();
+      }
+    });
+
+    return () => {
+      socket.emit("leave:project", projectId);
+      socket.off("task:created", handleSocketUpdate);
+      socket.off("task:updated", handleSocketUpdate);
+      socket.off("task:deleted", handleSocketUpdate);
+      socket.off("stats:updated", handleSocketUpdate);
+    };
+  }, [socket, projectId, fetchProject]);
 
   const handleDelete = async () => {
     setDeleting(true);

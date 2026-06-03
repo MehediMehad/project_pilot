@@ -80,6 +80,30 @@ export function initializeSocket(httpServer: HttpServer) {
     // Join role-specific room
     socket.join(`role:${user.role.toLowerCase()}`);
 
+    // Join project room
+    socket.on('join:project', (projectId: string) => {
+      socket.join(`project:${projectId}`);
+      logger.info(`Socket ${user.email} joined project room: project:${projectId}`);
+    });
+
+    // Leave project room
+    socket.on('leave:project', (projectId: string) => {
+      socket.leave(`project:${projectId}`);
+      logger.info(`Socket ${user.email} left project room: project:${projectId}`);
+    });
+
+    // Join task room
+    socket.on('join:task', (taskId: string) => {
+      socket.join(`task:${taskId}`);
+      logger.info(`Socket ${user.email} joined task room: task:${taskId}`);
+    });
+
+    // Leave task room
+    socket.on('leave:task', (taskId: string) => {
+      socket.leave(`task:${taskId}`);
+      logger.info(`Socket ${user.email} left task room: task:${taskId}`);
+    });
+
     // Broadcast online status to admins
     io.to('role:admin').emit('user:online', {
       userId: user.userId,

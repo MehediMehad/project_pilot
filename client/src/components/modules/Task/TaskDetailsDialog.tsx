@@ -50,6 +50,7 @@ import {
 } from "@/services/task/taskManagement";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { useSocket } from "@/contexts/SocketContext";
 
 interface TaskDetailsDialogProps {
   task: ITask;
@@ -69,6 +70,7 @@ export default function TaskDetailsDialog({
   onStatusChange,
 }: TaskDetailsDialogProps) {
   const [task, setTask] = useState<ITask>(initialTask);
+  const { socket } = useSocket();
   const [activeTab, setActiveTab] = useState<
     "comments" | "attachments" | "activity"
   >("comments");
@@ -105,6 +107,45 @@ export default function TaskDetailsDialog({
       fetchActivityLogs();
     }
   }, [isOpen, task?.id]);
+
+  // Real-time task events listener
+  useEffect(() => {
+    if (!isOpen || !task?.id || !socket) return;
+
+    socket.emit("join:task", task.id);
+
+    const handleCommentCreated = () => fetchComments();
+    const handleCommentUpdated = () => fetchComments();
+    const handleCommentDeleted = () => fetchComments();
+    const handleAttachmentCreated = () => fetchAttachments();
+    const handleAttachmentDeleted = () => fetchAttachments();
+    const handleActivityCreated = () => fetchActivityLogs();
+    const handleTaskDetailsUpdated = (updatedTask: any) => {
+      if (updatedTask && updatedTask.id === task.id) {
+        setTask(updatedTask);
+        if (onStatusChange) onStatusChange(updatedTask.status);
+      }
+    };
+
+    socket.on("comment:created", handleCommentCreated);
+    socket.on("comment:updated", handleCommentUpdated);
+    socket.on("comment:deleted", handleCommentDeleted);
+    socket.on("attachment:created", handleAttachmentCreated);
+    socket.on("attachment:deleted", handleAttachmentDeleted);
+    socket.on("activity:created", handleActivityCreated);
+    socket.on("task:details_updated", handleTaskDetailsUpdated);
+
+    return () => {
+      socket.emit("leave:task", task.id);
+      socket.off("comment:created", handleCommentCreated);
+      socket.off("comment:updated", handleCommentUpdated);
+      socket.off("comment:deleted", handleCommentDeleted);
+      socket.off("attachment:created", handleAttachmentCreated);
+      socket.off("attachment:deleted", handleAttachmentDeleted);
+      socket.off("activity:created", handleActivityCreated);
+      socket.off("task:details_updated", handleTaskDetailsUpdated);
+    };
+  }, [isOpen, task?.id, socket, onStatusChange]);
 
   const fetchComments = async () => {
     setIsLoadingComments(true);

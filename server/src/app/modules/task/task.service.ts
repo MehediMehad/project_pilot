@@ -104,6 +104,28 @@ const createTask = async (user: IAuthUser, payload: any): Promise<Task> => {
     );
   }
 
+  // Socket.io Real-time broadcast
+  if ((global as any).io) {
+    const fullTask = await prisma.task.findUnique({
+      where: { id: result.id },
+      include: {
+        project: true,
+        assignedTo: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
+    if (fullTask) {
+      (global as any).io.to(`project:${result.projectId}`).emit('task:created', fullTask);
+      (global as any).io.emit('stats:updated', { projectId: result.projectId });
+    }
+  }
+
   return result;
 };
 
@@ -431,6 +453,29 @@ const updateTask = async (
     );
   }
 
+  // Socket.io Real-time broadcast
+  if ((global as any).io) {
+    const fullTask = await prisma.task.findUnique({
+      where: { id: result.id },
+      include: {
+        project: true,
+        assignedTo: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
+    if (fullTask) {
+      (global as any).io.to(`project:${result.projectId}`).emit('task:updated', fullTask);
+      (global as any).io.to(`task:${result.id}`).emit('task:details_updated', fullTask);
+      (global as any).io.emit('stats:updated', { projectId: result.projectId });
+    }
+  }
+
   return result;
 };
 
@@ -489,6 +534,11 @@ const deleteTask = async (id: string, user: IAuthUser) => {
       where: { id },
     });
   });
+
+  if ((global as any).io) {
+    (global as any).io.to(`project:${task.projectId}`).emit('task:deleted', { id });
+    (global as any).io.emit('stats:updated', { projectId: task.projectId });
+  }
 
   return { message: 'Task deleted successfully' };
 };
@@ -570,6 +620,23 @@ const createComment = async (taskId: string, payload: { content: string }, user:
     );
   }
 
+  // Socket.io Real-time comments & activities broadcast
+  if ((global as any).io) {
+    (global as any).io.to(`task:${taskId}`).emit('comment:created', result);
+    const activity = await prisma.activityLog.findFirst({
+      where: { taskId, type: 'COMMENT_CREATED' },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true, role: true },
+        },
+      },
+    });
+    if (activity) {
+      (global as any).io.to(`task:${taskId}`).emit('activity:created', activity);
+    }
+  }
+
   return result;
 };
 
@@ -631,6 +698,10 @@ const updateComment = async (commentId: string, payload: { content: string }, us
     },
   });
 
+  if ((global as any).io) {
+    (global as any).io.to(`task:${comment.taskId}`).emit('comment:updated', result);
+  }
+
   return result;
 };
 
@@ -673,6 +744,10 @@ const deleteComment = async (commentId: string, user: IAuthUser) => {
     where: { id: commentId },
   });
 
+  if ((global as any).io) {
+    (global as any).io.to(`task:${comment.taskId}`).emit('comment:deleted', { id: commentId });
+  }
+
   return { message: 'Comment deleted successfully' };
 };
 
@@ -706,6 +781,23 @@ const createAttachment = async (taskId: string, req: any, user: IAuthUser) => {
       taskId: taskId,
     },
   });
+
+  // Socket.io Real-time attachments & activities broadcast
+  if ((global as any).io) {
+    (global as any).io.to(`task:${taskId}`).emit('attachment:created', result);
+    const activity = await prisma.activityLog.findFirst({
+      where: { taskId, type: 'ATTACHMENT_UPLOADED' },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, image: true, role: true },
+        },
+      },
+    });
+    if (activity) {
+      (global as any).io.to(`task:${taskId}`).emit('activity:created', activity);
+    }
+  }
 
   return result;
 };
@@ -772,6 +864,10 @@ const deleteAttachment = async (attachmentId: string, user: IAuthUser) => {
   await prisma.attachment.delete({
     where: { id: attachmentId },
   });
+
+  if ((global as any).io) {
+    (global as any).io.to(`task:${attachment.taskId}`).emit('attachment:deleted', { id: attachmentId });
+  }
 
   return { message: 'Attachment deleted successfully' };
 };
