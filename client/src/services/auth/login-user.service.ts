@@ -4,7 +4,7 @@
 import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from "@/lib/auth/auth-utils";
 import { serverFetch } from "@/services/http";
 import { zodValidator } from "@/lib/utils/zod-validator";
-import { loginValidationZodSchema } from "@/app/(auth)/_validations/auth.validation";
+import { loginValidationZodSchema } from "@/zod/auth.validation";
 import { parse } from "cookie";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { redirect } from "next/navigation";

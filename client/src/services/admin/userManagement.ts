@@ -1,12 +1,12 @@
 "use server";
 
 import { serverFetch } from "@/services/http";
-import { IUserQueryParams, IUsersResponse } from "@/types/user.interface";
+import { IApiResponse, IPaginationResponse, IUser, IUserQueryParams } from "@/types";
 import { revalidateTag } from "next/cache";
 
 export const getAllUsers = async (
   params?: IUserQueryParams
-): Promise<IUsersResponse> => {
+): Promise<IApiResponse<IPaginationResponse<IUser>>> => {
   try {
     const query = new URLSearchParams();
     if (params?.searchTerm) query.append("searchTerm", params.searchTerm);
@@ -27,7 +27,7 @@ export const getAllUsers = async (
     return {
       success: false,
       message: "Failed to fetch users",
-      data: { users: [], meta: { page: 1, limit: 10, total: 0 } },
+      data: { data: [], meta: { page: 1, limit: 10, total: 0 } },
     };
   }
 };

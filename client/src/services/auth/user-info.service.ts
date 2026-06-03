@@ -2,12 +2,12 @@
 "use server"
 
 import { serverFetch } from "@/services/http";
-import { UserInfo } from "@/app/(auth)/_types/user.type";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { getCookie } from "./token-handlers.service";
+import { IUser } from "@/types";
 
-export const getUserInfo = async (): Promise<UserInfo | any> => {
-    let userInfo: UserInfo | any;
+export const getUserInfo = async (): Promise<IUser | any> => {
+    let userInfo: IUser | any;
     try {
         const response = await serverFetch.get("/auth/me", {
             next: { tags: ["user-info"], revalidate: 180 },

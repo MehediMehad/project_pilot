@@ -1,15 +1,15 @@
 "use client";
 
 import { useAuthToken } from "@/hooks/useAuthToken";
-import { UserInfo } from "@/app/(auth)/_types/user.type";
 import { LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import UserDropdown from "@/components/layout/dashboard/UserDropdown";
 import { Button } from "@/components/ui/button";
+import { IUser } from "@/types";
 
 interface NavbarAuthButtonsProps {
   initialHasToken: boolean;
-  initialUserInfo: UserInfo | null;
+  initialUserInfo: IUser | null;
   initialDashboardRoute: string;
 }
 

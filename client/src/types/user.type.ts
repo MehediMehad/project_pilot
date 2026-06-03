@@ -19,17 +19,6 @@ export interface IUserQueryParams {
   role?: string;
 }
 
-export interface IPaginationMeta {
-  page: number;
-  limit: number;
-  total: number;
-}
 
-export interface IUsersResponse {
-  success: boolean;
-  message: string;
-  data: {
-    users: IUser[];
-    meta: IPaginationMeta;
-  };
-}
+
+

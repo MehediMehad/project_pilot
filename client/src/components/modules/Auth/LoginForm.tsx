@@ -1,6 +1,6 @@
 "use client";
 
-import { loginUser } from "@/app/(auth)/_services/login-user.service";
+import { loginUser } from "@/services/auth/login-user.service";
 import InputFieldError from "@/components/common/InputFieldError";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,7 +62,9 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
           <LockKeyhole className="h-6 w-6" />
         </div>
 
-        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Welcome Back!</h1>
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          Welcome Back!
+        </h1>
         <p className="mt-1.5 text-xs text-slate-400 font-medium">
           Sign in to continue to your account
         </p>
@@ -73,10 +75,7 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
 
         {/* Email */}
         <div className="space-y-1.5">
-          <label
-            htmlFor="email"
-            className="text-xs font-bold text-slate-700"
-          >
+          <label htmlFor="email" className="text-xs font-bold text-slate-700">
             Email Address
           </label>
 
@@ -168,7 +167,9 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
       {/* Divider */}
       <div className="flex items-center gap-4 py-4">
         <div className="h-px flex-1 bg-slate-100" />
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or</span>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          Or
+        </span>
         <div className="h-px flex-1 bg-slate-100" />
       </div>
 
@@ -177,37 +178,41 @@ const LoginForm = ({ redirect }: { redirect?: string }) => {
         <div className="flex items-start gap-2.5 mb-4">
           <ShieldAlert className="h-4 w-4 text-primary shrink-0 mt-0.5" />
           <div>
-            <h3 className="text-xs font-bold text-slate-800 leading-none">Try Demo Login</h3>
-            <p className="text-[10px] text-slate-400 font-medium mt-1">Experience the system with demo account</p>
+            <h3 className="text-xs font-bold text-slate-800 leading-none">
+              Try Demo Login
+            </h3>
+            <p className="text-[10px] text-slate-400 font-medium mt-1">
+              Experience the system with demo account
+            </p>
           </div>
         </div>
 
         {/* Selector Tabs */}
         <div className="grid grid-cols-3 gap-2">
-          {(["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"] as DemoRole[]).map((role) => (
-            <Button
-              key={role}
-              type="button"
-              variant={activeDemoRole === role ? "default" : "outline"}
-              onClick={() => handleSelectDemoRole(role)}
-              className={`rounded-xl py-3 px-1 text-[10px] font-bold uppercase tracking-wider transition-all min-h-[42px] cursor-pointer ${activeDemoRole === role
-                  ? "bg-primary border-primary text-white shadow-md shadow-primary/25 hover:bg-primary/95"
-                  : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+          {(["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"] as DemoRole[]).map(
+            (role) => (
+              <Button
+                key={role}
+                type="button"
+                variant={activeDemoRole === role ? "default" : "outline"}
+                onClick={() => handleSelectDemoRole(role)}
+                className={`rounded-xl py-3 px-1 text-[10px] font-bold uppercase tracking-wider transition-all min-h-[42px] cursor-pointer ${
+                  activeDemoRole === role
+                    ? "bg-primary border-primary text-white shadow-md shadow-primary/25 hover:bg-primary/95"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                 }`}
-            >
-              {role.replace("_", " ")}
-            </Button>
-          ))}
+              >
+                {role.replace("_", " ")}
+              </Button>
+            ),
+          )}
         </div>
       </div>
 
       {/* Register Link */}
       <p className="mt-5 text-center text-xs text-slate-400 font-medium">
         Don&apos;t have an account?{" "}
-        <a
-          href="/register"
-          className="font-bold text-primary hover:underline"
-        >
+        <a href="/register" className="font-bold text-primary hover:underline">
           Register here
         </a>
       </p>

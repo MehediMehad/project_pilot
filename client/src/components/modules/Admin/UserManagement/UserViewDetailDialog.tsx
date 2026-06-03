@@ -1,6 +1,6 @@
 "use client";
 
-import { IUser } from "@/types/user.interface";
+import { IUser } from "@/types/user.type";
 import {
   Dialog,
   DialogContent,
@@ -40,7 +40,11 @@ export default function UserViewDetailDialog({
         <div className="flex flex-col items-center gap-4 py-6 border-b">
           <Avatar className="h-20 w-20 border-2 border-primary/20">
             {user.profilePhoto ? (
-              <AvatarImage src={user.profilePhoto} alt={user.name} className="object-cover" />
+              <AvatarImage
+                src={user.profilePhoto}
+                alt={user.name}
+                className="object-cover"
+              />
             ) : null}
             <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
               {user.name.charAt(0).toUpperCase()}
@@ -109,7 +113,10 @@ export default function UserViewDetailDialog({
         </div>
 
         <DialogFooter className="pt-2">
-          <Button className="w-full sm:w-auto" onClick={() => onOpenChange(false)}>
+          <Button
+            className="w-full sm:w-auto"
+            onClick={() => onOpenChange(false)}
+          >
             Close
           </Button>
         </DialogFooter>

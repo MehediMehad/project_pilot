@@ -1,4 +1,4 @@
-import ForgotPasswordForm from "@/app/(auth)/_components/ForgotPasswordForm";
+import ForgotPasswordForm from "@/components/modules/Auth/ForgotPasswordForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Card,

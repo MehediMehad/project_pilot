@@ -1,4 +1,4 @@
-import { IUser } from "@/types/user.interface";
+import { IUser } from "@/types/user.type";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
@@ -17,7 +17,11 @@ export const getUserColumns = (actions: UserColumnActions) => [
       return (
         <Avatar className="h-9 w-9">
           {photoUrl ? (
-            <AvatarImage src={photoUrl} alt={row.name} className="object-cover" />
+            <AvatarImage
+              src={photoUrl}
+              alt={row.name}
+              className="object-cover"
+            />
           ) : null}
           <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
             {row.name.charAt(0).toUpperCase()}
@@ -29,12 +33,16 @@ export const getUserColumns = (actions: UserColumnActions) => [
   {
     header: "Name",
     accessor: "name",
-    render: (value: unknown) => <span className="font-medium text-foreground">{value as string}</span>,
+    render: (value: unknown) => (
+      <span className="font-medium text-foreground">{value as string}</span>
+    ),
   },
   {
     header: "Email",
     accessor: "email",
-    render: (value: unknown) => <span className="text-muted-foreground">{value as string}</span>,
+    render: (value: unknown) => (
+      <span className="text-muted-foreground">{value as string}</span>
+    ),
   },
   {
     header: "Role",
@@ -64,7 +72,9 @@ export const getUserColumns = (actions: UserColumnActions) => [
               : "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400"
           }`}
         >
-          <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-green-600" : "bg-red-600"}`} />
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-green-600" : "bg-red-600"}`}
+          />
           {statusStr}
         </button>
       );

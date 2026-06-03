@@ -1,5 +1,5 @@
 // LoginPage.tsx
-import LoginForm from "@/app/(auth)/_components/LoginForm";
+import LoginForm from "@/components/modules/Auth/LoginForm";
 import Image from "next/image";
 import loginImg from "@/assets/images/login.png";
 import { ShieldCheck, UsersRound, Zap, Headset } from "lucide-react";

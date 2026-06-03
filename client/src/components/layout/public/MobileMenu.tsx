@@ -1,6 +1,5 @@
 "use client";
 
-import { UserInfo } from "@/app/(auth)/_types/user.type";
 import { LayoutDashboard, Menu } from "lucide-react";
 import Link from "next/link";
 import UserDropdown from "@/components/layout/dashboard/UserDropdown";
@@ -11,11 +10,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { IUser } from "@/types";
 
 interface MobileMenuProps {
   navItems: Array<{ href: string; label: string }>;
   hasAccessToken: boolean;
-  userInfo?: UserInfo | null;
+  userInfo?: IUser | null;
   dashboardRoute?: string;
 }
 

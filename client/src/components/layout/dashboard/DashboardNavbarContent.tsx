@@ -2,16 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { NavSection } from "@/app/(dashboardLayout)/admin/_types/dashboard.type";
-import { UserInfo } from "@/app/(auth)/_types/user.type";
+import { NavSection } from "@/types/core.type";
 import { Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import DashboardMobileSidebar from "./DashboardMobileSidebar";
 import NotificationDropdown from "./NotificationDropdown";
 import UserDropdown from "./UserDropdown";
+import { IUser } from "@/types";
 
 interface DashboardNavbarContentProps {
-  userInfo: UserInfo;
+  userInfo: IUser;
   navItems?: NavSection[];
   dashboardHome?: string;
 }

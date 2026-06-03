@@ -1,4 +1,4 @@
-import { NavSection } from "@/app/(dashboardLayout)/admin/_types/dashboard.type";
+import { NavSection } from "@/types/core.type";
 import { getDefaultDashboardRoute, UserRole } from "../auth/auth-utils";
 
 export const getCommonNavItems = (role: UserRole): NavSection[] => {
@@ -11,13 +11,13 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
                     title: "Home",
                     href: "/",
                     icon: "Home",
-                    roles: ["USER", "ADMIN"],
+                    roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],
                 },
                 {
                     title: "Dashboard",
                     href: defaultDashboard,
                     icon: "LayoutDashboard",
-                    roles: ["USER", "ADMIN"],
+                    roles: ["PROJECT_MANAGER", "TEAM_MEMBER", "ADMIN"],
                 },
                 {
                     title: "User Management",
@@ -29,7 +29,7 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
                     title: "My Profile",
                     href: `/settings/profile`,
                     icon: "User",
-                    roles: ["USER", "ADMIN"],
+                    roles: ["PROJECT_MANAGER", "TEAM_MEMBER", "ADMIN"],
                 },
             ]
         },
@@ -40,7 +40,7 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
                     title: "Change Password",
                     href: "/settings/change-password",
                     icon: "Settings",
-                    roles: ["USER", "ADMIN"],
+                    roles: ["PROJECT_MANAGER", "TEAM_MEMBER", "ADMIN"],
                 },
             ],
         },

@@ -1,6 +1,6 @@
 "use client";
 
-import { IUser, IPaginationMeta } from "@/types/user.interface";
+import { IUser, IPaginationMeta } from "@/types";
 import { getUserColumns, UserColumnActions } from "./userColumns";
 import {
   Table,

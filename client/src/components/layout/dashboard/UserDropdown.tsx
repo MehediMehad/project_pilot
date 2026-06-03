@@ -10,13 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { logoutUser } from "@/app/(auth)/_services/logout-user.service";
-import { UserInfo } from "@/app/(auth)/_types/user.type";
+import { logoutUser } from "@/services/auth/logout-user.service";
 import { Settings, User } from "lucide-react";
 import Link from "next/link";
+import { IUser } from "@/types";
 
 interface UserDropdownProps {
-  userInfo: UserInfo;
+  userInfo: IUser;
 }
 
 const UserDropdown = ({ userInfo }: UserDropdownProps) => {

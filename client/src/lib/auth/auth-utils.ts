@@ -1,4 +1,4 @@
-export type UserRole = "ADMIN" | "USER";
+export type UserRole = "ADMIN" | "PROJECT_MANAGER" | "TEAM_MEMBER";
 
 export type RouteConfig = {
     exact: string[],
@@ -50,8 +50,11 @@ export const getDefaultDashboardRoute = (role: UserRole): string => {
     if (role === "ADMIN") {
         return "/admin/dashboard";
     }
-    if (role === "USER") {
-        return "/user/dashboard";
+    if (role === "PROJECT_MANAGER") {
+        return "/project-manager/dashboard";
+    }
+    if (role === "TEAM_MEMBER") {
+        return "/team-member/dashboard";
     }
     return "/";
 }

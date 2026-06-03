@@ -6,15 +6,15 @@ import { Separator } from "@/components/ui/separator";
 import { SheetTitle } from "@/components/ui/sheet";
 import { getIconComponent } from "@/lib/helpers/icon-mapper";
 import { cn } from "@/lib/utils";
-import { NavSection } from "@/app/(dashboardLayout)/admin/_types/dashboard.type";
-import { UserInfo } from "@/app/(auth)/_types/user.type";
+import { IUser } from "@/types";
+import { NavSection } from "@/types/core.type";
 import Image from "next/image";
 // import log from "@/assets/logos/navlog.png";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 interface DashboardMobileSidebarContentProps {
-  userInfo: UserInfo;
+  userInfo: IUser;
   navItems: NavSection[];
   dashboardHome: string;
 }

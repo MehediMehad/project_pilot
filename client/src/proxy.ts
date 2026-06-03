@@ -2,8 +2,8 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { getDefaultDashboardRoute, getRouteOwner, isAuthRoute, UserRole } from './lib/auth/auth-utils';
-import { getNewAccessToken } from './app/(auth)/_services/auth.service';
-import { deleteCookie, getCookie } from './app/(auth)/_services/token-handlers.service';
+import { getNewAccessToken } from './services/auth/auth.service';
+import { deleteCookie, getCookie } from './services/auth/token-handlers.service';
 
 export async function proxy(request: NextRequest) {
     const pathname = request.nextUrl.pathname;

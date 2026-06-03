@@ -5,16 +5,20 @@ import UserManagementHeader from "@/components/modules/Admin/UserManagement/User
 import UserTable from "@/components/modules/Admin/UserManagement/UserTable";
 import UserFormDialog from "@/components/modules/Admin/UserManagement/UserFormDialog";
 import UserViewDetailDialog from "@/components/modules/Admin/UserManagement/UserViewDetailDialog";
-import { IUser, IPaginationMeta } from "@/types/user.interface";
 import { getAllUsers, changeUserStatus } from "@/services/admin/userManagement";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
+import { IPaginationMeta, IUser } from "@/types";
 
 export default function UserManagementPage() {
   // Data States
   const [users, setUsers] = useState<IUser[]>([]);
-  const [meta, setMeta] = useState<IPaginationMeta>({ page: 1, limit: 10, total: 0 });
+  const [meta, setMeta] = useState<IPaginationMeta>({
+    page: 1,
+    limit: 10,
+    total: 0,
+  });
   const [loading, setLoading] = useState(true);
 
   // Filter/Pagination States
@@ -41,7 +45,7 @@ export default function UserManagementPage() {
       });
 
       if (res.success) {
-        setUsers(res.data.users);
+        setUsers(res.data.data);
         setMeta(res.data.meta);
       } else {
         toast.error(res.message || "Failed to fetch users");
@@ -109,7 +113,9 @@ export default function UserManagementPage() {
         {/* Dropdowns */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground font-semibold uppercase">Status</span>
+            <span className="text-xs text-muted-foreground font-semibold uppercase">
+              Status
+            </span>
             <select
               value={statusFilter}
               onChange={(e) => {
@@ -125,7 +131,9 @@ export default function UserManagementPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground font-semibold uppercase">Role</span>
+            <span className="text-xs text-muted-foreground font-semibold uppercase">
+              Role
+            </span>
             <select
               value={roleFilter}
               onChange={(e) => {

@@ -4,16 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getIconComponent } from "@/lib/helpers/icon-mapper";
 import { cn } from "@/lib/utils";
-import { NavSection } from "@/app/(dashboardLayout)/admin/_types/dashboard.type";
-import { UserInfo } from "@/app/(auth)/_types/user.type";
+import { NavSection } from "@/types/core.type";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 // import logo from "@/assets/logos/navlog.png";
 import Image from "next/image";
+import { IUser } from "@/types";
 
 interface DashboardSidebarContentProps {
-  userInfo: UserInfo;
+  userInfo: IUser;
   navItems: NavSection[];
   dashboardHome: string;
 }
