@@ -12,6 +12,7 @@ model User {
   assignedTasks   Task[]          @relation("AssignedTasks")
   comments        Comment[]
   projectMembers  ProjectMember[]
+  notifications   Notification[]
   activities      ActivityLog[]
 
   createdAt DateTime @default(now())
