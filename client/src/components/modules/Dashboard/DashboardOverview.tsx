@@ -23,6 +23,25 @@ import {
   Shield,
   Loader2,
 } from "lucide-react";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
+
+const ChartSkeleton = () => (
+  <div className="flex h-full w-full items-center justify-center bg-slate-50/10 dark:bg-slate-900/10 animate-pulse rounded-xl py-12">
+    <Loader2 className="h-6 w-6 animate-spin text-slate-350 dark:text-slate-650" />
+  </div>
+);
 
 interface DashboardOverviewProps {
   userRole: UserRole;
@@ -39,6 +58,10 @@ export default function DashboardOverview({
   const [activeSubTab, setActiveSubTab] = useState<"deadlines" | "highPriority">(
     "deadlines"
   );
+  const [isMounted, setIsMounted] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [activeProjectTab, setActiveProjectTab] = useState<"chart" | "list">("chart");
+  const [activeWorkloadTab, setActiveWorkloadTab] = useState<"chart" | "list">("chart");
   const { socket } = useSocket();
 
   const fetchStats = useCallback(async () => {
@@ -57,6 +80,20 @@ export default function DashboardOverview({
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
+
+  useEffect(() => {
+    setIsMounted(true);
+    const checkTheme = () => {
+      setIsDarkMode(document.documentElement.classList.contains("dark"));
+    };
+    checkTheme();
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   // Real-time stats listener
   useEffect(() => {
@@ -162,167 +199,279 @@ export default function DashboardOverview({
       {/* 2. Status Breakdown and Project Progress */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Status & Priority */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col">
           <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
             <TrendingUp className="h-4.5 w-4.5 text-primary" />
             Task Status & Priority Breakdown
           </h3>
 
-          <div className="space-y-6">
-            {/* Status Analytics */}
-            <div>
-              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
-                Statuses
-              </p>
-              <div className="space-y-3">
-                <div>
-                  <div className="flex justify-between text-xs font-semibold text-slate-650 dark:text-slate-300 mb-1.5">
-                    <span>To Do</span>
-                    <span>{statusAnalytics.todo} tasks</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-amber-500 transition-all duration-500"
-                      style={{
-                        width: `${
-                          overview.totalTasks > 0
-                            ? (statusAnalytics.todo / overview.totalTasks) * 100
-                            : 0
-                        }%`,
-                      }}
-                    />
-                  </div>
-                </div>
+          {!isMounted ? (
+            <ChartSkeleton />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center justify-center flex-1">
+              {/* Doughnut Chart for Status */}
+              <div className="flex flex-col items-center justify-center">
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
+                  Status Distribution
+                </span>
+                {(() => {
+                  const statusData = [
+                    { name: "To Do", value: statusAnalytics.todo, color: "#f59e0b" },
+                    { name: "In Progress", value: statusAnalytics.inProgress, color: "#3b82f6" },
+                    { name: "Completed", value: statusAnalytics.completed, color: "#10b981" },
+                  ];
+                  const totalStatusTasks = statusAnalytics.todo + statusAnalytics.inProgress + statusAnalytics.completed;
+                  const statusChartData = totalStatusTasks > 0
+                    ? statusData
+                    : [{ name: "No Tasks", value: 1, color: isDarkMode ? "#334155" : "#e2e8f0" }];
 
-                <div>
-                  <div className="flex justify-between text-xs font-semibold text-slate-650 dark:text-slate-300 mb-1.5">
-                    <span>In Progress</span>
-                    <span>{statusAnalytics.inProgress} tasks</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-blue-500 transition-all duration-500"
-                      style={{
-                        width: `${
-                          overview.totalTasks > 0
-                            ? (statusAnalytics.inProgress / overview.totalTasks) * 100
-                            : 0
-                        }%`,
-                      }}
-                    />
-                  </div>
-                </div>
+                  return (
+                    <div className="w-full flex flex-col items-center">
+                      <div className="relative flex items-center justify-center h-[180px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={statusChartData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={55}
+                              outerRadius={75}
+                              paddingAngle={totalStatusTasks > 0 ? 4 : 0}
+                              dataKey="value"
+                            >
+                              {statusChartData.map((entry: any, index: number) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            {totalStatusTasks > 0 && (
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: isDarkMode ? "#0f172a" : "#ffffff",
+                                  borderColor: isDarkMode ? "#1e293b" : "#e2e8f0",
+                                  borderRadius: "8px",
+                                  color: isDarkMode ? "#f8fafc" : "#0f172a",
+                                }}
+                              />
+                            )}
+                          </PieChart>
+                        </ResponsiveContainer>
+                        <div className="absolute flex flex-col items-center justify-center">
+                          <span className="text-xl font-extrabold text-slate-800 dark:text-slate-100">
+                            {totalStatusTasks}
+                          </span>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">
+                            Tasks
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap justify-center gap-x-3 gap-y-1.5 mt-2">
+                        {statusData.map((item, index) => (
+                          <div key={index} className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                            <span>{item.name}: <span className="font-extrabold text-slate-700 dark:text-slate-350">{item.value}</span></span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
 
-                <div>
-                  <div className="flex justify-between text-xs font-semibold text-slate-650 dark:text-slate-300 mb-1.5">
-                    <span>Completed</span>
-                    <span>{statusAnalytics.completed} tasks</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-emerald-500 transition-all duration-500"
-                      style={{
-                        width: `${
-                          overview.totalTasks > 0
-                            ? (statusAnalytics.completed / overview.totalTasks) * 100
-                            : 0
-                        }%`,
-                      }}
-                    />
-                  </div>
-                </div>
+              {/* Pie Chart for Priority */}
+              <div className="flex flex-col items-center justify-center">
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
+                  Priority Distribution
+                </span>
+                {(() => {
+                  const priorityData = [
+                    { name: "Low", value: priorityAnalytics.low, color: "#94a3b8" },
+                    { name: "Medium", value: priorityAnalytics.medium, color: "#f59e0b" },
+                    { name: "High", value: priorityAnalytics.high, color: "#f43f5e" },
+                  ];
+                  const totalPriorityTasks = priorityAnalytics.low + priorityAnalytics.medium + priorityAnalytics.high;
+                  const priorityChartData = totalPriorityTasks > 0
+                    ? priorityData
+                    : [{ name: "No Tasks", value: 1, color: isDarkMode ? "#334155" : "#e2e8f0" }];
+
+                  return (
+                    <div className="w-full flex flex-col items-center">
+                      <div className="relative flex items-center justify-center h-[180px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={priorityChartData}
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={75}
+                              paddingAngle={totalPriorityTasks > 0 ? 2 : 0}
+                              dataKey="value"
+                            >
+                              {priorityChartData.map((entry: any, index: number) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            {totalPriorityTasks > 0 && (
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: isDarkMode ? "#0f172a" : "#ffffff",
+                                  borderColor: isDarkMode ? "#1e293b" : "#e2e8f0",
+                                  borderRadius: "8px",
+                                  color: isDarkMode ? "#f8fafc" : "#0f172a",
+                                }}
+                              />
+                            )}
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="flex flex-wrap justify-center gap-x-3 gap-y-1.5 mt-2">
+                        {priorityData.map((item, index) => (
+                          <div key={index} className="flex items-center gap-1 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                            <span>{item.name}: <span className="font-extrabold text-slate-700 dark:text-slate-350">{item.value}</span></span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
-
-            {/* Priority Analytics */}
-            <div>
-              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">
-                Priorities
-              </p>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 rounded-xl p-3 text-center">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Low
-                  </span>
-                  <div className="text-xl font-extrabold text-slate-700 dark:text-slate-300 mt-1">
-                    {priorityAnalytics.low}
-                  </div>
-                </div>
-                <div className="border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 rounded-xl p-3 text-center">
-                  <span className="text-[10px] font-bold text-amber-555 uppercase tracking-wider">
-                    Medium
-                  </span>
-                  <div className="text-xl font-extrabold text-amber-600 mt-1">
-                    {priorityAnalytics.medium}
-                  </div>
-                </div>
-                <div className="border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40 rounded-xl p-3 text-center">
-                  <span className="text-[10px] font-bold text-rose-500 uppercase tracking-wider">
-                    High
-                  </span>
-                  <div className="text-xl font-extrabold text-rose-600 mt-1">
-                    {priorityAnalytics.high}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Project Progress */}
         <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
-            <FolderKanban className="h-4.5 w-4.5 text-primary" />
-            Project Progress Summary
-          </h3>
-
-          <div className="flex-1 overflow-y-auto space-y-4 max-h-[295px] pr-1">
-            {projectProgress.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-slate-400 py-10">
-                <FolderKanban className="h-8 w-8 mb-2" />
-                <p className="text-xs">No active projects found</p>
-              </div>
-            ) : (
-              projectProgress.map((project: any) => (
-                <div
-                  key={project.id}
-                  className="border border-slate-50 dark:border-slate-800/60 rounded-xl p-4 bg-slate-50/20 dark:bg-slate-900/10 flex flex-col gap-2"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">
-                      {project.name}
-                    </span>
-                    <Badge
-                      className={
-                        project.status === "COMPLETED"
-                          ? "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400 border border-green-150 dark:border-green-900/30"
-                          : project.status === "ON_HOLD"
-                            ? "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-150 dark:border-amber-900/30"
-                            : "bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 border border-blue-150 dark:border-blue-900/30"
-                      }
-                    >
-                      {project.status}
-                    </Badge>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-[11px] text-slate-400 font-semibold mb-1">
-                      <span>Progress</span>
-                      <span>
-                        {project.completedTasks}/{project.totalTasks} Tasks ({project.progress}%)
-                      </span>
-                    </div>
-                    <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-primary transition-all duration-500"
-                        style={{ width: `${project.progress}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+          <div className="flex items-center justify-between mb-5 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <FolderKanban className="h-4.5 w-4.5 text-primary" />
+              Project Progress Summary
+            </h3>
+            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200/40 dark:border-slate-700/40">
+              <button
+                onClick={() => setActiveProjectTab("chart")}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${
+                  activeProjectTab === "chart"
+                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
+                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                }`}
+              >
+                Chart
+              </button>
+              <button
+                onClick={() => setActiveProjectTab("list")}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${
+                  activeProjectTab === "list"
+                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
+                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                }`}
+              >
+                List
+              </button>
+            </div>
           </div>
+
+          {activeProjectTab === "chart" ? (
+            <div className="flex-1 min-h-[295px] flex items-center justify-center">
+              {!isMounted ? (
+                <ChartSkeleton />
+              ) : projectProgress.length === 0 ? (
+                <div className="flex flex-col items-center justify-center text-slate-400 py-10">
+                  <FolderKanban className="h-8 w-8 mb-2" />
+                  <p className="text-xs">No active projects found</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart
+                    layout="vertical"
+                    data={projectProgress.map((p: any) => ({
+                      name: p.name.length > 15 ? `${p.name.substring(0, 15)}...` : p.name,
+                      fullName: p.name,
+                      progress: p.progress,
+                    }))}
+                    margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      horizontal={false}
+                      stroke={isDarkMode ? "#1e293b" : "#f1f5f9"}
+                    />
+                    <XAxis
+                      type="number"
+                      domain={[0, 100]}
+                      unit="%"
+                      stroke={isDarkMode ? "#64748b" : "#94a3b8"}
+                      className="text-[10px] font-bold"
+                    />
+                    <YAxis
+                      dataKey="name"
+                      type="category"
+                      width={90}
+                      stroke={isDarkMode ? "#64748b" : "#94a3b8"}
+                      className="text-[10px] font-bold"
+                    />
+                    <Tooltip
+                      formatter={(value: any) => [`${value}%`, "Progress"]}
+                      contentStyle={{
+                        backgroundColor: isDarkMode ? "#0f172a" : "#ffffff",
+                        borderColor: isDarkMode ? "#1e293b" : "#e2e8f0",
+                        borderRadius: "8px",
+                        color: isDarkMode ? "#f8fafc" : "#0f172a",
+                      }}
+                    />
+                    <Bar dataKey="progress" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={12} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          ) : (
+            <div className="flex-1 overflow-y-auto space-y-4 max-h-[295px] pr-1">
+              {projectProgress.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-slate-400 py-10">
+                  <FolderKanban className="h-8 w-8 mb-2" />
+                  <p className="text-xs">No active projects found</p>
+                </div>
+              ) : (
+                projectProgress.map((project: any) => (
+                  <div
+                    key={project.id}
+                    className="border border-slate-50 dark:border-slate-800/60 rounded-xl p-4 bg-slate-50/20 dark:bg-slate-900/10 flex flex-col gap-2"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">
+                        {project.name}
+                      </span>
+                      <Badge
+                        className={
+                          project.status === "COMPLETED"
+                            ? "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400 border border-green-150 dark:border-green-900/30"
+                            : project.status === "ON_HOLD"
+                              ? "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-150 dark:border-amber-900/30"
+                              : "bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 border border-blue-150 dark:border-blue-900/30"
+                        }
+                      >
+                        {project.status}
+                      </Badge>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-[11px] text-slate-400 font-semibold mb-1">
+                        <span>Progress</span>
+                        <span>
+                          {project.completedTasks}/{project.totalTasks} Tasks ({project.progress}%)
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary transition-all duration-500"
+                          style={{ width: `${project.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -330,81 +479,157 @@ export default function DashboardOverview({
       <div className="grid gap-6 md:grid-cols-2">
         {/* Team Workload */}
         <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
-            <Users className="h-4.5 w-4.5 text-primary" />
-            Member Workload Summary
-          </h3>
-
-          <div className="flex-1 overflow-x-auto overflow-y-auto max-h-[350px] pr-1">
-            {memberWorkload.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-slate-400 py-10">
-                <Users className="h-8 w-8 mb-2" />
-                <p className="text-xs">No team members workload to show</p>
-              </div>
-            ) : (
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    <th className="pb-3 pl-1">Member</th>
-                    <th className="pb-3 text-center">Total</th>
-                    <th className="pb-3 text-center text-emerald-600">Done</th>
-                    <th className="pb-3 text-center text-amber-500">Pending</th>
-                    <th className="pb-3 text-right pr-1">Progress</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50 dark:divide-slate-850/50">
-                  {memberWorkload.map((mw: any) => {
-                    const percentage =
-                      mw.totalTasks > 0
-                        ? Math.round((mw.completedTasks / mw.totalTasks) * 100)
-                        : 0;
-                    return (
-                      <tr
-                        key={mw.id}
-                        className="text-xs hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-all"
-                      >
-                        <td className="py-3 pl-1 flex items-center gap-2.5">
-                          <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
-                            {mw.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="font-bold text-slate-800 dark:text-slate-200 truncate leading-none">
-                              {mw.name}
-                            </p>
-                            <p className="text-[9px] text-slate-400 mt-1 leading-none truncate max-w-[120px]">
-                              {mw.email}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="py-3 text-center font-extrabold text-slate-700 dark:text-slate-300">
-                          {mw.totalTasks}
-                        </td>
-                        <td className="py-3 text-center font-extrabold text-emerald-600">
-                          {mw.completedTasks}
-                        </td>
-                        <td className="py-3 text-center font-extrabold text-amber-500">
-                          {mw.pendingTasks}
-                        </td>
-                        <td className="py-3 text-right pr-1">
-                          <div className="flex flex-col items-end gap-1">
-                            <span className="text-[10px] font-bold text-slate-500">
-                              {percentage}%
-                            </span>
-                            <div className="w-16 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-primary transition-all duration-350"
-                                style={{ width: `${percentage}%` }}
-                              />
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
+          <div className="flex items-center justify-between mb-5 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Users className="h-4.5 w-4.5 text-primary" />
+              Member Workload Summary
+            </h3>
+            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200/40 dark:border-slate-700/40">
+              <button
+                onClick={() => setActiveWorkloadTab("chart")}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${
+                  activeWorkloadTab === "chart"
+                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
+                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                }`}
+              >
+                Chart
+              </button>
+              <button
+                onClick={() => setActiveWorkloadTab("list")}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${
+                  activeWorkloadTab === "list"
+                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
+                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                }`}
+              >
+                Table
+              </button>
+            </div>
           </div>
+
+          {activeWorkloadTab === "chart" ? (
+            <div className="flex-1 min-h-[350px] flex items-center justify-center">
+              {!isMounted ? (
+                <ChartSkeleton />
+              ) : memberWorkload.length === 0 ? (
+                <div className="flex flex-col items-center justify-center text-slate-400 py-10">
+                  <Users className="h-8 w-8 mb-2" />
+                  <p className="text-xs">No team members workload to show</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={320}>
+                  <BarChart
+                    data={memberWorkload.map((mw: any) => ({
+                      name: mw.name.split(" ")[0],
+                      fullName: mw.name,
+                      Completed: mw.completedTasks,
+                      Pending: mw.pendingTasks,
+                    }))}
+                    margin={{ top: 10, right: 10, left: -25, bottom: 5 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke={isDarkMode ? "#1e293b" : "#f1f5f9"}
+                    />
+                    <XAxis
+                      dataKey="name"
+                      stroke={isDarkMode ? "#64748b" : "#94a3b8"}
+                      className="text-[10px] font-bold"
+                    />
+                    <YAxis
+                      stroke={isDarkMode ? "#64748b" : "#94a3b8"}
+                      className="text-[10px] font-bold"
+                      allowDecimals={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: isDarkMode ? "#0f172a" : "#ffffff",
+                        borderColor: isDarkMode ? "#1e293b" : "#e2e8f0",
+                        borderRadius: "8px",
+                        color: isDarkMode ? "#f8fafc" : "#0f172a",
+                      }}
+                    />
+                    <Legend verticalAlign="top" height={36} iconType="circle" />
+                    <Bar dataKey="Completed" stackId="a" fill="#10b981" barSize={16} />
+                    <Bar dataKey="Pending" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} barSize={16} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          ) : (
+            <div className="flex-1 overflow-x-auto overflow-y-auto max-h-[350px] pr-1">
+              {memberWorkload.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-slate-400 py-10">
+                  <Users className="h-8 w-8 mb-2" />
+                  <p className="text-xs">No team members workload to show</p>
+                </div>
+              ) : (
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      <th className="pb-3 pl-1">Member</th>
+                      <th className="pb-3 text-center">Total</th>
+                      <th className="pb-3 text-center text-emerald-600">Done</th>
+                      <th className="pb-3 text-center text-amber-500">Pending</th>
+                      <th className="pb-3 text-right pr-1">Progress</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50 dark:divide-slate-850/50">
+                    {memberWorkload.map((mw: any) => {
+                      const percentage =
+                        mw.totalTasks > 0
+                          ? Math.round((mw.completedTasks / mw.totalTasks) * 100)
+                          : 0;
+                      return (
+                        <tr
+                          key={mw.id}
+                          className="text-xs hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-all"
+                        >
+                          <td className="py-3 pl-1 flex items-center gap-2.5">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                              {mw.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-slate-800 dark:text-slate-200 truncate leading-none">
+                                {mw.name}
+                              </p>
+                              <p className="text-[9px] text-slate-400 mt-1 leading-none truncate max-w-[120px]">
+                                {mw.email}
+                              </p>
+                            </div>
+                          </td>
+                          <td className="py-3 text-center font-extrabold text-slate-700 dark:text-slate-300">
+                            {mw.totalTasks}
+                          </td>
+                          <td className="py-3 text-center font-extrabold text-emerald-600">
+                            {mw.completedTasks}
+                          </td>
+                          <td className="py-3 text-center font-extrabold text-amber-500">
+                            {mw.pendingTasks}
+                          </td>
+                          <td className="py-3 text-right pr-1">
+                            <div className="flex flex-col items-end gap-1">
+                              <span className="text-[10px] font-bold text-slate-500">
+                                {percentage}%
+                              </span>
+                              <div className="w-16 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-primary transition-all duration-350"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Task Action Center (Tabs) */}
