@@ -14,8 +14,11 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "eslint .",
+    "lint:check": "eslint . --ext .ts",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "seed:user": "ts-node-dev --respawn --transpile-only ./src/helpers/seed-users.ts",
+    "seed:project": "ts-node-dev --respawn --transpile-only ./src/helpers/seed-projects.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
