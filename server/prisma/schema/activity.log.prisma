@@ -10,5 +10,6 @@ model ActivityLog {
   task      Task?        @relation(fields: [taskId], references: [id], onDelete: Cascade)
   user      User?        @relation(fields: [userId], references: [id])
 
+  @@index([projectId])
   @@map("activity_logs")
 }

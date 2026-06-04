@@ -402,24 +402,45 @@ const getProjectSummary = async (projectId: string) => {
     },
   });
 
-  const memberWorkload = await Promise.all(
-    members.map(async (member) => {
-      const [total, completed, pending] = await Promise.all([
-        prisma.task.count({ where: { projectId, assignedToId: member.userId } }),
-        prisma.task.count({ where: { projectId, assignedToId: member.userId, status: 'COMPLETED' } }),
-        prisma.task.count({
-          where: { projectId, assignedToId: member.userId, status: { not: 'COMPLETED' } },
-        }),
-      ]);
+  // Aggregate workload stats using a single groupBy query instead of N+1 counts
+  const taskGroups = await prisma.task.groupBy({
+    by: ['assignedToId', 'status'],
+    where: {
+      projectId,
+      assignedToId: { not: null },
+    },
+    _count: {
+      _all: true,
+    },
+  });
 
-      return {
-        user: member.user,
-        totalTasks: total,
-        completedTasks: completed,
-        pendingTasks: pending,
-      };
-    }),
-  );
+  const workloadMap: Record<string, { total: number; completed: number; pending: number }> = {};
+  for (const m of members) {
+    workloadMap[m.userId] = { total: 0, completed: 0, pending: 0 };
+  }
+
+  for (const group of taskGroups) {
+    const userId = group.assignedToId;
+    if (!userId || !workloadMap[userId]) continue;
+
+    const count = group._count._all;
+    workloadMap[userId].total += count;
+    if (group.status === 'COMPLETED') {
+      workloadMap[userId].completed += count;
+    } else {
+      workloadMap[userId].pending += count;
+    }
+  }
+
+  const memberWorkload = members.map((member) => {
+    const stats = workloadMap[member.userId] || { total: 0, completed: 0, pending: 0 };
+    return {
+      user: member.user,
+      totalTasks: stats.total,
+      completedTasks: stats.completed,
+      pendingTasks: stats.pending,
+    };
+  });
 
   return {
     taskStats: {

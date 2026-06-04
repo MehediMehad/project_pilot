@@ -31,5 +31,6 @@ router.post(
 );
 
 router.get('/me', auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER), AuthController.getMe);
+router.post('/logout', AuthController.logoutUser);
 
 export const AuthRoutes = router;

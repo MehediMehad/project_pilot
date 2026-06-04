@@ -132,6 +132,26 @@ const getMe = catchAsync(async (req: Request & { user?: any }, res: Response) =>
   });
 });
 
+const logoutUser = catchAsync(async (req: Request, res: Response) => {
+  res.clearCookie('accessToken', {
+    secure: true,
+    httpOnly: true,
+    sameSite: 'none',
+  });
+  res.clearCookie('refreshToken', {
+    secure: true,
+    httpOnly: true,
+    sameSite: 'none',
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Logged out successfully!',
+    data: null,
+  });
+});
+
 export const AuthController = {
   loginUser,
   refreshToken,
@@ -139,4 +159,5 @@ export const AuthController = {
   forgotPassword,
   resetPassword,
   getMe,
+  logoutUser,
 };
