@@ -25,6 +25,8 @@ export default function UserManagementPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [roleFilter, setRoleFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [page, setPage] = useState(1);
 
   // Dialog States
@@ -40,6 +42,8 @@ export default function UserManagementPage() {
         searchTerm,
         status: statusFilter,
         role: roleFilter,
+        sortBy,
+        sortOrder,
         page,
         limit: 10,
       });
@@ -62,7 +66,7 @@ export default function UserManagementPage() {
   useEffect(() => {
     fetchUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, statusFilter, roleFilter, page]);
+  }, [searchTerm, statusFilter, roleFilter, sortBy, sortOrder, page]);
 
   // Handle status toggle
   const handleToggleStatus = async (user: IUser) => {
@@ -140,11 +144,31 @@ export default function UserManagementPage() {
                 setRoleFilter(e.target.value);
                 setPage(1);
               }}
-              className="flex h-9 w-[130px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="flex h-9 w-[130px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
             >
               <option value="ALL">All Roles</option>
               <option value="USER">User</option>
               <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground font-semibold uppercase">
+              Sort By
+            </span>
+            <select
+              value={`${sortBy}:${sortOrder}`}
+              onChange={(e) => {
+                const [field, order] = e.target.value.split(":");
+                setSortBy(field);
+                setSortOrder(order);
+                setPage(1);
+              }}
+              className="flex h-9 w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+            >
+              <option value="createdAt:desc">Latest Created</option>
+              <option value="name:asc">Name (A-Z)</option>
+              <option value="name:desc">Name (Z-A)</option>
             </select>
           </div>
         </div>

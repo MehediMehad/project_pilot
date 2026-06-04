@@ -37,6 +37,8 @@ export default function ProjectListPage({
   // Filters
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [page, setPage] = useState(1);
 
   // Dialog
@@ -52,6 +54,8 @@ export default function ProjectListPage({
         status: statusFilter,
         page,
         limit: 12,
+        sortBy,
+        sortOrder,
       });
 
       if (res.success) {
@@ -71,7 +75,7 @@ export default function ProjectListPage({
   useEffect(() => {
     fetchProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, statusFilter, page]);
+  }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
 
   const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit));
 
@@ -113,23 +117,46 @@ export default function ProjectListPage({
           />
         </div>
 
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
-            Status
-          </span>
-          <select
-            value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value);
-              setPage(1);
-            }}
-            className="flex h-9 w-[140px] rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 font-medium hover:border-gray-300 outline-none transition-all shadow-sm"
-          >
-            <option value="ALL">All Status</option>
-            <option value="ACTIVE">Active</option>
-            <option value="ON_HOLD">On Hold</option>
-            <option value="COMPLETED">Completed</option>
-          </select>
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+              Status
+            </span>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              className="flex h-9 w-[140px] rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 font-medium hover:border-gray-300 outline-none transition-all shadow-sm cursor-pointer"
+            >
+              <option value="ALL">All Status</option>
+              <option value="ACTIVE">Active</option>
+              <option value="ON_HOLD">On Hold</option>
+              <option value="COMPLETED">Completed</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+              Sort By
+            </span>
+            <select
+              value={`${sortBy}:${sortOrder}`}
+              onChange={(e) => {
+                const [field, order] = e.target.value.split(":");
+                setSortBy(field);
+                setSortOrder(order);
+                setPage(1);
+              }}
+              className="flex h-9 w-[160px] rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 font-medium hover:border-gray-300 outline-none transition-all shadow-sm cursor-pointer"
+            >
+              <option value="createdAt:desc">Latest Created</option>
+              <option value="createdAt:asc">Oldest Created</option>
+              <option value="deadline:asc">Nearest Deadline</option>
+              <option value="name:asc">Alphabetical (A-Z)</option>
+            </select>
+          </div>
         </div>
       </div>
 

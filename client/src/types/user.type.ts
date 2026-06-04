@@ -17,6 +17,8 @@ export interface IUserQueryParams {
   limit?: number;
   status?: string;
   role?: string;
+  sortBy?: string;
+  sortOrder?: string;
 }
 
 

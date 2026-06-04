@@ -14,6 +14,8 @@ export const getAllUsers = async (
     if (params?.limit) query.append("limit", params.limit.toString());
     if (params?.status && params.status !== "ALL") query.append("status", params.status);
     if (params?.role && params.role !== "ALL") query.append("role", params.role);
+    if (params?.sortBy) query.append("sortBy", params.sortBy);
+    if (params?.sortOrder) query.append("sortOrder", params.sortOrder);
 
     const res = await serverFetch.get(`/user?${query.toString()}`, {
       next: { tags: ["users-list"] },

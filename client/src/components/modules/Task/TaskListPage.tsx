@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { UserRole } from "@/lib/auth/auth-utils";
-import { ITask, TaskPriority, TaskStatus } from "@/types";
+import { ITask, TaskPriority, TaskStatus, IUser } from "@/types";
 import {
   getAllTasks,
   getMyTasks,
   getOverdueTasks,
   getUpcomingTasks,
 } from "@/services/task/taskManagement";
+import { getAllUsers } from "@/services/admin/userManagement";
 import TaskCard from "./TaskCard";
 import TaskFormDialog from "./TaskFormDialog";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
   const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0 });
   const [activeTab, setActiveTab] = useState<TabType>("all");
   const [currentUserId, setCurrentUserId] = useState<string | undefined>(propCurrentUserId);
+  const [users, setUsers] = useState<IUser[]>([]);
 
   useEffect(() => {
     if (!currentUserId) {
@@ -39,10 +41,22 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
     }
   }, [currentUserId, propCurrentUserId]);
 
+  // Fetch all users on mount for member filter
+  useEffect(() => {
+    getAllUsers({ limit: 100 }).then((res) => {
+      if (res.success && res.data) {
+        setUsers(res.data.data);
+      }
+    });
+  }, []);
+
   // Filters
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [priorityFilter, setPriorityFilter] = useState("ALL");
+  const [assignedToFilter, setAssignedToFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [page, setPage] = useState(1);
 
   // Dialog State
@@ -57,6 +71,9 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
         searchTerm: searchTerm || undefined,
         status: statusFilter !== "ALL" ? statusFilter : undefined,
         priority: priorityFilter !== "ALL" ? priorityFilter : undefined,
+        assignedToId: assignedToFilter !== "ALL" ? assignedToFilter : undefined,
+        sortBy,
+        sortOrder,
         page,
         limit: 10,
       };
@@ -84,7 +101,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
   // Trigger fetch when tab, filters, page or search updates
   useEffect(() => {
     fetchTasks();
-  }, [activeTab, statusFilter, priorityFilter, page]);
+  }, [activeTab, statusFilter, priorityFilter, assignedToFilter, sortBy, sortOrder, page]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +113,9 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
     setSearchTerm("");
     setStatusFilter("ALL");
     setPriorityFilter("ALL");
+    setAssignedToFilter("ALL");
+    setSortBy("createdAt");
+    setSortOrder("desc");
     setPage(1);
   };
 
@@ -212,6 +232,46 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
               <option value="LOW">Low</option>
               <option value="MEDIUM">Medium</option>
               <option value="HIGH">High</option>
+            </select>
+          </div>
+
+          {/* Member filter */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-muted-foreground">Assignee:</span>
+            <select
+              value={assignedToFilter}
+              onChange={(e) => {
+                setAssignedToFilter(e.target.value);
+                setPage(1);
+              }}
+              className="text-xs bg-background border rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer max-w-[140px]"
+            >
+              <option value="ALL">All Members</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Sort By */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-medium text-muted-foreground">Sort By:</span>
+            <select
+              value={`${sortBy}:${sortOrder}`}
+              onChange={(e) => {
+                const [field, order] = e.target.value.split(":");
+                setSortBy(field);
+                setSortOrder(order);
+                setPage(1);
+              }}
+              className="text-xs bg-background border rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+            >
+              <option value="createdAt:desc">Latest Created</option>
+              <option value="dueDate:asc">Nearest Deadline</option>
+              <option value="priority:asc">Highest Priority</option>
+              <option value="updatedAt:desc">Recently Updated</option>
             </select>
           </div>
 
