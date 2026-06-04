@@ -5,8 +5,15 @@ const createProject = z.object({
     name: z.string().min(1, 'Project name is required'),
     description: z.string().optional(),
     deadline: z.string().refine(
-      (val) => !isNaN(Date.parse(val)),
-      { message: 'Invalid date format' },
+      (val) => {
+        const parsed = Date.parse(val);
+        if (isNaN(parsed)) return false;
+        const date = new Date(parsed);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
+      },
+      { message: 'Please select a valid deadline.' },
     ),
     status: z.enum(['ACTIVE', 'COMPLETED', 'ON_HOLD']).optional(),
   }),
@@ -18,7 +25,17 @@ const updateProject = z.object({
     description: z.string().optional(),
     deadline: z
       .string()
-      .refine((val) => !isNaN(Date.parse(val)), { message: 'Invalid date format' })
+      .refine(
+        (val) => {
+          const parsed = Date.parse(val);
+          if (isNaN(parsed)) return false;
+          const date = new Date(parsed);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return date >= today;
+        },
+        { message: 'Please select a valid deadline.' },
+      )
       .optional(),
     status: z.enum(['ACTIVE', 'COMPLETED', 'ON_HOLD']).optional(),
   }),

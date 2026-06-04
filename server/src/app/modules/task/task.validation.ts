@@ -4,9 +4,19 @@ const createTask = z.object({
   body: z.object({
     title: z.string().min(1, 'Task title is required'),
     description: z.string().optional(),
-    dueDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: 'Invalid date format for dueDate',
-    }),
+    dueDate: z.string().refine(
+      (val) => {
+        const parsed = Date.parse(val);
+        if (isNaN(parsed)) return false;
+        const date = new Date(parsed);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
+      },
+      {
+        message: 'Please select a valid deadline.',
+      },
+    ),
     priority: z.enum(['HIGH', 'MEDIUM', 'LOW']).optional(),
     status: z.enum(['TODO', 'IN_PROGRESS', 'COMPLETED']).optional(),
     projectId: z.string().min(1, 'Project ID is required'),
@@ -20,9 +30,19 @@ const updateTask = z.object({
     description: z.string().optional().nullable(),
     dueDate: z
       .string()
-      .refine((val) => !isNaN(Date.parse(val)), {
-        message: 'Invalid date format for dueDate',
-      })
+      .refine(
+        (val) => {
+          const parsed = Date.parse(val);
+          if (isNaN(parsed)) return false;
+          const date = new Date(parsed);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return date >= today;
+        },
+        {
+          message: 'Please select a valid deadline.',
+        },
+      )
       .optional(),
     priority: z.enum(['HIGH', 'MEDIUM', 'LOW']).optional(),
     status: z.enum(['TODO', 'IN_PROGRESS', 'COMPLETED']).optional(),

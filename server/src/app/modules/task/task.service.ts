@@ -67,6 +67,23 @@ const createTask = async (user: IAuthUser, payload: any): Promise<Task> => {
     }
   }
 
+  // Check for duplicate task title in project
+  const existingTask = await prisma.task.findUnique({
+    where: {
+      projectId_title: {
+        projectId: payload.projectId,
+        title: payload.title,
+      },
+    },
+  });
+
+  if (existingTask) {
+    throw new ApiError(
+      httpStatus.CONFLICT,
+      'This task already exists in the project.',
+    );
+  }
+
   const result = await prisma.$transaction(async (tx) => {
     const task = await tx.task.create({
       data: {
@@ -315,6 +332,45 @@ const updateTask = async (
       throw new ApiError(
         httpStatus.FORBIDDEN,
         'You are not authorized to update tasks in this project',
+      );
+    }
+  }
+
+  // TEAM_MEMBER can only update tasks assigned to them
+  if (userData.role === UserRole.TEAM_MEMBER && task.assignedToId !== userData.id) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      'You are not authorized to update this task as it is not assigned to you',
+    );
+  }
+
+  // Completed tasks cannot be reassigned
+  if (
+    payload.assignedToId !== undefined &&
+    payload.assignedToId !== task.assignedToId &&
+    task.status === 'COMPLETED'
+  ) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Completed tasks cannot be reassigned.',
+    );
+  }
+
+  // Check for duplicate task title in project if title is being changed
+  if (payload.title && payload.title !== task.title) {
+    const existingTask = await prisma.task.findUnique({
+      where: {
+        projectId_title: {
+          projectId: task.projectId,
+          title: payload.title,
+        },
+      },
+    });
+
+    if (existingTask) {
+      throw new ApiError(
+        httpStatus.CONFLICT,
+        'This task already exists in the project.',
       );
     }
   }

@@ -165,7 +165,7 @@ export default function DashboardOverview({
   return (
     <div className="space-y-6">
       {/* 1. Overview Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
         <StatsCard
           title="Total Projects"
           value={overview.totalProjects}
@@ -193,6 +193,13 @@ export default function DashboardOverview({
           iconName="Clock"
           description="Tasks in progress"
           iconClassName="bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400"
+        />
+        <StatsCard
+          title="Overdue Tasks"
+          value={overview.overdueTasks || 0}
+          iconName="AlertTriangle"
+          description="Tasks past deadline"
+          iconClassName="bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400"
         />
         <StatsCard
           title="Team Members"

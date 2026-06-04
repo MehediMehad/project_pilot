@@ -36,17 +36,33 @@ const getDashboardStats = async (userId: string, role: UserRole) => {
   let completedTasks = 0;
   let pendingTasks = 0;
   let totalMembers = 0;
+  let overdueTasks = 0;
+
+  const now = new Date();
 
   if (role === UserRole.ADMIN) {
     totalProjects = await prisma.project.count();
     totalTasks = await prisma.task.count();
     completedTasks = await prisma.task.count({ where: { status: 'COMPLETED' } });
     totalMembers = await prisma.user.count();
+    overdueTasks = await prisma.task.count({
+      where: {
+        dueDate: { lt: now },
+        status: { not: 'COMPLETED' },
+      },
+    });
   } else {
     totalProjects = projectIds.length;
     totalTasks = await prisma.task.count({ where: taskWhere });
     completedTasks = await prisma.task.count({
       where: { ...taskWhere, status: 'COMPLETED' },
+    });
+    overdueTasks = await prisma.task.count({
+      where: {
+        ...taskWhere,
+        dueDate: { lt: now },
+        status: { not: 'COMPLETED' },
+      },
     });
 
     const membersCount = await prisma.projectMember.groupBy({
@@ -223,6 +239,7 @@ const getDashboardStats = async (userId: string, role: UserRole) => {
       pendingTasks,
       totalMembers,
       complianceRate,
+      overdueTasks,
     },
     statusAnalytics,
     priorityAnalytics,
