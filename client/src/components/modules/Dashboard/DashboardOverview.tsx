@@ -335,63 +335,74 @@ export default function DashboardOverview({
             Member Workload Summary
           </h3>
 
-          <div className="flex-1 overflow-y-auto space-y-4 max-h-[350px] pr-1">
+          <div className="flex-1 overflow-x-auto overflow-y-auto max-h-[350px] pr-1">
             {memberWorkload.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-slate-400 py-10">
                 <Users className="h-8 w-8 mb-2" />
                 <p className="text-xs">No team members workload to show</p>
               </div>
             ) : (
-              memberWorkload.map((mw: any) => (
-                <div
-                  key={mw.id}
-                  className="border border-slate-50 dark:border-slate-800/40 bg-slate-50/20 dark:bg-slate-900/10 rounded-xl p-4 flex flex-col gap-3"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
-                      {mw.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-bold text-slate-800 dark:text-slate-200 leading-none">
-                        {mw.name}
-                      </p>
-                      <p className="text-[10px] text-slate-450 mt-1 leading-none truncate">
-                        {mw.email}
-                      </p>
-                    </div>
-                    <Badge variant="outline" className="text-[10px] uppercase font-bold shrink-0">
-                      {mw.role.replace("_", " ")}
-                    </Badge>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-50 dark:border-slate-850 text-center">
-                    <div>
-                      <span className="text-sm font-extrabold text-slate-800 dark:text-slate-250">
-                        {mw.totalTasks}
-                      </span>
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
-                        Total
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-extrabold text-emerald-600">
-                        {mw.completedTasks}
-                      </span>
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
-                        Done
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-sm font-extrabold text-amber-500">
-                        {mw.pendingTasks}
-                      </span>
-                      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
-                        Pending
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <th className="pb-3 pl-1">Member</th>
+                    <th className="pb-3 text-center">Total</th>
+                    <th className="pb-3 text-center text-emerald-600">Done</th>
+                    <th className="pb-3 text-center text-amber-500">Pending</th>
+                    <th className="pb-3 text-right pr-1">Progress</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50 dark:divide-slate-850/50">
+                  {memberWorkload.map((mw: any) => {
+                    const percentage =
+                      mw.totalTasks > 0
+                        ? Math.round((mw.completedTasks / mw.totalTasks) * 100)
+                        : 0;
+                    return (
+                      <tr
+                        key={mw.id}
+                        className="text-xs hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-all"
+                      >
+                        <td className="py-3 pl-1 flex items-center gap-2.5">
+                          <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                            {mw.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-slate-800 dark:text-slate-200 truncate leading-none">
+                              {mw.name}
+                            </p>
+                            <p className="text-[9px] text-slate-400 mt-1 leading-none truncate max-w-[120px]">
+                              {mw.email}
+                            </p>
+                          </div>
+                        </td>
+                        <td className="py-3 text-center font-extrabold text-slate-700 dark:text-slate-300">
+                          {mw.totalTasks}
+                        </td>
+                        <td className="py-3 text-center font-extrabold text-emerald-600">
+                          {mw.completedTasks}
+                        </td>
+                        <td className="py-3 text-center font-extrabold text-amber-500">
+                          {mw.pendingTasks}
+                        </td>
+                        <td className="py-3 text-right pr-1">
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="text-[10px] font-bold text-slate-500">
+                              {percentage}%
+                            </span>
+                            <div className="w-16 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-primary transition-all duration-350"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             )}
           </div>
         </div>
