@@ -8,7 +8,7 @@ import { userValidation } from './user.validation';
 
 const router = express.Router();
 
-router.get('/', auth(UserRole.ADMIN), userController.getAllFromDB);
+router.get('/', auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER), userController.getAllFromDB);
 
 router.get('/me', auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER), userController.getMyProfile);
 
