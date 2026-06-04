@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IProjectMember, IUser } from "@/types";
 import { UserRole } from "@/lib/auth/auth-utils";
 import {
@@ -47,15 +47,17 @@ export default function ProjectMemberManager({
 
   const memberUserIds = new Set(members.map((m) => m.userId));
 
+  console.log("searchResults", searchResults);
+
   const handleSearchUsers = async () => {
-    if (!searchTerm.trim()) return;
     setSearching(true);
     try {
       const res = await getAllUsers({
-        searchTerm: searchTerm.trim(),
-        limit: 10,
+        searchTerm: searchTerm.trim() || undefined,
+        limit: 100,
       });
       if (res.success) {
+        console.log("success");
         setSearchResults(res.data.data);
       }
     } catch (error) {
@@ -64,6 +66,12 @@ export default function ProjectMemberManager({
       setSearching(false);
     }
   };
+
+  useEffect(() => {
+    if (addDialogOpen) {
+      handleSearchUsers();
+    }
+  }, [addDialogOpen]);
 
   const handleAddMember = async (userId: string) => {
     setAddingId(userId);
@@ -209,9 +217,13 @@ export default function ProjectMemberManager({
             </div>
 
             <div className="max-h-[300px] overflow-y-auto space-y-2">
-              {searchResults.length === 0 ? (
+              {searching ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : searchResults.length === 0 ? (
                 <p className="text-center text-sm text-muted-foreground py-8">
-                  Search for users to add to this project
+                  No users found
                 </p>
               ) : (
                 searchResults.map((user) => {

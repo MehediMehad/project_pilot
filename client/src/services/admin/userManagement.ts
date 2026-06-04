@@ -7,6 +7,9 @@ import { revalidateTag } from "next/cache";
 export const getAllUsers = async (
   params?: IUserQueryParams
 ): Promise<IApiResponse<IPaginationResponse<IUser>>> => {
+
+  console.log("params", params);
+
   try {
     const query = new URLSearchParams();
     if (params?.searchTerm) query.append("searchTerm", params.searchTerm);
