@@ -136,6 +136,10 @@ const getSingleProject = async (id: string, user: IAuthUser) => {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated');
   }
 
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: { email: user.email },
+  });
+
   const project = await prisma.project.findUniqueOrThrow({
     where: { id },
     include: {
@@ -154,6 +158,24 @@ const getSingleProject = async (id: string, user: IAuthUser) => {
       },
     },
   });
+
+  if (userData.role !== UserRole.ADMIN) {
+    const isMember = await prisma.projectMember.findUnique({
+      where: {
+        projectId_userId: {
+          projectId: id,
+          userId: userData.id,
+        },
+      },
+    });
+
+    if (!isMember) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        'You are not authorized to view this project',
+      );
+    }
+  }
 
   return project;
 };

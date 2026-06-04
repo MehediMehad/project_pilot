@@ -30,6 +30,6 @@ router.post(
   AuthController.resetPassword,
 );
 
-router.get('/me', AuthController.getMe);
+router.get('/me', auth(UserRole.ADMIN, UserRole.PROJECT_MANAGER, UserRole.TEAM_MEMBER), AuthController.getMe);
 
 export const AuthRoutes = router;

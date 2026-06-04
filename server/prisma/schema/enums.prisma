@@ -39,6 +39,7 @@ enum ActivityType {
   TASK_COMPLETED
   COMMENT_CREATED
   ATTACHMENT_UPLOADED
+  TASK_DELETED
 }
 
 enum NotificationType {

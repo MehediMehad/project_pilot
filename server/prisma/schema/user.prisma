@@ -1,22 +1,19 @@
 model User {
-  id       String     @id @default(uuid())
-  image    String?
-  name     String
-  email    String     @unique
-  password String
-  role     UserRole   @default(TEAM_MEMBER)
-  status   UserStatus @default(ACTIVE)
-
-  // Relations
+  id              String          @id @default(uuid())
+  image           String?
+  name            String
+  email           String          @unique
+  password        String
+  role            UserRole        @default(TEAM_MEMBER)
+  status          UserStatus      @default(ACTIVE)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  activities      ActivityLog[]
+  comments        Comment[]
+  notifications   Notification[]
+  projectMembers  ProjectMember[]
   createdProjects Project[]       @relation("CreatedProjects")
   assignedTasks   Task[]          @relation("AssignedTasks")
-  comments        Comment[]
-  projectMembers  ProjectMember[]
-  notifications   Notification[]
-  activities      ActivityLog[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("users")
 }

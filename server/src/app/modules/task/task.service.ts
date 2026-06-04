@@ -575,11 +575,11 @@ const deleteTask = async (id: string, user: IAuthUser) => {
   }
 
   await prisma.$transaction(async (tx) => {
-    // Log activity using PROJECT_UPDATED since there is no TASK_DELETED
+    // Log activity using TASK_DELETED
     await tx.activityLog.create({
       data: {
         message: `Task "${task.title}" was deleted`,
-        type: 'PROJECT_UPDATED',
+        type: 'TASK_DELETED',
         userId: userData.id,
         projectId: task.projectId,
         taskId: null,

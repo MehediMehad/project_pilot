@@ -19,7 +19,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
   const isCorrectPassword: boolean = await bcrypt.compare(payload.password, userData.password);
 
   if (!isCorrectPassword) {
-    throw new Error('Password incorrect!');
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password incorrect!');
   }
   const accessToken = jwtHelpers.generateToken(
     {
@@ -254,12 +254,16 @@ const resetPassword = async (
 };
 
 const getMe = async (user: any) => {
-  const accessToken = user.accessToken;
-  const decodedData = jwtHelpers.verifyToken(accessToken, config.jwt.jwt_secret as Secret);
+  let email = user.email;
+
+  if (!email && user.accessToken) {
+    const decodedData = jwtHelpers.verifyToken(user.accessToken, config.jwt.jwt_secret as Secret);
+    email = decodedData.email;
+  }
 
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
-      email: decodedData.email,
+      email: email,
       status: UserStatus.ACTIVE,
     },
     select: {

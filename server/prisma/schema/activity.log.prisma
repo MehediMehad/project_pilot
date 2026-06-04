@@ -1,18 +1,14 @@
 model ActivityLog {
-  id      String       @id @default(uuid())
-  message String
-  type    ActivityType
-
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id])
-
+  id        String       @id @default(uuid())
+  message   String
+  type      ActivityType
+  userId    String?
   projectId String?
-  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  taskId String?
-  task   Task?   @relation(fields: [taskId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
+  taskId    String?
+  createdAt DateTime     @default(now())
+  project   Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task      Task?        @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user      User?        @relation(fields: [userId], references: [id])
 
   @@map("activity_logs")
 }

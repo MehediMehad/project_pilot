@@ -30,10 +30,10 @@ async function bootstrap() {
       if (server) {
         server.close(() => {
           logger.info('Server closed gracefully.');
-          process.exit(1); // Exit with a failure code
+          process.exit(0);
         });
       } else {
-        process.exit(1);
+        process.exit(0);
       }
     };
 
