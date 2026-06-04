@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { IProject, IPaginationMeta } from "@/types";
 import { UserRole } from "@/lib/auth/auth-utils";
 import { getAllProjects } from "@/services/project/projectManagement";
@@ -16,6 +16,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useSocket } from "@/contexts/SocketContext";
 
 interface ProjectListPageProps {
   userRole: UserRole;
@@ -43,10 +44,11 @@ export default function ProjectListPage({
 
   // Dialog
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const { socket } = useSocket();
 
   const canCreate = userRole === "ADMIN" || userRole === "PROJECT_MANAGER";
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
       const res = await getAllProjects({
@@ -70,12 +72,28 @@ export default function ProjectListPage({
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, statusFilter, page, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleProjectEvent = () => {
+      fetchProjects();
+    };
+
+    socket.on("project:added", handleProjectEvent);
+    socket.on("project:removed", handleProjectEvent);
+
+    return () => {
+      socket.off("project:added", handleProjectEvent);
+      socket.off("project:removed", handleProjectEvent);
+    };
+  }, [socket, fetchProjects]);
 
   const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit));
 

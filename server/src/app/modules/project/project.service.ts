@@ -6,6 +6,7 @@ import ApiError from '../../errors/ApiError';
 import { IAuthUser } from '../../interfaces/common';
 import { IPaginationOptions } from '../../interfaces/pagination';
 import { projectSearchAbleFields } from './project.constant';
+import { notificationService } from '../notification/notification.service';
 
 const createProject = async (user: IAuthUser, payload: any): Promise<Project> => {
   if (!user) {
@@ -312,6 +313,19 @@ const addProjectMember = async (projectId: string, userId: string, user: IAuthUs
     return member;
   });
 
+  // Send real-time notification to the added user
+  await notificationService.sendNotification(
+    'Added to Project',
+    `You have been added to the project "${project.name}" by ${userData.name}`,
+    'PROJECT_UPDATED',
+    userId,
+  );
+
+  // Emit socket event to reload user's projects page
+  if ((global as any).io) {
+    (global as any).io.to(`user:${userId}`).emit('project:added', { projectId });
+  }
+
   return result;
 };
 
@@ -360,6 +374,19 @@ const removeProjectMember = async (projectId: string, userId: string, user: IAut
       },
     });
   });
+
+  // Send real-time notification to the removed user
+  await notificationService.sendNotification(
+    'Removed from Project',
+    `You have been removed from the project "${project.name}" by ${userData.name}`,
+    'PROJECT_UPDATED',
+    userId,
+  );
+
+  // Emit socket event to reload user's projects page
+  if ((global as any).io) {
+    (global as any).io.to(`user:${userId}`).emit('project:removed', { projectId });
+  }
 
   return { message: 'Member removed successfully' };
 };
