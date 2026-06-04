@@ -148,6 +148,20 @@ export default function DashboardOverview({
     highPriorityTasks,
   } = stats;
 
+  const CustomYAxisTick = ({ x, y, payload }: any) => {
+    return (
+      <text
+        x={x - 6}
+        y={y + 3}
+        textAnchor="end"
+        fill={isDarkMode ? "#94a3b8" : "#475569"}
+        className="text-[10px] font-bold"
+      >
+        {payload.value}
+      </text>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* 1. Overview Grid */}
@@ -351,8 +365,8 @@ export default function DashboardOverview({
                 onClick={() => setActiveProjectTab("chart")}
                 className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${
                   activeProjectTab === "chart"
-                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                     ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
+                     : "text-slate-500 hover:text-slate-880 dark:hover:text-slate-200"
                 }`}
               >
                 Chart
@@ -361,8 +375,8 @@ export default function DashboardOverview({
                 onClick={() => setActiveProjectTab("list")}
                 className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${
                   activeProjectTab === "list"
-                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+                     ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
+                     : "text-slate-500 hover:text-slate-880 dark:hover:text-slate-200"
                 }`}
               >
                 List
@@ -384,12 +398,18 @@ export default function DashboardOverview({
                   <BarChart
                     layout="vertical"
                     data={projectProgress.map((p: any) => ({
-                      name: p.name.length > 15 ? `${p.name.substring(0, 15)}...` : p.name,
+                      name: p.name.length > 20 ? `${p.name.substring(0, 20)}...` : p.name,
                       fullName: p.name,
                       progress: p.progress,
                     }))}
                     margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
                   >
+                    <defs>
+                      <linearGradient id="projectProgressGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor={isDarkMode ? "#a78bfa" : "#818cf8"} />
+                        <stop offset="100%" stopColor={isDarkMode ? "#6d28d9" : "#4f46e5"} />
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid
                       strokeDasharray="3 3"
                       horizontal={false}
@@ -405,9 +425,11 @@ export default function DashboardOverview({
                     <YAxis
                       dataKey="name"
                       type="category"
-                      width={90}
+                      width={120}
                       stroke={isDarkMode ? "#64748b" : "#94a3b8"}
-                      className="text-[10px] font-bold"
+                      tickLine={false}
+                      axisLine={false}
+                      tick={<CustomYAxisTick />}
                     />
                     <Tooltip
                       formatter={(value: any) => [`${value}%`, "Progress"]}
@@ -418,7 +440,7 @@ export default function DashboardOverview({
                         color: isDarkMode ? "#f8fafc" : "#0f172a",
                       }}
                     />
-                    <Bar dataKey="progress" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={12} />
+                    <Bar dataKey="progress" fill="url(#projectProgressGrad)" radius={[0, 4, 4, 0]} barSize={12} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
