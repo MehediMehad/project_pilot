@@ -103,12 +103,12 @@ export default function ProjectListPage({
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card p-4 rounded-xl border border-border shadow-xs">
         <div className="relative w-full sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search projects..."
-            className="pl-9 bg-white border-gray-200 hover:border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-lg text-sm transition-all"
+            className="pl-9 bg-card border-border hover:border-accent focus:border-primary focus:ring-primary rounded-lg text-sm transition-all text-foreground"
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -119,7 +119,7 @@ export default function ProjectListPage({
 
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+            <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
               Status
             </span>
             <select
@@ -128,7 +128,7 @@ export default function ProjectListPage({
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="flex h-9 w-[140px] rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 font-medium hover:border-gray-300 outline-none transition-all shadow-sm cursor-pointer"
+              className="flex h-9 w-[140px] rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground font-medium hover:border-accent outline-none transition-all shadow-sm cursor-pointer"
             >
               <option value="ALL">All Status</option>
               <option value="ACTIVE">Active</option>
@@ -138,7 +138,7 @@ export default function ProjectListPage({
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+            <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
               Sort By
             </span>
             <select
@@ -149,7 +149,7 @@ export default function ProjectListPage({
                 setSortOrder(order);
                 setPage(1);
               }}
-              className="flex h-9 w-[160px] rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700 font-medium hover:border-gray-300 outline-none transition-all shadow-sm cursor-pointer"
+              className="flex h-9 w-[160px] rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground font-medium hover:border-accent outline-none transition-all shadow-sm cursor-pointer"
             >
               <option value="createdAt:desc">Latest Created</option>
               <option value="createdAt:asc">Oldest Created</option>
@@ -160,20 +160,20 @@ export default function ProjectListPage({
         </div>
       </div>
 
-      {/* Projects Grid */}
+       {/* Projects Grid */}
       {loading ? (
-        <div className="flex h-64 items-center justify-center rounded-xl border border-gray-100 bg-white text-gray-400 shadow-sm">
+        <div className="flex h-64 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-xs">
           <div className="flex flex-col items-center gap-2">
-            <span className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
+            <span className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
             <span className="text-sm font-medium">Loading projects...</span>
           </div>
         </div>
       ) : projects.length === 0 ? (
-        <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-gray-100 bg-white text-gray-400 shadow-sm gap-3">
-          <FolderKanban className="h-12 w-12 text-gray-300" />
+        <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-xs gap-3">
+          <FolderKanban className="h-12 w-12 text-muted-foreground/50" />
           <div className="text-center">
-            <p className="font-semibold text-gray-700">No projects found</p>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="font-semibold text-foreground">No projects found</p>
+            <p className="text-sm text-muted-foreground mt-0.5">
               {canCreate
                 ? "Create your first project to get started."
                 : "You haven't been added to any projects yet."}
@@ -183,7 +183,7 @@ export default function ProjectListPage({
             <Button
               variant="outline"
               onClick={() => setCreateDialogOpen(true)}
-              className="mt-2 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl gap-2 px-4 py-2"
+              className="mt-2 border-border text-foreground hover:bg-accent hover:text-accent-foreground rounded-xl gap-2 px-4 py-2 cursor-pointer"
             >
               <Plus className="h-4 w-4" />
               Create Project
