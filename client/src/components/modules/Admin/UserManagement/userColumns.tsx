@@ -49,10 +49,23 @@ export const getUserColumns = (actions: UserColumnActions) => [
     accessor: "role",
     render: (value: unknown) => {
       const roleStr = value as string;
-      const isConfigAdmin = roleStr === "ADMIN";
+      let displayRole = roleStr;
+      let badgeStyle = "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20";
+
+      if (roleStr === "ADMIN") {
+        displayRole = "Admin";
+        badgeStyle = "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/10";
+      } else if (roleStr === "PROJECT_MANAGER") {
+        displayRole = "Project Manager";
+        badgeStyle = "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20 hover:bg-purple-500/10";
+      } else if (roleStr === "TEAM_MEMBER") {
+        displayRole = "Team Member";
+        badgeStyle = "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 hover:bg-blue-500/10";
+      }
+
       return (
-        <Badge variant={isConfigAdmin ? "default" : "secondary"}>
-          {roleStr}
+        <Badge variant="outline" className={`${badgeStyle} font-bold px-2.5 py-0.5 rounded-md`}>
+          {displayRole}
         </Badge>
       );
     },
