@@ -90,7 +90,7 @@ export default function UserFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-card dark:bg-slate-900/95 border border-border dark:border-slate-700/60 backdrop-blur-md">
         <DialogHeader>
           <DialogTitle>Add New User</DialogTitle>
         </DialogHeader>

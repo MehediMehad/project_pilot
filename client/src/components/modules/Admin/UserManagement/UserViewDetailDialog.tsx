@@ -29,7 +29,7 @@ export default function UserViewDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px]">
+      <DialogContent className="sm:max-w-[450px] bg-card dark:bg-slate-900/95 border border-border dark:border-slate-700/60 backdrop-blur-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
             <Info className="h-5 w-5 text-primary" />
