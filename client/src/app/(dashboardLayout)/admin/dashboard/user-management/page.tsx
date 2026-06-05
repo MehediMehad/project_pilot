@@ -106,7 +106,7 @@ export default function UserManagementPage() {
       <UserManagementHeader onAddUserClick={() => setCreateDialogOpen(true)} />
 
       {/* Filters bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card p-4 rounded-md border">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card/65 dark:bg-slate-900/50 backdrop-blur-md p-4 rounded-xl border border-border dark:border-slate-700/60 shadow-xs">
         {/* Search */}
         <div className="relative w-full sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -195,7 +195,7 @@ export default function UserManagementPage() {
 
       {/* Users Table */}
       {loading ? (
-        <div className="flex h-64 items-center justify-center rounded-md border bg-card text-muted-foreground">
+        <div className="flex h-64 items-center justify-center rounded-xl border border-border dark:border-slate-700/60 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md text-muted-foreground">
           <div className="flex flex-col items-center gap-2">
             <span className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
             <span>Loading user directory...</span>

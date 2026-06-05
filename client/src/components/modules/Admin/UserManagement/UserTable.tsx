@@ -42,7 +42,7 @@ export default function UserTable({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border bg-card">
+      <div className="rounded-xl border border-border dark:border-slate-700/60 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md overflow-hidden shadow-2xs">
         <Table>
           <TableHeader>
             <TableRow>
