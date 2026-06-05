@@ -36,6 +36,7 @@ interface TaskFormDialogProps {
   onSuccess: () => void;
   task?: ITask | null; // If provided, we're editing
   preSelectedProjectId?: string; // If provided, we lock task creation to this project
+  preSelectedAssigneeId?: string; // If provided, we pre-select this assignee
 }
 
 export default function TaskFormDialog({
@@ -44,6 +45,7 @@ export default function TaskFormDialog({
   onSuccess,
   task,
   preSelectedProjectId,
+  preSelectedAssigneeId,
 }: TaskFormDialogProps) {
   const isEdit = !!task;
   const [isPending, setIsPending] = useState(false);
@@ -55,7 +57,7 @@ export default function TaskFormDialog({
   const [priority, setPriority] = useState<TaskPriority>(task?.priority || "MEDIUM");
   const [status, setStatus] = useState<TaskStatus>(task?.status || "TODO");
   const [projectId, setProjectId] = useState(preSelectedProjectId || task?.projectId || "");
-  const [assignedToId, setAssignedToId] = useState(task?.assignedToId || "");
+  const [assignedToId, setAssignedToId] = useState(preSelectedAssigneeId || task?.assignedToId || "");
 
   const [projects, setProjects] = useState<IProject[]>([]);
   const [members, setMembers] = useState<IProjectMember[]>([]);
@@ -72,10 +74,10 @@ export default function TaskFormDialog({
       setPriority(task?.priority || "MEDIUM");
       setStatus(task?.status || "TODO");
       setProjectId(preSelectedProjectId || task?.projectId || "");
-      setAssignedToId(task?.assignedToId || "");
+      setAssignedToId(preSelectedAssigneeId || task?.assignedToId || "");
       setErrors({});
     }
-  }, [open, task, preSelectedProjectId]);
+  }, [open, task, preSelectedProjectId, preSelectedAssigneeId]);
 
   // Fetch all projects if not locked to preSelectedProjectId
   useEffect(() => {
@@ -284,23 +286,39 @@ export default function TaskFormDialog({
 
             <div className="space-y-2">
               <Label htmlFor="task-assignee">Assignee</Label>
-              <Select
-                value={assignedToId || "UNASSIGNED"}
-                onValueChange={(value) => setAssignedToId(value === "UNASSIGNED" ? "" : value)}
-                disabled={isLoadingMembers || !projectId}
-              >
-                <SelectTrigger id="task-assignee" className="w-full h-10 bg-background text-foreground">
-                  <SelectValue placeholder="Unassigned" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="UNASSIGNED">Unassigned</SelectItem>
-                  {members.map((m) => (
-                    <SelectItem key={m.userId} value={m.userId}>
-                      {m.user.name} ({m.user.role.replace("_", " ")})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {preSelectedAssigneeId ? (
+                (() => {
+                  const preSelectedMember = members.find((m) => m.userId === preSelectedAssigneeId);
+                  return (
+                    <div className="flex items-center gap-3 px-3 bg-muted/40 dark:bg-slate-900/40 border border-border/70 dark:border-slate-800/80 rounded-xl h-10">
+                      <div className="h-6 w-6 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                        {preSelectedMember?.user.name.charAt(0).toUpperCase() || "?"}
+                      </div>
+                      <span className="text-sm font-semibold text-foreground">
+                        {preSelectedMember?.user.name || "Loading..."}
+                      </span>
+                    </div>
+                  );
+                })()
+              ) : (
+                <Select
+                  value={assignedToId || "UNASSIGNED"}
+                  onValueChange={(value) => setAssignedToId(value === "UNASSIGNED" ? "" : value)}
+                  disabled={isLoadingMembers || !projectId}
+                >
+                  <SelectTrigger id="task-assignee" className="w-full h-10 bg-background text-foreground">
+                    <SelectValue placeholder="Unassigned" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="UNASSIGNED">Unassigned</SelectItem>
+                    {members.map((m) => (
+                      <SelectItem key={m.userId} value={m.userId}>
+                        {m.user.name} ({m.user.role.replace("_", " ")})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
 

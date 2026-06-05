@@ -91,6 +91,7 @@ export default function ProjectDetailPage({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ITask | null>(null);
+  const [preSelectedAssigneeId, setPreSelectedAssigneeId] = useState<string | undefined>(undefined);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -414,18 +415,6 @@ export default function ProjectDetailPage({
         </div>
       )}
 
-      {/* Team Members Section */}
-      <div className="mt-8">
-        <ProjectMemberManager
-          projectId={projectId}
-          members={project.members}
-          createdById={project.createdById}
-          userRole={userRole}
-          onMembersChanged={() => fetchProject(false)}
-          workload={summary?.memberWorkload}
-        />
-      </div>
-
       {/* Project Tasks Section */}
       <div className="mt-8 pt-4">
         <div className="flex items-center justify-between gap-4 mb-4">
@@ -438,6 +427,7 @@ export default function ProjectDetailPage({
               size="sm"
               onClick={() => {
                 setEditingTask(null);
+                setPreSelectedAssigneeId(undefined);
                 setTaskDialogOpen(true);
               }}
               className="flex items-center gap-1.5 cursor-pointer"
@@ -475,13 +465,36 @@ export default function ProjectDetailPage({
         )}
       </div>
 
+      {/* Team Members Section */}
+      <div className="mt-8">
+        <ProjectMemberManager
+          projectId={projectId}
+          members={project.members}
+          createdById={project.createdById}
+          userRole={userRole}
+          onMembersChanged={() => fetchProject(false)}
+          workload={summary?.memberWorkload}
+          onAddTaskClick={(userId) => {
+            setEditingTask(null);
+            setPreSelectedAssigneeId(userId);
+            setTaskDialogOpen(true);
+          }}
+        />
+      </div>
+
       {/* Task Creation/Editing Dialog */}
       <TaskFormDialog
         open={taskDialogOpen}
-        onOpenChange={setTaskDialogOpen}
+        onOpenChange={(open) => {
+          setTaskDialogOpen(open);
+          if (!open) {
+            setPreSelectedAssigneeId(undefined);
+          }
+        }}
         onSuccess={() => fetchProject(false)}
         task={editingTask}
         preSelectedProjectId={projectId}
+        preSelectedAssigneeId={preSelectedAssigneeId}
       />
 
       {/* Edit Dialog */}

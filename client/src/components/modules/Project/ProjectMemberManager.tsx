@@ -60,6 +60,7 @@ interface ProjectMemberManagerProps {
   userRole: UserRole;
   onMembersChanged: () => void;
   workload?: IProjectSummary["memberWorkload"];
+  onAddTaskClick?: (userId: string) => void;
 }
 
 export default function ProjectMemberManager({
@@ -69,6 +70,7 @@ export default function ProjectMemberManager({
   userRole,
   onMembersChanged,
   workload = [],
+  onAddTaskClick,
 }: ProjectMemberManagerProps) {
   const canManageMembers =
     userRole === "ADMIN" || userRole === "PROJECT_MANAGER";
@@ -234,7 +236,20 @@ export default function ProjectMemberManager({
                     </div>
                   </div>
 
-                  {canManageMembers && !isCreator && (
+                  {/* Add Task Button */}
+                  {canManageMembers && onAddTaskClick && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8 gap-1.5 rounded-lg border-primary/20 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer shrink-0 text-xs font-bold"
+                      onClick={() => onAddTaskClick(member.userId)}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add Task
+                    </Button>
+                  )}
+
+                  {canManageMembers && (
                     <Button
                       size="icon"
                       variant="ghost"
