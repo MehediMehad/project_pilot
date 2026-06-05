@@ -192,10 +192,18 @@ export default function ProjectMemberManager({
                 className={`flex flex-col sm:flex-row sm:items-center justify-between rounded-xl border border-border/70 dark:border-slate-800/80 p-4 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md shadow-sm gap-4 ${style.cardBorder}`}
               >
                 <div className="flex items-center gap-3.5">
-                  <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 font-bold ${style.avatarBg}`}>
-                    <span className="text-sm font-bold">
-                      {member.user.name.charAt(0).toUpperCase()}
-                    </span>
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 font-bold overflow-hidden ${style.avatarBg}`}>
+                    {member.user.image ? (
+                      <img
+                        src={member.user.image}
+                        alt={member.user.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-sm font-bold">
+                        {member.user.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
                   </div>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
