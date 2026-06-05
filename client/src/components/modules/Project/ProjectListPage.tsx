@@ -112,10 +112,10 @@ export default function ProjectListPage({
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
             Projects
           </h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             Manage and track your projects in one place.
           </p>
         </div>
@@ -128,7 +128,7 @@ export default function ProjectListPage({
       </div>
 
       {/* Filters Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card p-4 rounded-xl border border-border shadow-xs">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card/65 dark:bg-slate-900/50 backdrop-blur-md p-4 rounded-xl border border-border/70 dark:border-slate-800/80 shadow-sm">
         <div className="relative w-full sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -193,7 +193,7 @@ export default function ProjectListPage({
         </div>
       </div>
 
-       {/* Projects Grid */}
+      {/* Projects Grid */}
       {loading ? (
         <div className="flex h-64 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-xs">
           <div className="flex flex-col items-center gap-2">
@@ -238,7 +238,7 @@ export default function ProjectListPage({
       {/* Pagination Row */}
       {!loading && projects.length > 0 && (
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-1 pt-4">
-          <div className="text-sm text-gray-500 font-medium">
+          <div className="text-sm text-muted-foreground font-medium">
             Showing {from} to {to} of {meta.total}{" "}
             {meta.total === 1 ? "project" : "projects"}
           </div>
@@ -246,20 +246,20 @@ export default function ProjectListPage({
             <button
               onClick={() => setPage(page - 1)}
               disabled={page <= 1}
-              className="flex items-center gap-1 border border-gray-200 text-gray-600 rounded-lg px-3 py-1.5 text-xs font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+              className="flex items-center gap-1 border border-border text-foreground rounded-lg px-3 py-1.5 text-xs font-semibold hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-background"
             >
               <ChevronLeft className="h-3.5 w-3.5" />
               Previous
             </button>
 
-            <span className="border border-indigo-600 bg-indigo-50/50 text-indigo-600 rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all shadow-sm">
+            <span className="border border-primary bg-primary/10 text-primary rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all shadow-sm">
               {meta.page}
             </span>
 
             <button
               onClick={() => setPage(page + 1)}
               disabled={page >= totalPages}
-              className="flex items-center gap-1 border border-gray-200 text-gray-600 rounded-lg px-3 py-1.5 text-xs font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-white"
+              className="flex items-center gap-1 border border-border text-foreground rounded-lg px-3 py-1.5 text-xs font-semibold hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-background"
             >
               Next
               <ChevronRight className="h-3.5 w-3.5" />

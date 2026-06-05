@@ -45,9 +45,9 @@ export default function ProjectCard({ project, basePath }: ProjectCardProps) {
   const config = statusColors[project.status] || statusColors.ACTIVE;
 
   return (
-    <Link href={`${basePath}/${project.id}`} className="block h-full">
+    <Link href={`${basePath}/${project.id}`} className="block h-full group">
       <div
-        className={`overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-md h-full border-t-4 ${config.border} bg-card rounded-xl border-l border-r border-b border-border flex flex-col justify-between`}
+        className={`overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg h-full bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 flex flex-col justify-between`}
       >
         <div className="p-5 flex-1 flex flex-col justify-between">
           <div>
@@ -92,7 +92,7 @@ export default function ProjectCard({ project, basePath }: ProjectCardProps) {
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-4 border-t border-border flex items-center justify-between bg-card text-xs text-muted-foreground font-medium">
+        <div className="px-5 py-4 border-t border-border/70 dark:border-slate-800/80 flex items-center justify-between bg-card/30 dark:bg-slate-950/20 text-xs text-muted-foreground font-medium">
           <div className="flex items-center gap-1.5">
             <Calendar className="h-4 w-4 text-muted-foreground" />
             <span className={isOverdue ? "text-red-500 font-bold" : ""}>
