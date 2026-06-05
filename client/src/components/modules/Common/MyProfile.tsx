@@ -68,7 +68,7 @@ const MyProfile = ({ userInfo }: MyProfileProps) => {
       <form onSubmit={handleSubmit}>
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Profile Card */}
-          <Card className="lg:col-span-1">
+          <Card className="lg:col-span-1 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md border border-border dark:border-slate-700/60 rounded-xl shadow-xs">
             <CardHeader>
               <CardTitle>Profile Picture</CardTitle>
             </CardHeader>
@@ -116,7 +116,7 @@ const MyProfile = ({ userInfo }: MyProfileProps) => {
           </Card>
 
           {/* Profile Information Card */}
-          <Card className="lg:col-span-2">
+          <Card className="lg:col-span-2 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md border border-border dark:border-slate-700/60 rounded-xl shadow-xs">
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
             </CardHeader>
