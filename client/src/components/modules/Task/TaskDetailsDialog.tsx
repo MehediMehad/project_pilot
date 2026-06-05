@@ -34,8 +34,6 @@ import {
   Folder,
   Tag,
   CheckCircle2,
-  Circle,
-  AlertTriangle,
   Eye,
 } from "lucide-react";
 import {
@@ -675,7 +673,7 @@ export default function TaskDetailsDialog({
                                         setEditingCommentId(comment.id);
                                         setEditCommentText(comment.content);
                                       }}
-                                      className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"
+                                      className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 dark:hover:bg-primary cursor-pointer"
                                     >
                                       <Edit2 className="h-3.5 w-3.5" />
                                     </button>
@@ -776,7 +774,7 @@ export default function TaskDetailsDialog({
                             <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                               <button
                                 onClick={() => setPreviewAttachment(attachment)}
-                                className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-250 dark:hover:bg-slate-800 cursor-pointer"
+                                className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-250 dark:hover:bg-primary cursor-pointer"
                               >
                                 <Eye className="h-4 w-4" />
                               </button>
@@ -784,7 +782,7 @@ export default function TaskDetailsDialog({
                                 onClick={() =>
                                   handleDeleteAttachment(attachment.id)
                                 }
-                                className="p-2 rounded-lg text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
+                                className="p-2 rounded-lg text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/50 cursor-pointer"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -803,11 +801,11 @@ export default function TaskDetailsDialog({
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                       </div>
                     ) : activityLogs.length === 0 ? (
-                      <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                      <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-primary">
                         No activity logged yet.
                       </div>
                     ) : (
-                      <div className="relative pl-6 space-y-6 before:absolute before:inset-y-0 before:left-3.5 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-850 max-h-[380px] overflow-y-auto pr-2 py-2">
+                      <div className="relative pl-6 space-y-6 before:absolute before:inset-y-0 before:left-3.5 before:w-0.5 before:bg-slate-200 dark:before:bg-primary/30 max-h-[380px] overflow-y-auto pr-2 py-2">
                         {activityLogs.map((log) => (
                           <div key={log.id} className="relative flex items-start gap-4 group">
                             {/* Dot / Icon container */}
@@ -816,7 +814,7 @@ export default function TaskDetailsDialog({
                             </div>
 
                             {/* Detail card */}
-                            <div className="flex-1 ml-10 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 flex items-center justify-between gap-3 shadow-xs">
+                            <div className="flex-1 ml-10 p-3.5 rounded-xl border border-slate-200 dark:border-primary bg-primary/10 dark:bg-slate-900/50 flex items-center justify-between gap-3 shadow-xs">
                               <div className="flex items-center gap-3">
                                 {/* Actor Avatar */}
                                 <div className="h-7 w-7 rounded-full bg-slate-200 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center uppercase overflow-hidden border border-slate-350 dark:border-slate-700 shrink-0">
@@ -994,14 +992,14 @@ export default function TaskDetailsDialog({
                   "application/vnd.ms-excel",
                   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
                   "application/vnd.ms-powerpoint"
-                ].includes(fileType) || 
-                fileName.endsWith(".pdf") ||
-                fileName.endsWith(".docx") ||
-                fileName.endsWith(".doc") ||
-                fileName.endsWith(".xlsx") ||
-                fileName.endsWith(".xls") ||
-                fileName.endsWith(".pptx") ||
-                fileName.endsWith(".ppt");
+                ].includes(fileType) ||
+                  fileName.endsWith(".pdf") ||
+                  fileName.endsWith(".docx") ||
+                  fileName.endsWith(".doc") ||
+                  fileName.endsWith(".xlsx") ||
+                  fileName.endsWith(".xls") ||
+                  fileName.endsWith(".pptx") ||
+                  fileName.endsWith(".ppt");
 
                 if (fileType.startsWith("image/")) {
                   return (
