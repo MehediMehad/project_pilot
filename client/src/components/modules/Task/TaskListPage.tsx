@@ -134,11 +134,11 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
+          <h1 className="text-3xl font-black tracking-tight text-foreground flex items-center gap-2.5">
             <ListTodo className="h-8 w-8 text-primary" />
             Task Workspace
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-sm font-semibold text-muted-foreground mt-1.5">
             Manage, assign, and organize tasks across your projects.
           </p>
         </div>
@@ -148,7 +148,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
               setEditingTask(null);
               setIsDialogOpen(true);
             }}
-            className="flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+            className="flex items-center gap-1.5 self-start sm:self-auto cursor-pointer rounded-xl font-bold px-4 py-5 shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all"
           >
             <Plus className="h-4 w-4" />
             Add Task
@@ -157,7 +157,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-muted">
+      <div className="flex border-b border-border/60 dark:border-slate-800/60 overflow-x-auto scrollbar-none">
         {(["all", "my", "overdue", "upcoming"] as const).map((tab) => {
           const labels = {
             all: "All Tasks",
@@ -167,9 +167,9 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
           };
 
           const activeStyle =
-            "border-b-2 border-primary text-primary font-semibold";
+            "border-b-2 border-primary text-primary font-extrabold dark:text-primary";
           const inactiveStyle =
-            "text-muted-foreground hover:text-foreground font-medium";
+            "text-muted-foreground hover:text-foreground font-semibold";
 
           return (
             <button
@@ -178,7 +178,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
                 setActiveTab(tab);
                 setPage(1);
               }}
-              className={`px-4 py-2.5 text-sm transition-all focus:outline-none cursor-pointer ${
+              className={`px-4 py-3 text-sm transition-all focus:outline-none cursor-pointer shrink-0 ${
                 activeTab === tab ? activeStyle : inactiveStyle
               }`}
             >
@@ -189,26 +189,26 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
       </div>
 
       {/* Search & Filter Controls */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-card p-4 rounded-xl border border-muted shadow-xs">
-        <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 w-full md:max-w-md">
+      <div className="flex flex-col xl:flex-row gap-4 items-center justify-between bg-card/65 dark:bg-slate-900/50 backdrop-blur-md p-4 rounded-2xl border border-border/70 dark:border-slate-800/80 shadow-md">
+        <form onSubmit={handleSearchSubmit} className="flex items-center gap-2.5 w-full xl:max-w-md">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search tasks..."
-              className="pl-9 h-9"
+              className="pl-9 h-10 bg-muted/40 dark:bg-slate-950/40 border-border/60 dark:border-slate-800/60 rounded-xl"
             />
           </div>
-          <Button type="submit" size="sm" className="h-9 cursor-pointer">
+          <Button type="submit" className="h-10 px-5 rounded-xl cursor-pointer font-bold">
             Search
           </Button>
         </form>
 
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto justify-start xl:justify-end">
           {/* Status filter */}
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-medium text-muted-foreground">Status:</span>
+            <span className="text-xs font-semibold text-muted-foreground">Status:</span>
             <Select
               value={statusFilter}
               onValueChange={(value) => {
@@ -216,7 +216,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-[110px] h-8 text-xs bg-background text-foreground">
+              <SelectTrigger className="w-[120px] h-9 text-xs bg-muted/40 dark:bg-slate-950/40 border-border/60 dark:border-slate-800/60 rounded-xl">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -230,7 +230,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
 
           {/* Priority filter */}
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-medium text-muted-foreground">Priority:</span>
+            <span className="text-xs font-semibold text-muted-foreground">Priority:</span>
             <Select
               value={priorityFilter}
               onValueChange={(value) => {
@@ -238,7 +238,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-[125px] h-8 text-xs bg-background text-foreground">
+              <SelectTrigger className="w-[130px] h-9 text-xs bg-muted/40 dark:bg-slate-950/40 border-border/60 dark:border-slate-800/60 rounded-xl">
                 <SelectValue placeholder="All Priorities" />
               </SelectTrigger>
               <SelectContent>
@@ -252,7 +252,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
 
           {/* Member filter */}
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-medium text-muted-foreground">Assignee:</span>
+            <span className="text-xs font-semibold text-muted-foreground">Assignee:</span>
             <Select
               value={assignedToFilter}
               onValueChange={(value) => {
@@ -260,7 +260,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-[130px] h-8 text-xs bg-background text-foreground">
+              <SelectTrigger className="w-[140px] h-9 text-xs bg-muted/40 dark:bg-slate-950/40 border-border/60 dark:border-slate-800/60 rounded-xl">
                 <SelectValue placeholder="All Members" />
               </SelectTrigger>
               <SelectContent>
@@ -276,7 +276,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
 
           {/* Sort By */}
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-medium text-muted-foreground">Sort By:</span>
+            <span className="text-xs font-semibold text-muted-foreground">Sort By:</span>
             <Select
               value={`${sortBy}:${sortOrder}`}
               onValueChange={(value) => {
@@ -286,7 +286,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
                 setPage(1);
               }}
             >
-              <SelectTrigger className="w-[145px] h-8 text-xs bg-background text-foreground">
+              <SelectTrigger className="w-[155px] h-9 text-xs bg-muted/40 dark:bg-slate-950/40 border-border/60 dark:border-slate-800/60 rounded-xl">
                 <SelectValue placeholder="Latest Created" />
               </SelectTrigger>
               <SelectContent>
@@ -298,38 +298,49 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
             </Select>
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={fetchTasks}
-            disabled={isPending}
-            className="h-9 w-9 text-muted-foreground hover:text-foreground cursor-pointer"
-            title="Refresh"
-          >
-            <RefreshCw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`} />
-          </Button>
+          <div className="flex items-center gap-2 ml-auto xl:ml-0">
+            {(searchTerm || statusFilter !== "ALL" || priorityFilter !== "ALL" || assignedToFilter !== "ALL") && (
+              <Button
+                variant="ghost"
+                onClick={handleResetFilters}
+                className="h-9 px-3 text-xs font-semibold text-muted-foreground hover:text-foreground cursor-pointer rounded-xl hover:bg-muted/30"
+              >
+                Reset
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={fetchTasks}
+              disabled={isPending}
+              className="h-9 w-9 text-muted-foreground hover:text-foreground cursor-pointer rounded-xl bg-muted/30 dark:bg-slate-950/30 border border-border/60 dark:border-slate-800/60"
+              title="Refresh"
+            >
+              <RefreshCw className={`h-4 w-4 ${isPending ? "animate-spin" : ""}`} />
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Main Task List Grid */}
       {isPending ? (
-        <div className="flex items-center justify-center py-20">
+        <div className="flex items-center justify-center py-24">
           <LoaderCw />
         </div>
       ) : tasks.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 border rounded-xl bg-card border-dashed">
-          <ListTodo className="h-10 w-10 text-muted-foreground mb-3" />
-          <p className="font-semibold text-lg text-foreground">No tasks found</p>
-          <p className="text-muted-foreground text-sm mt-1">
-            Try adjusting your search query or filters.
+        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-border/80 dark:border-slate-800/80 rounded-2xl bg-card/40 dark:bg-slate-900/20 backdrop-blur-md">
+          <ListTodo className="h-12 w-12 text-muted-foreground mb-4 opacity-80" />
+          <p className="font-bold text-lg text-foreground">No tasks found</p>
+          <p className="text-muted-foreground text-sm mt-1 max-w-sm text-center">
+            Try adjusting your search query or filters to find what you are looking for.
           </p>
-          {(searchTerm || statusFilter !== "ALL" || priorityFilter !== "ALL") && (
+          {(searchTerm || statusFilter !== "ALL" || priorityFilter !== "ALL" || assignedToFilter !== "ALL") && (
             <Button
-              variant="link"
+              variant="outline"
               onClick={handleResetFilters}
-              className="mt-2 text-sm text-primary"
+              className="mt-4 text-xs font-bold rounded-xl px-4 py-2 border-primary/20 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer"
             >
-              Clear filters
+              Clear all filters
             </Button>
           )}
         </div>
@@ -353,18 +364,18 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-muted/80 pt-4">
-              <span className="text-xs text-muted-foreground">
-                Showing page <span className="font-medium text-foreground">{meta.page}</span> of{" "}
-                <span className="font-medium text-foreground">{totalPages}</span> ({meta.total} total items)
+            <div className="flex items-center justify-between border-t border-border/60 dark:border-slate-800/60 pt-5">
+              <span className="text-xs font-semibold text-muted-foreground">
+                Showing page <span className="font-bold text-foreground">{meta.page}</span> of{" "}
+                <span className="font-bold text-foreground">{totalPages}</span> ({meta.total} total items)
               </span>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setPage((p) => Math.max(p - 1, 1))}
                   disabled={page === 1}
-                  className="h-8 text-xs cursor-pointer"
+                  className="h-8 text-xs font-bold rounded-lg cursor-pointer"
                 >
                   <ChevronLeft className="h-3.5 w-3.5 mr-1" />
                   Prev
@@ -374,7 +385,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
                   size="sm"
                   onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                   disabled={page === totalPages}
-                  className="h-8 text-xs cursor-pointer"
+                  className="h-8 text-xs font-bold rounded-lg cursor-pointer"
                 >
                   Next
                   <ChevronRight className="h-3.5 w-3.5 ml-1" />
@@ -398,7 +409,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
 
 function LoaderCw() {
   return (
-    <div className="flex items-center gap-2 text-muted-foreground">
+    <div className="flex items-center gap-3 text-muted-foreground font-bold">
       <RefreshCw className="h-5 w-5 animate-spin text-primary" />
       <span>Loading workspace...</span>
     </div>
