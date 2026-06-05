@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { IProjectMember, IUser } from "@/types";
+import { IProjectMember, IUser, IProjectSummary } from "@/types";
 import { UserRole } from "@/lib/auth/auth-utils";
 import {
   addProjectMember,
@@ -59,6 +59,7 @@ interface ProjectMemberManagerProps {
   createdById: string;
   userRole: UserRole;
   onMembersChanged: () => void;
+  workload?: IProjectSummary["memberWorkload"];
 }
 
 export default function ProjectMemberManager({
@@ -67,6 +68,7 @@ export default function ProjectMemberManager({
   createdById,
   userRole,
   onMembersChanged,
+  workload = [],
 }: ProjectMemberManagerProps) {
   const canManageMembers =
     userRole === "ADMIN" || userRole === "PROJECT_MANAGER";
@@ -176,10 +178,16 @@ export default function ProjectMemberManager({
               avatarBg: "bg-primary/10 text-primary",
             };
             const label = roleLabels[member.user.role] || member.user.role.replace("_", " ");
+            const userWorkload = workload.find((w) => w.user.id === member.userId) || {
+              totalTasks: 0,
+              completedTasks: 0,
+              pendingTasks: 0,
+            };
+
             return (
               <div
                 key={member.id}
-                className={`flex items-center justify-between rounded-xl border border-border/70 dark:border-slate-800/80 p-4 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md shadow-sm ${style.cardBorder}`}
+                className={`flex flex-col sm:flex-row sm:items-center justify-between rounded-xl border border-border/70 dark:border-slate-800/80 p-4 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md shadow-sm gap-4 ${style.cardBorder}`}
               >
                 <div className="flex items-center gap-3.5">
                   <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 font-bold ${style.avatarBg}`}>
@@ -207,21 +215,41 @@ export default function ProjectMemberManager({
                   </div>
                 </div>
 
-                {canManageMembers && !isCreator && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8 text-muted-foreground hover:text-rose-600 transition-colors"
-                    onClick={() => handleRemoveMember(member.userId)}
-                    disabled={removingId === member.userId}
-                  >
-                    {removingId === member.userId ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-4 w-4" />
-                    )}
-                  </Button>
-                )}
+                <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-border/40">
+                  {/* Task stats pills */}
+                  <div className="flex items-center gap-4 text-xs font-semibold">
+                    <div className="flex flex-col items-center min-w-[36px]">
+                      <span className="text-sm font-extrabold text-foreground">{userWorkload.totalTasks}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</span>
+                    </div>
+                    <div className="h-6 w-px bg-border/60" />
+                    <div className="flex flex-col items-center min-w-[36px]">
+                      <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">{userWorkload.completedTasks}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Done</span>
+                    </div>
+                    <div className="h-6 w-px bg-border/60" />
+                    <div className="flex flex-col items-center min-w-[36px]">
+                      <span className="text-sm font-extrabold text-amber-500">{userWorkload.pendingTasks}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Pending</span>
+                    </div>
+                  </div>
+
+                  {canManageMembers && !isCreator && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 text-muted-foreground hover:text-rose-600 transition-colors shrink-0"
+                      onClick={() => handleRemoveMember(member.userId)}
+                      disabled={removingId === member.userId}
+                    >
+                      {removingId === member.userId ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
             );
           });

@@ -422,66 +422,9 @@ export default function ProjectDetailPage({
           createdById={project.createdById}
           userRole={userRole}
           onMembersChanged={() => fetchProject(false)}
+          workload={summary?.memberWorkload}
         />
       </div>
-
-      {/* Member Workload Section */}
-      {summary && summary.memberWorkload.length > 0 && (
-        <div className="mt-8 pt-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Users className="h-5 w-5 text-muted-foreground" />
-            <h3 className="text-lg font-bold text-foreground">Member Workload</h3>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {summary.memberWorkload.map((mw) => (
-              <div
-                key={mw.user.id}
-                className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md border border-border/70 dark:border-slate-800/80 rounded-xl p-5 shadow-sm flex flex-col justify-between"
-              >
-                <div className="flex items-center gap-3.5 mb-5">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
-                    {mw.user.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-foreground leading-none">
-                      {mw.user.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {mw.user.email}
-                    </p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-2 pt-4 border-t border-border/60 text-center">
-                  <div className="border-r border-border/40">
-                    <span className="text-[18px] font-extrabold text-foreground">
-                      {mw.totalTasks}
-                    </span>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
-                      Total
-                    </p>
-                  </div>
-                  <div className="border-r border-border/40">
-                    <span className="text-[18px] font-extrabold text-emerald-600 dark:text-emerald-400">
-                      {mw.completedTasks}
-                    </span>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
-                      Done
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-[18px] font-extrabold text-amber-500">
-                      {mw.pendingTasks}
-                    </span>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
-                      Pending
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Project Tasks Section */}
       <div className="mt-8 pt-4">
