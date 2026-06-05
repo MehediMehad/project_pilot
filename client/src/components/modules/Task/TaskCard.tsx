@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { updateTask, deleteTask } from "@/services/task/taskManagement";
 import { toast } from "sonner";
 import TaskDetailsDialog from "./TaskDetailsDialog";
+import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 
 interface TaskCardProps {
   task: ITask;
@@ -27,6 +28,7 @@ export default function TaskCard({
   const [isPending, setIsPending] = useState(false);
   const [status, setStatus] = useState<TaskStatus>(task.status);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   // Status colors
   const statusColors = {
@@ -75,8 +77,10 @@ export default function TaskCard({
   };
 
   const handleDelete = () => {
-    if (!confirm("Are you sure you want to delete this task?")) return;
+    setIsDeleteConfirmOpen(true);
+  };
 
+  const handleDeleteConfirmed = () => {
     setIsPending(true);
     try {
       deleteTask(task.id, task.projectId).then((res) => {
@@ -211,6 +215,14 @@ export default function TaskCard({
         onOpenChange={setIsDetailsOpen}
         userRole={userRole}
         currentUserId={currentUserId}
+      />
+
+      <DeleteConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        onOpenChange={setIsDeleteConfirmOpen}
+        onConfirm={handleDeleteConfirmed}
+        title="Delete Task"
+        description="Are you sure you want to permanently delete this task? This action cannot be undone."
       />
     </>
   );

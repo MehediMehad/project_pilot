@@ -52,6 +52,7 @@ import {
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { useSocket } from "@/contexts/SocketContext";
+import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
 
 interface TaskDetailsDialogProps {
   task: ITask;
@@ -93,6 +94,10 @@ export default function TaskDetailsDialog({
   const [isUploading, setIsUploading] = useState(false);
   const [previewAttachment, setPreviewAttachment] = useState<IAttachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Deletion states
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
+  const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
 
   // Sync initialTask changes
   useEffect(() => {
@@ -330,11 +335,14 @@ export default function TaskDetailsDialog({
     }
   };
 
-  const handleDeleteComment = async (commentId: string) => {
-    if (!confirm("Are you sure you want to delete this comment?")) return;
+  const handleDeleteComment = (commentId: string) => {
+    setCommentToDelete(commentId);
+  };
 
+  const handleDeleteCommentConfirmed = async () => {
+    if (!commentToDelete) return;
     try {
-      const res = await deleteComment(task.id, commentId);
+      const res = await deleteComment(task.id, commentToDelete);
       if (res.success) {
         toast.success("Comment deleted");
         fetchComments();
@@ -344,6 +352,8 @@ export default function TaskDetailsDialog({
     } catch (error) {
       console.error(error);
       toast.error("Error deleting comment");
+    } finally {
+      setCommentToDelete(null);
     }
   };
 
@@ -374,11 +384,14 @@ export default function TaskDetailsDialog({
     }
   };
 
-  const handleDeleteAttachment = async (attachmentId: string) => {
-    if (!confirm("Are you sure you want to delete this attachment?")) return;
+  const handleDeleteAttachment = (attachmentId: string) => {
+    setAttachmentToDelete(attachmentId);
+  };
 
+  const handleDeleteAttachmentConfirmed = async () => {
+    if (!attachmentToDelete) return;
     try {
-      const res = await deleteAttachment(task.id, attachmentId);
+      const res = await deleteAttachment(task.id, attachmentToDelete);
       if (res.success) {
         toast.success("Attachment deleted");
         fetchAttachments();
@@ -388,6 +401,8 @@ export default function TaskDetailsDialog({
     } catch (error) {
       console.error(error);
       toast.error("Error deleting attachment");
+    } finally {
+      setAttachmentToDelete(null);
     }
   };
 
@@ -1039,6 +1054,26 @@ export default function TaskDetailsDialog({
           </DialogContent>
         </Dialog>
       )}
+
+      <DeleteConfirmDialog
+        isOpen={!!commentToDelete}
+        onOpenChange={(open) => {
+          if (!open) setCommentToDelete(null);
+        }}
+        onConfirm={handleDeleteCommentConfirmed}
+        title="Delete Comment"
+        description="Are you sure you want to delete this comment? This action cannot be undone."
+      />
+
+      <DeleteConfirmDialog
+        isOpen={!!attachmentToDelete}
+        onOpenChange={(open) => {
+          if (!open) setAttachmentToDelete(null);
+        }}
+        onConfirm={handleDeleteAttachmentConfirmed}
+        title="Delete Attachment"
+        description="Are you sure you want to delete this attachment? This action cannot be undone."
+      />
     </>
   );
 }
