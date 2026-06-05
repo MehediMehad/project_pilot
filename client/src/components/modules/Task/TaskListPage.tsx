@@ -33,7 +33,7 @@ type TabType = "all" | "my" | "overdue" | "upcoming";
 
 export default function TaskListPage({ userRole, currentUserId: propCurrentUserId }: TaskListPageProps) {
   const [tasks, setTasks] = useState<ITask[]>([]);
-  const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0 });
+  const [meta, setMeta] = useState({ page: 1, limit: 9, total: 0 });
   const [activeTab, setActiveTab] = useState<TabType>("all");
   const [currentUserId, setCurrentUserId] = useState<string | undefined>(propCurrentUserId);
   const [users, setUsers] = useState<IUser[]>([]);
@@ -65,6 +65,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(9);
 
   // Dialog State
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -82,7 +83,7 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
         sortBy,
         sortOrder,
         page,
-        limit: 10,
+        limit,
       };
 
       let res;
@@ -105,10 +106,15 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
     });
   };
 
-  // Trigger fetch when tab, filters, page or search updates
+  // Trigger fetch when tab, filters, page, limit or search updates
   useEffect(() => {
     fetchTasks();
-  }, [activeTab, statusFilter, priorityFilter, assignedToFilter, sortBy, sortOrder, page]);
+  }, [activeTab, statusFilter, priorityFilter, assignedToFilter, sortBy, sortOrder, page, limit]);
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1);
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,7 +132,9 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
     setPage(1);
   };
 
-  const totalPages = Math.ceil(meta.total / meta.limit);
+  const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit));
+  const from = meta.total === 0 ? 0 : (meta.page - 1) * meta.limit + 1;
+  const to = Math.min(meta.page * meta.limit, meta.total);
   const isManagerOrAdmin = userRole === "ADMIN" || userRole === "PROJECT_MANAGER";
 
   return (
@@ -363,32 +371,115 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
           </div>
 
           {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-border/60 dark:border-slate-800/60 pt-5">
-              <span className="text-xs font-semibold text-muted-foreground">
-                Showing page <span className="font-bold text-foreground">{meta.page}</span> of{" "}
-                <span className="font-bold text-foreground">{totalPages}</span> ({meta.total} total items)
-              </span>
-              <div className="flex items-center gap-1.5">
+          {!isPending && tasks.length > 0 && (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-t border-border/60 dark:border-slate-800/60 pt-5 gap-4">
+              <div className="flex items-center gap-4">
+                <span className="text-xs font-semibold text-muted-foreground">
+                  Showing <span className="font-bold text-foreground">{from}</span> to <span className="font-bold text-foreground">{to}</span> of{" "}
+                  <span className="font-bold text-foreground">{meta.total}</span> ({totalPages} {totalPages === 1 ? "page" : "pages"})
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground font-semibold">Rows per page:</span>
+                  <Select
+                    value={meta.limit.toString()}
+                    onValueChange={(val) => handleLimitChange(Number(val))}
+                  >
+                    <SelectTrigger className="w-[70px] h-8 bg-background border-border dark:border-slate-800 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[6, 9, 12, 18, 30].map((size) => (
+                        <SelectItem key={size} value={size.toString()} className="text-xs cursor-pointer">
+                          {size}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 flex-wrap">
                 <Button
                   variant="outline"
                   size="sm"
+                  className="h-8 text-xs px-2.5 border border-border dark:border-slate-800 hover:bg-muted dark:hover:bg-slate-800/80 cursor-pointer"
                   onClick={() => setPage((p) => Math.max(p - 1, 1))}
                   disabled={page === 1}
-                  className="h-8 text-xs font-bold rounded-lg cursor-pointer"
                 >
-                  <ChevronLeft className="h-3.5 w-3.5 mr-1" />
-                  Prev
+                  Previous
                 </Button>
+
+                {(() => {
+                  const getPageNumbers = () => {
+                    const pages = [];
+                    const maxVisiblePages = 5;
+
+                    if (totalPages <= maxVisiblePages + 2) {
+                      for (let i = 1; i <= totalPages; i++) {
+                        pages.push(i);
+                      }
+                    } else {
+                      pages.push(1);
+
+                      if (page > 3) {
+                        pages.push("...");
+                      }
+
+                      const start = Math.max(2, page - 1);
+                      const end = Math.min(totalPages - 1, page + 1);
+
+                      for (let i = start; i <= end; i++) {
+                        pages.push(i);
+                      }
+
+                      if (page < totalPages - 2) {
+                        pages.push("...");
+                      }
+
+                      pages.push(totalPages);
+                    }
+                    return pages;
+                  };
+
+                  return getPageNumbers().map((pageNum, idx) => {
+                    if (pageNum === "...") {
+                      return (
+                        <span
+                          key={`ellipsis-${idx}`}
+                          className="px-1.5 text-xs text-muted-foreground select-none"
+                        >
+                          ...
+                        </span>
+                      );
+                    }
+
+                    const isCurrent = pageNum === page;
+                    return (
+                      <Button
+                        key={`page-${pageNum}`}
+                        variant={isCurrent ? "default" : "outline"}
+                        size="sm"
+                        className={`h-8 w-8 text-xs p-0 border border-border dark:border-slate-800 font-semibold cursor-pointer ${
+                          isCurrent
+                            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                            : "hover:bg-muted dark:hover:bg-slate-800/80"
+                        }`}
+                        onClick={() => setPage(Number(pageNum))}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  });
+                })()}
+
                 <Button
                   variant="outline"
                   size="sm"
+                  className="h-8 text-xs px-2.5 border border-border dark:border-slate-800 hover:bg-muted dark:hover:bg-slate-800/80 cursor-pointer"
                   onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                   disabled={page === totalPages}
-                  className="h-8 text-xs font-bold rounded-lg cursor-pointer"
                 >
                   Next
-                  <ChevronRight className="h-3.5 w-3.5 ml-1" />
                 </Button>
               </div>
             </div>
