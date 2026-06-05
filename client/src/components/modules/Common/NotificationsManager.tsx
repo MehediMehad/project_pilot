@@ -2,7 +2,7 @@
 
 import { useSocket } from "@/contexts/SocketContext";
 import { formatDistanceToNow } from "date-fns";
-import { Bell, BellOff, CheckCheck, Trash2, Clock, CheckCircle2, Circle } from "lucide-react";
+import { BellOff, CheckCheck, Clock, CheckCircle2, Circle } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
@@ -12,8 +12,6 @@ const NotificationsManager = () => {
     unreadCount,
     markAllAsRead,
     markAsRead,
-    clearNotification,
-    clearAllNotifications,
   } = useSocket();
 
   const [filter, setFilter] = useState<"ALL" | "UNREAD" | "READ">("ALL");
@@ -46,13 +44,6 @@ const NotificationsManager = () => {
                 Mark all as read
               </button>
             )}
-            <button
-              onClick={clearAllNotifications}
-              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold border border-border dark:border-slate-700/60 hover:bg-muted dark:hover:bg-slate-900/60 text-rose-500 dark:text-rose-400 rounded-xl transition-all"
-            >
-              <Trash2 className="h-4 w-4" />
-              Clear all logs
-            </button>
           </div>
         )}
       </div>
@@ -75,11 +66,10 @@ const NotificationsManager = () => {
               <button
                 key={tab}
                 onClick={() => setFilter(tab)}
-                className={`relative px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                  isActive
-                    ? "bg-muted dark:bg-slate-800 text-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50 dark:hover:bg-slate-800/40"
-                }`}
+                className={`relative px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${isActive
+                  ? "bg-muted dark:bg-slate-800 text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50 dark:hover:bg-slate-800/40"
+                  }`}
               >
                 <span className="capitalize">{tab.toLowerCase()}</span>
                 {count > 0 && (
@@ -116,11 +106,15 @@ const NotificationsManager = () => {
               return (
                 <div
                   key={notif.id || index}
-                  className={`p-4 flex gap-4 transition-all duration-200 hover:bg-muted/40 dark:hover:bg-slate-850/20 ${
-                    !notif.isRead
-                      ? "bg-primary/5 dark:bg-primary/5 border-l-4 border-primary"
-                      : "border-l-4 border-transparent"
-                  }`}
+                  className={`p-4 flex gap-4 transition-all duration-200 hover:bg-muted/40 dark:hover:bg-slate-850/20 ${!notif.isRead
+                    ? "bg-primary/5 dark:bg-primary/5 border-l-4 border-primary cursor-pointer"
+                    : "border-l-4 border-transparent"
+                    }`}
+                  onClick={() => {
+                    if (!notif.isRead && notif.id) {
+                      markAsRead(notif.id);
+                    }
+                  }}
                 >
                   {/* Status Indicator Icon */}
                   <div className="pt-0.5 shrink-0">
@@ -143,14 +137,7 @@ const NotificationsManager = () => {
                         </p>
                       </div>
 
-                      {/* Right-aligned remove single notification action */}
-                      <button
-                        onClick={() => clearNotification(index)}
-                        className="text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 p-1 rounded-md hover:bg-muted dark:hover:bg-slate-800 transition-colors shrink-0"
-                        title="Dismiss notification"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
+
                     </div>
 
                     <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-3 font-medium">
