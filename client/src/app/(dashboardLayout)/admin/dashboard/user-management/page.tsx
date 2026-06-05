@@ -101,7 +101,7 @@ export default function UserManagementPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
       {/* Header */}
       <UserManagementHeader onAddUserClick={() => setCreateDialogOpen(true)} />
 
