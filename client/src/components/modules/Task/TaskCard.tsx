@@ -124,7 +124,7 @@ export default function TaskCard({
     <>
       <div
         onClick={() => setIsDetailsOpen(true)}
-        className={`bg-card text-card-foreground border border-t-4 rounded-xl shadow-xs transition-all duration-300 hover:shadow-md flex flex-col justify-between cursor-pointer ${statusColors[status]}`}
+        className={`overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border-t-4 border-l border-r border-b border-l-border border-r-border border-b-border dark:border-l-slate-700/60 dark:border-r-slate-700/60 dark:border-b-slate-700/60 flex flex-col justify-between ${statusColors[status]}`}
       >
         <div className="p-5 space-y-4">
           {/* Top Info */}
@@ -161,7 +161,7 @@ export default function TaskCard({
         </div>
 
         {/* Footer Details */}
-        <div className="px-5 py-4 border-t border-muted/80 bg-muted/10 dark:bg-muted/5 flex items-center justify-between gap-4">
+        <div className="px-5 py-4 border-t border-border dark:border-slate-700/60 bg-card/30 dark:bg-slate-950/20 flex items-center justify-between gap-4">
           {/* Due Date & Assignee */}
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
