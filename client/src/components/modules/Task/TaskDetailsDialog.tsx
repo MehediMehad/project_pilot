@@ -36,6 +36,7 @@ import {
   CheckCircle2,
   Circle,
   AlertTriangle,
+  Eye,
 } from "lucide-react";
 import {
   getTaskComments,
@@ -90,6 +91,7 @@ export default function TaskDetailsDialog({
 
   // Attachment state
   const [isUploading, setIsUploading] = useState(false);
+  const [previewAttachment, setPreviewAttachment] = useState<IAttachment | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync initialTask changes
@@ -426,167 +428,168 @@ export default function TaskDetailsDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[950px] md:max-w-[1050px] w-[95vw] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0 rounded-2xl bg-background border border-border shadow-2xl transition-all duration-300">
-        {/* Top Header Card */}
-        <div className="relative p-6 border-b border-border bg-linear-to-r from-slate-50 to-white dark:from-slate-950 dark:to-slate-900/40">
-          <div className="flex flex-col md:flex-row md:items-start justify-between gap-5 pr-8">
-            <div className="space-y-1.5 flex-1">
-              <div className="flex items-center gap-2 text-xs text-primary font-bold tracking-wider uppercase">
-                <Folder className="h-3.5 w-3.5" />
-                <span>{task.project?.name || "Workspace Project"}</span>
+    <>
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[950px] md:max-w-[1050px] w-[95vw] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0 rounded-2xl bg-background border border-border shadow-2xl transition-all duration-300">
+          {/* Top Header Card */}
+          <div className="relative p-6 border-b border-border bg-linear-to-r from-slate-50 to-white dark:from-slate-950 dark:to-slate-900/40">
+            <div className="flex flex-col md:flex-row md:items-start justify-between gap-5 pr-8">
+              <div className="space-y-1.5 flex-1">
+                <div className="flex items-center gap-2 text-xs text-primary font-bold tracking-wider uppercase">
+                  <Folder className="h-3.5 w-3.5" />
+                  <span>{task.project?.name || "Workspace Project"}</span>
+                </div>
+                <DialogTitle className="text-2xl font-extrabold text-foreground tracking-tight leading-snug">
+                  {task.title}
+                </DialogTitle>
               </div>
-              <DialogTitle className="text-2xl font-extrabold text-foreground tracking-tight leading-snug">
-                {task.title}
-              </DialogTitle>
             </div>
           </div>
-        </div>
 
-        {/* Scrollable Layout Content */}
-        <div className="flex-1 overflow-y-auto p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Body (Left 2 Columns) */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Description Card */}
-            <div className="space-y-3">
-              <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                <FileText className="h-4 w-4 text-primary" />
-                Description
-              </h5>
-              <div className="p-5 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-sm text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap border border-slate-200 dark:border-slate-800/80 shadow-xs">
-                {task.description || (
-                  <span className="italic text-slate-500 dark:text-slate-400">
-                    No description provided for this task.
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Dynamic Tabs Block */}
-            <div className="space-y-6">
-              <div className="flex border-b border-border gap-2">
-                <button
-                  onClick={() => setActiveTab("comments")}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "comments"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                    }`}
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Comments
-                  <span className="ml-1 px-2.5 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-full font-bold text-slate-700 dark:text-slate-300">
-                    {comments.length}
-                  </span>
-                </button>
-                <button
-                  onClick={() => setActiveTab("attachments")}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "attachments"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                    }`}
-                >
-                  <Paperclip className="h-4 w-4" />
-                  Attachments
-                  <span className="ml-1 px-2.5 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-full font-bold text-slate-700 dark:text-slate-300">
-                    {attachments.length}
-                  </span>
-                </button>
-                <button
-                  onClick={() => setActiveTab("activity")}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "activity"
-                    ? "border-primary text-primary"
-                    : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                    }`}
-                >
-                  <Clock className="h-4 w-4" />
-                  Activity
-                  <span className="ml-1 px-2.5 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-full font-bold text-slate-700 dark:text-slate-300">
-                    {activityLogs.length}
-                  </span>
-                </button>
+          {/* Scrollable Layout Content */}
+          <div className="flex-1 overflow-y-auto p-6 lg:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Body (Left 2 Columns) */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* Description Card */}
+              <div className="space-y-3">
+                <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                  <FileText className="h-4 w-4 text-primary" />
+                  Description
+                </h5>
+                <div className="p-5 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-sm text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-wrap border border-slate-200 dark:border-slate-800/80 shadow-xs">
+                  {task.description || (
+                    <span className="italic text-slate-500 dark:text-slate-400">
+                      No description provided for this task.
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* Comments Panel */}
-              {activeTab === "comments" && (
-                <div className="space-y-6">
-                  {/* Styled Input Box */}
-                  <form
-                    onSubmit={handleAddComment}
-                    className="flex gap-3 items-start bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800"
+              {/* Dynamic Tabs Block */}
+              <div className="space-y-6">
+                <div className="flex border-b border-border gap-2">
+                  <button
+                    onClick={() => setActiveTab("comments")}
+                    className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "comments"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                      }`}
                   >
-                    <Textarea
-                      placeholder="Write a clear, detailed comment..."
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      className="min-h-[50px] max-h-[140px] rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus-visible:ring-1 focus-visible:ring-primary shadow-xs resize-none text-slate-800 dark:text-slate-200"
-                    />
-                    <Button
-                      type="submit"
-                      disabled={isSubmittingComment || !newComment.trim()}
-                      className="h-[50px] w-[50px] rounded-lg px-0 shrink-0 bg-primary hover:bg-primary/90 text-white font-bold cursor-pointer"
+                    <MessageSquare className="h-4 w-4" />
+                    Comments
+                    <span className="ml-1 px-2.5 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-full font-bold text-slate-700 dark:text-slate-300">
+                      {comments.length}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("attachments")}
+                    className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "attachments"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                      }`}
+                  >
+                    <Paperclip className="h-4 w-4" />
+                    Attachments
+                    <span className="ml-1 px-2.5 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-full font-bold text-slate-700 dark:text-slate-300">
+                      {attachments.length}
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("activity")}
+                    className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "activity"
+                      ? "border-primary text-primary"
+                      : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                      }`}
+                  >
+                    <Clock className="h-4 w-4" />
+                    Activity
+                    <span className="ml-1 px-2.5 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded-full font-bold text-slate-700 dark:text-slate-300">
+                      {activityLogs.length}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Comments Panel */}
+                {activeTab === "comments" && (
+                  <div className="space-y-6">
+                    {/* Styled Input Box */}
+                    <form
+                      onSubmit={handleAddComment}
+                      className="flex gap-3 items-start bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800"
                     >
-                      {isSubmittingComment ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        <Plus className="h-5 w-5" />
-                      )}
-                    </Button>
-                  </form>
+                      <Textarea
+                        placeholder="Write a clear, detailed comment..."
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        className="min-h-[50px] max-h-[140px] rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 focus-visible:ring-1 focus-visible:ring-primary shadow-xs resize-none text-slate-800 dark:text-slate-200"
+                      />
+                      <Button
+                        type="submit"
+                        disabled={isSubmittingComment || !newComment.trim()}
+                        className="h-[50px] w-[50px] rounded-lg px-0 shrink-0 bg-primary hover:bg-primary/90 text-white font-bold cursor-pointer"
+                      >
+                        {isSubmittingComment ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Plus className="h-5 w-5" />
+                        )}
+                      </Button>
+                    </form>
 
-                  {/* List of Comments */}
-                  {isLoadingComments ? (
-                    <div className="py-12 flex justify-center text-muted-foreground">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  ) : comments.length === 0 ? (
-                    <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-                      No comments posted yet.
-                    </div>
-                  ) : (
-                    <div className="space-y-4 max-h-[340px] overflow-y-auto pr-2">
-                      {comments.map((comment) => {
-                        const isOwner = comment.userId === currentUserId;
-                        const isEditing = editingCommentId === comment.id;
+                    {/* List of Comments */}
+                    {isLoadingComments ? (
+                      <div className="py-12 flex justify-center text-muted-foreground">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      </div>
+                    ) : comments.length === 0 ? (
+                      <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                        No comments posted yet.
+                      </div>
+                    ) : (
+                      <div className="space-y-4 max-h-[340px] overflow-y-auto pr-2">
+                        {comments.map((comment) => {
+                          const isOwner = comment.userId === currentUserId;
+                          const isEditing = editingCommentId === comment.id;
 
-                        return (
-                          <div
-                            key={comment.id}
-                            className="p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 flex gap-4 transition-all duration-300 hover:shadow-xs group relative"
-                          >
-                            {/* User Avatar */}
-                            <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-sm uppercase overflow-hidden shrink-0 border border-slate-350 dark:border-slate-700">
-                              {comment.user.image ? (
-                                <img
-                                  src={comment.user.image}
-                                  alt={comment.user.name}
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                comment.user.name.charAt(0)
-                              )}
-                            </div>
+                          return (
+                            <div
+                              key={comment.id}
+                              className="p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 flex gap-4 transition-all duration-300 hover:shadow-xs group relative"
+                            >
+                              {/* User Avatar */}
+                              <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 flex items-center justify-center font-bold text-sm uppercase overflow-hidden shrink-0 border border-slate-350 dark:border-slate-700">
+                                {comment.user.image ? (
+                                  <img
+                                    src={comment.user.image}
+                                    alt={comment.user.name}
+                                    className="h-full w-full object-cover"
+                                  />
+                                ) : (
+                                  comment.user.name.charAt(0)
+                                )}
+                              </div>
 
-                            <div className="flex-1 space-y-1.5">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100">
-                                    {comment.user.name}
-                                  </span>
-                                  <span className="text-[9px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold uppercase tracking-wider">
-                                    {comment.user.role.replace("_", " ")}
-                                  </span>
-                                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
-                                    {new Date(
-                                      comment.createdAt,
-                                    ).toLocaleDateString("en-US", {
-                                      month: "short",
-                                      day: "numeric",
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
-                                  </span>
-                                </div>
-                                {/* <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
+                              <div className="flex-1 space-y-1.5">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100">
+                                      {comment.user.name}
+                                    </span>
+                                    <span className="text-[9px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold uppercase tracking-wider">
+                                      {comment.user.role.replace("_", " ")}
+                                    </span>
+                                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
+                                      {new Date(
+                                        comment.createdAt,
+                                      ).toLocaleDateString("en-US", {
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })}
+                                    </span>
+                                  </div>
+                                  {/* <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
                                   {new Date(
                                     comment.createdAt,
                                   ).toLocaleDateString("en-US", {
@@ -596,347 +599,409 @@ export default function TaskDetailsDialog({
                                     minute: "2-digit",
                                   })}
                                 </span> */}
+                                </div>
+
+                                {isEditing ? (
+                                  <div className="space-y-2 pt-1">
+                                    <Textarea
+                                      value={editCommentText}
+                                      onChange={(e) =>
+                                        setEditCommentText(e.target.value)
+                                      }
+                                      className="min-h-[70px] text-slate-800 dark:text-slate-200"
+                                    />
+                                    <div className="flex justify-end gap-2">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => setEditingCommentId(null)}
+                                        className="h-8 px-3 text-xs cursor-pointer"
+                                      >
+                                        Cancel
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        onClick={() =>
+                                          handleUpdateComment(comment.id)
+                                        }
+                                        className="h-8 px-3 text-xs bg-primary hover:bg-primary/95 text-white cursor-pointer"
+                                      >
+                                        Save
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p
+                                    className="text-sm text-slate-800 dark:text-slate-200                 >
+ leading-relaxed font-medium"
+                                  >
+                                    {comment.content}
+                                  </p>
+                                )}
                               </div>
 
-                              {isEditing ? (
-                                <div className="space-y-2 pt-1">
-                                  <Textarea
-                                    value={editCommentText}
-                                    onChange={(e) =>
-                                      setEditCommentText(e.target.value)
-                                    }
-                                    className="min-h-[70px] text-slate-800 dark:text-slate-200"
-                                  />
-                                  <div className="flex justify-end gap-2">
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => setEditingCommentId(null)}
-                                      className="h-8 px-3 text-xs cursor-pointer"
+                              {/* Comment Action Icons */}
+                              {!isEditing &&
+                                (isOwner || userRole === "ADMIN") && (
+                                  <div className="absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <button
+                                      onClick={() => {
+                                        setEditingCommentId(comment.id);
+                                        setEditCommentText(comment.content);
+                                      }}
+                                      className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"
                                     >
-                                      Cancel
-                                    </Button>
-                                    <Button
-                                      size="sm"
+                                      <Edit2 className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button
                                       onClick={() =>
-                                        handleUpdateComment(comment.id)
+                                        handleDeleteComment(comment.id)
                                       }
-                                      className="h-8 px-3 text-xs bg-primary hover:bg-primary/95 text-white cursor-pointer"
+                                      className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
                                     >
-                                      Save
-                                    </Button>
+                                      <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
                                   </div>
-                                </div>
-                              ) : (
-                                <p
-                                  className="text-sm text-slate-800 dark:text-slate-200                 >
- leading-relaxed font-medium"
-                                >
-                                  {comment.content}
-                                </p>
-                              )}
+                                )}
                             </div>
-
-                            {/* Comment Action Icons */}
-                            {!isEditing &&
-                              (isOwner || userRole === "ADMIN") && (
-                                <div className="absolute right-3 top-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                  <button
-                                    onClick={() => {
-                                      setEditingCommentId(comment.id);
-                                      setEditCommentText(comment.content);
-                                    }}
-                                    className="p-1.5 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 cursor-pointer"
-                                  >
-                                    <Edit2 className="h-3.5 w-3.5" />
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      handleDeleteComment(comment.id)
-                                    }
-                                    className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                  </button>
-                                </div>
-                              )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {activeTab === "attachments" && (
-                <div className="space-y-6">
-                  {/* File Upload Zone */}
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-primary/50 dark:hover:border-primary/40 rounded-xl p-8 text-center cursor-pointer transition-all duration-300 bg-slate-50 hover:bg-slate-100/50 dark:bg-slate-900/10 dark:hover:bg-slate-900/20 flex flex-col items-center justify-center gap-3 group"
-                  >
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                    {isUploading ? (
-                      <>
-                        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                          Uploading selected file...
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <div className="h-12 w-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 group-hover:scale-110 transition-transform shadow-xs">
-                          <Plus className="h-6 w-6 text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                            Click to upload files
-                          </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
-                            Upload images, PDFs, spreadsheets, or documents (Max
-                            10MB)
-                          </p>
-                        </div>
-                      </>
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
+                )}
 
-                  {/* Attachments List */}
-                  {isLoadingAttachments ? (
-                    <div className="py-12 flex justify-center text-muted-foreground">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                {activeTab === "attachments" && (
+                  <div className="space-y-6">
+                    {/* File Upload Zone */}
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-primary/50 dark:hover:border-primary/40 rounded-xl p-8 text-center cursor-pointer transition-all duration-300 bg-slate-50 hover:bg-slate-100/50 dark:bg-slate-900/10 dark:hover:bg-slate-900/20 flex flex-col items-center justify-center gap-3 group"
+                    >
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                            Uploading selected file...
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <div className="h-12 w-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 group-hover:scale-110 transition-transform shadow-xs">
+                            <Plus className="h-6 w-6 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                              Click to upload files
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">
+                              Upload images, PDFs, spreadsheets, or documents (Max
+                              10MB)
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
-                  ) : attachments.length === 0 ? (
-                    <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-                      No documents or files uploaded yet.
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[340px] overflow-y-auto pr-2">
-                      {attachments.map((attachment) => (
-                        <div
-                          key={attachment.id}
-                          className="p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 flex items-center justify-between gap-4 group hover:shadow-xs transition-shadow duration-300"
-                        >
-                          <div className="flex items-center gap-3 overflow-hidden">
-                            <div className="h-11 w-11 rounded-xl bg-slate-200/50 dark:bg-slate-900 flex items-center justify-center border border-slate-250 dark:border-slate-800 shrink-0">
-                              {getAttachmentIcon(attachment.fileType)}
+
+                    {/* Attachments List */}
+                    {isLoadingAttachments ? (
+                      <div className="py-12 flex justify-center text-muted-foreground">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      </div>
+                    ) : attachments.length === 0 ? (
+                      <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                        No documents or files uploaded yet.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[340px] overflow-y-auto pr-2">
+                        {attachments.map((attachment) => (
+                          <div
+                            key={attachment.id}
+                            className="p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/30 flex items-center justify-between gap-4 group hover:shadow-xs transition-shadow duration-300"
+                          >
+                            <div className="flex items-center gap-3 overflow-hidden">
+                              <div className="h-11 w-11 rounded-xl bg-slate-200/50 dark:bg-slate-900 flex items-center justify-center border border-slate-250 dark:border-slate-800 shrink-0">
+                                {getAttachmentIcon(attachment.fileType)}
+                              </div>
+                              <div className="overflow-hidden">
+                                <p
+                                  className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate"
+                                  title={attachment.fileName}
+                                >
+                                  {attachment.fileName}
+                                </p>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">
+                                  {new Date(
+                                    attachment.createdAt,
+                                  ).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                  })}
+                                </span>
+                              </div>
                             </div>
-                            <div className="overflow-hidden">
-                              <p
-                                className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate"
-                                title={attachment.fileName}
+
+                            <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              <button
+                                onClick={() => setPreviewAttachment(attachment)}
+                                className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-250 dark:hover:bg-slate-800 cursor-pointer"
                               >
-                                {attachment.fileName}
-                              </p>
-                              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">
-                                {new Date(
-                                  attachment.createdAt,
-                                ).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                })}
+                                <Eye className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleDeleteAttachment(attachment.id)
+                                }
+                                className="p-2 rounded-lg text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === "activity" && (
+                  <div className="space-y-6">
+                    {isLoadingActivity ? (
+                      <div className="py-12 flex justify-center text-muted-foreground">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      </div>
+                    ) : activityLogs.length === 0 ? (
+                      <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                        No activity logged yet.
+                      </div>
+                    ) : (
+                      <div className="relative pl-6 space-y-6 before:absolute before:inset-y-0 before:left-3.5 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-850 max-h-[380px] overflow-y-auto pr-2 py-2">
+                        {activityLogs.map((log) => (
+                          <div key={log.id} className="relative flex items-start gap-4 group">
+                            {/* Dot / Icon container */}
+                            <div className="absolute left-0 mt-0.5 shrink-0 z-10">
+                              {getActivityIcon(log.type)}
+                            </div>
+
+                            {/* Detail card */}
+                            <div className="flex-1 ml-10 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 flex items-center justify-between gap-3 shadow-xs">
+                              <div className="flex items-center gap-3">
+                                {/* Actor Avatar */}
+                                <div className="h-7 w-7 rounded-full bg-slate-200 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center uppercase overflow-hidden border border-slate-350 dark:border-slate-700 shrink-0">
+                                  {log.user?.image ? (
+                                    <img
+                                      src={log.user.image}
+                                      alt={log.user.name}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  ) : (
+                                    log.user?.name?.charAt(0) || "U"
+                                  )}
+                                </div>
+                                <div className="space-y-0.5">
+                                  <p className="text-xs font-bold text-slate-850 dark:text-slate-250">
+                                    {log.message}
+                                  </p>
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                                    by {log.user?.name || "System"} • {log.user?.role?.replace("_", " ")}
+                                  </p>
+                                </div>
+                              </div>
+                              <span className="text-[10px] text-slate-450 dark:text-slate-450 font-semibold shrink-0">
+                                {formatDistanceToNow(new Date(log.createdAt), { addSuffix: true })}
                               </span>
                             </div>
                           </div>
-
-                          <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <a
-                              href={attachment.fileUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              download
-                              className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-250 dark:hover:bg-slate-800 cursor-pointer"
-                            >
-                              <Download className="h-4 w-4" />
-                            </a>
-                            <button
-                              onClick={() =>
-                                handleDeleteAttachment(attachment.id)
-                              }
-                              className="p-2 rounded-lg text-slate-500 hover:text-red-650 hover:bg-red-50 dark:hover:bg-red-950/20 cursor-pointer"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {activeTab === "activity" && (
-                <div className="space-y-6">
-                  {isLoadingActivity ? (
-                    <div className="py-12 flex justify-center text-muted-foreground">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  ) : activityLogs.length === 0 ? (
-                    <div className="text-center py-12 text-sm text-slate-500 dark:text-slate-400 italic bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-                      No activity logged yet.
-                    </div>
-                  ) : (
-                    <div className="relative pl-6 space-y-6 before:absolute before:inset-y-0 before:left-3.5 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-850 max-h-[380px] overflow-y-auto pr-2 py-2">
-                      {activityLogs.map((log) => (
-                        <div key={log.id} className="relative flex items-start gap-4 group">
-                          {/* Dot / Icon container */}
-                          <div className="absolute left-0 mt-0.5 shrink-0 z-10">
-                            {getActivityIcon(log.type)}
-                          </div>
-
-                          {/* Detail card */}
-                          <div className="flex-1 ml-10 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 flex items-center justify-between gap-3 shadow-xs">
-                            <div className="flex items-center gap-3">
-                              {/* Actor Avatar */}
-                              <div className="h-7 w-7 rounded-full bg-slate-200 dark:bg-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center uppercase overflow-hidden border border-slate-350 dark:border-slate-700 shrink-0">
-                                {log.user?.image ? (
-                                  <img
-                                    src={log.user.image}
-                                    alt={log.user.name}
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
-                                  log.user?.name?.charAt(0) || "U"
-                                )}
-                              </div>
-                              <div className="space-y-0.5">
-                                <p className="text-xs font-bold text-slate-850 dark:text-slate-250">
-                                  {log.message}
-                                </p>
-                                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
-                                  by {log.user?.name || "System"} • {log.user?.role?.replace("_", " ")}
-                                </p>
-                              </div>
-                            </div>
-                            <span className="text-[10px] text-slate-450 dark:text-slate-450 font-semibold shrink-0">
-                              {formatDistanceToNow(new Date(log.createdAt), { addSuffix: true })}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Sidebar Columns (Right Column) */}
-          <div className="space-y-6 lg:border-l lg:border-border lg:pl-8">
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
-              {/* Interactive Status Selector */}
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
-                  Status
-                </span>
-                <select
-                  value={task.status}
-                  onChange={(e) =>
-                    handleUpdateStatus(e.target.value as TaskStatus)
-                  }
-                  disabled={isUpdatingState || (userRole === "TEAM_MEMBER" && task.assignedToId !== currentUserId)}
-                  className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${statusStyles[task.status]}`}
-                >
-                  <option value="TODO">To Do</option>
-                  <option value="IN_PROGRESS">In Progress</option>
-                  <option value="COMPLETED">Completed</option>
-                </select>
-              </div>
-
-              {/* Interactive Priority Selector */}
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
-                  Priority
-                </span>
-                <select
-                  value={task.priority}
-                  onChange={(e) =>
-                    handleUpdatePriority(e.target.value as TaskPriority)
-                  }
-                  disabled={isUpdatingState || userRole === "TEAM_MEMBER"}
-                  className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${priorityStyles[task.priority]}`}
-                >
-                  <option value="LOW">Low Priority</option>
-                  <option value="MEDIUM">Medium Priority</option>
-                  <option value="HIGH">High Priority</option>
-                </select>
-              </div>
-            </div>
-            <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-              <Tag className="h-4 w-4 text-primary" />
-              Task Details
-            </h5>
-
-            <div className="space-y-4">
-              {/* Due Date Details */}
-              <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/20">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
-                  <Calendar className="h-4 w-4 text-primary" />
-                  <span>Due Date</span>
-                </div>
-                <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 pl-6">
-                  {formattedDueDate}
-                </span>
-              </div>
-
-              {/* Assignee Details */}
-              <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/20">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
-                  <User2 className="h-4 w-4 text-primary" />
-                  <span>Assignee</span>
-                </div>
-                <div className="flex items-center gap-2.5 pl-6 mt-0.5">
-                  <div className="h-6 w-6 rounded-full bg-slate-350 dark:bg-slate-700 text-[10px] font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center uppercase overflow-hidden border border-slate-300">
-                    {task.assignedTo?.image ? (
-                      <img
-                        src={task.assignedTo.image}
-                        alt={task.assignedTo.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      task.assignedTo?.name.charAt(0) || "U"
+                        ))}
+                      </div>
                     )}
                   </div>
-                  <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
-                    {task.assignedTo ? task.assignedTo.name : "Unassigned"}
+                )}
+              </div>
+            </div>
+
+            {/* Sidebar Columns (Right Column) */}
+            <div className="space-y-6 lg:border-l lg:border-border lg:pl-8">
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
+                {/* Interactive Status Selector */}
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
+                    Status
+                  </span>
+                  <select
+                    value={task.status}
+                    onChange={(e) =>
+                      handleUpdateStatus(e.target.value as TaskStatus)
+                    }
+                    disabled={isUpdatingState || (userRole === "TEAM_MEMBER" && task.assignedToId !== currentUserId)}
+                    className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${statusStyles[task.status]}`}
+                  >
+                    <option value="TODO">To Do</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="COMPLETED">Completed</option>
+                  </select>
+                </div>
+
+                {/* Interactive Priority Selector */}
+                <div className="flex flex-col gap-1">
+                  <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
+                    Priority
+                  </span>
+                  <select
+                    value={task.priority}
+                    onChange={(e) =>
+                      handleUpdatePriority(e.target.value as TaskPriority)
+                    }
+                    disabled={isUpdatingState || userRole === "TEAM_MEMBER"}
+                    className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${priorityStyles[task.priority]}`}
+                  >
+                    <option value="LOW">Low Priority</option>
+                    <option value="MEDIUM">Medium Priority</option>
+                    <option value="HIGH">High Priority</option>
+                  </select>
+                </div>
+              </div>
+              <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                <Tag className="h-4 w-4 text-primary" />
+                Task Details
+              </h5>
+
+              <div className="space-y-4">
+                {/* Due Date Details */}
+                <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/20">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    <span>Due Date</span>
+                  </div>
+                  <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 pl-6">
+                    {formattedDueDate}
+                  </span>
+                </div>
+
+                {/* Assignee Details */}
+                <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/20">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+                    <User2 className="h-4 w-4 text-primary" />
+                    <span>Assignee</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 pl-6 mt-0.5">
+                    <div className="h-6 w-6 rounded-full bg-slate-350 dark:bg-slate-700 text-[10px] font-bold text-slate-700 dark:text-slate-300 flex items-center justify-center uppercase overflow-hidden border border-slate-300">
+                      {task.assignedTo?.image ? (
+                        <img
+                          src={task.assignedTo.image}
+                          alt={task.assignedTo.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        task.assignedTo?.name.charAt(0) || "U"
+                      )}
+                    </div>
+                    <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100">
+                      {task.assignedTo ? task.assignedTo.name : "Unassigned"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Date Created Details */}
+                <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/20">
+                  <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+                    <Clock className="h-4 w-4 text-primary" />
+                    <span>Created At</span>
+                  </div>
+                  <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 pl-6">
+                    {new Date(task.createdAt).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
                   </span>
                 </div>
               </div>
-
-              {/* Date Created Details */}
-              <div className="flex flex-col gap-1.5 p-4 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/20">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
-                  <Clock className="h-4 w-4 text-primary" />
-                  <span>Created At</span>
-                </div>
-                <span className="text-sm font-extrabold text-slate-900 dark:text-slate-100 pl-6">
-                  {new Date(task.createdAt).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </span>
-              </div>
             </div>
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className="p-5 border-t border-border flex justify-end bg-slate-50 dark:bg-slate-950/40 gap-3">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="px-6 font-semibold cursor-pointer"
-          >
-            Close
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+          {/* Footer */}
+          <div className="p-5 border-t border-border flex justify-end bg-slate-50 dark:bg-slate-950/40 gap-3">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="px-6 font-semibold cursor-pointer"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {previewAttachment && (
+        <Dialog
+          open={!!previewAttachment}
+          onOpenChange={(open) => {
+            if (!open) setPreviewAttachment(null);
+          }}
+        >
+          <DialogContent className="sm:max-w-[95vw] md:max-w-[90vw] lg:max-w-[85vw] xl:max-w-[80vw] h-[85vh] max-h-[90vh] flex flex-col p-6 overflow-hidden">
+            <DialogHeader className="flex flex-row items-center justify-between pb-2 border-b">
+              <DialogTitle className="text-base font-bold truncate max-w-[80%]">
+                {previewAttachment.fileName}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-auto flex items-center justify-center p-4 min-h-[300px]">
+              {previewAttachment.fileType?.startsWith("image/") ? (
+                <img
+                  src={previewAttachment.fileUrl}
+                  alt={previewAttachment.fileName}
+                  className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-lg"
+                />
+              ) : previewAttachment.fileType?.startsWith("video/") ? (
+                <video
+                  src={previewAttachment.fileUrl}
+                  controls
+                  className="max-w-full max-h-[75vh] rounded-lg shadow-lg"
+                />
+              ) : previewAttachment.fileType?.startsWith("audio/") ? (
+                <audio
+                  src={previewAttachment.fileUrl}
+                  controls
+                  className="w-full max-w-md"
+                />
+              ) : previewAttachment.fileType === "application/pdf" ? (
+                <iframe
+                  src={previewAttachment.fileUrl}
+                  title={previewAttachment.fileName}
+                  className="w-full h-[75vh] rounded-lg border shadow-xs"
+                />
+              ) : (
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <FileIcon className="h-16 w-16 text-slate-400" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      Preview not available for this file type
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      {previewAttachment.fileName}
+                    </p>
+                  </div>
+                  <a
+                    href={previewAttachment.fileUrl}
+                    download
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90 transition"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download File
+                  </a>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
