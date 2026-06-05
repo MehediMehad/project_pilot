@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { getDashboardStats } from "@/services/dashboard/dashboard";
+import { getWorkspaceActivities } from "@/services/activity/activity";
+import { formatDistanceToNow } from "date-fns";
 import { useSocket } from "@/contexts/SocketContext";
 import { StatsCard } from "@/components/cards/StatCard";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +24,9 @@ import {
   TrendingUp,
   Shield,
   Loader2,
+  Activity,
+  MessageSquare,
+  Paperclip,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -55,9 +60,11 @@ export default function DashboardOverview({
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<ITask | null>(null);
-  const [activeSubTab, setActiveSubTab] = useState<"deadlines" | "highPriority">(
-    "deadlines"
+  const [activeSubTab, setActiveSubTab] = useState<"activities" | "deadlines" | "highPriority">(
+    "activities"
   );
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [loadingActivities, setLoadingActivities] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeProjectTab, setActiveProjectTab] = useState<"chart" | "list">("chart");
@@ -77,9 +84,46 @@ export default function DashboardOverview({
     }
   }, []);
 
+  const fetchActivities = useCallback(async () => {
+    setLoadingActivities(true);
+    try {
+      const res = await getWorkspaceActivities(1, 5);
+      if (res.success && res.data) {
+        setRecentActivities(res.data.data);
+      }
+    } catch (err) {
+      console.error("Failed to load recent activities:", err);
+    } finally {
+      setLoadingActivities(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchStats();
-  }, [fetchStats]);
+    fetchActivities();
+  }, [fetchStats, fetchActivities]);
+
+  const getActivityIcon = (type: string) => {
+    switch (type) {
+      case "TASK_CREATED":
+      case "TASK_UPDATED":
+      case "TASK_DELETED":
+        return <ClipboardList className="h-4 w-4 text-blue-500" />;
+      case "COMMENT_CREATED":
+      case "COMMENT_UPDATED":
+      case "COMMENT_DELETED":
+        return <MessageSquare className="h-4 w-4 text-emerald-500" />;
+      case "ATTACHMENT_UPLOADED":
+      case "ATTACHMENT_DELETED":
+        return <Paperclip className="h-4 w-4 text-purple-500" />;
+      case "PROJECT_CREATED":
+      case "PROJECT_UPDATED":
+      case "PROJECT_DELETED":
+        return <FolderKanban className="h-4 w-4 text-indigo-500" />;
+      default:
+        return <Activity className="h-4 w-4 text-slate-500" />;
+    }
+  };
 
   useEffect(() => {
     setIsMounted(true);
@@ -103,12 +147,18 @@ export default function DashboardOverview({
       fetchStats();
     };
 
+    const handleActivityCreated = () => {
+      fetchActivities();
+    };
+
     socket.on("stats:updated", handleStatsUpdate);
+    socket.on("activity:created", handleActivityCreated);
 
     return () => {
       socket.off("stats:updated", handleStatsUpdate);
+      socket.off("activity:created", handleActivityCreated);
     };
-  }, [socket, fetchStats]);
+  }, [socket, fetchStats, fetchActivities]);
 
   if (loading) {
     return (
@@ -661,14 +711,24 @@ export default function DashboardOverview({
           )}
         </div>
 
-        {/* Task Action Center (Tabs) */}
+        {/* Recent Activities & Task Action (Tabs) */}
         <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 mb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 mb-5 gap-3">
             <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Shield className="h-4.5 w-4.5 text-primary" />
-              Task Action Center
+              <Activity className="h-4.5 w-4.5 text-primary animate-pulse" />
+              Recent Activities & Task Action
             </h3>
-            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5">
+            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 self-start sm:self-auto">
+              <button
+                onClick={() => setActiveSubTab("activities")}
+                className={`text-[11px] font-bold px-3 py-1.5 rounded-md cursor-pointer transition-all ${
+                  activeSubTab === "activities"
+                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
+                    : "text-slate-500 hover:text-slate-850 dark:hover:text-slate-200"
+                }`}
+              >
+                Recent Activities
+              </button>
               <button
                 onClick={() => setActiveSubTab("deadlines")}
                 className={`text-[11px] font-bold px-3 py-1.5 rounded-md cursor-pointer transition-all ${
@@ -693,7 +753,41 @@ export default function DashboardOverview({
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-3.5 max-h-[330px] pr-1">
-            {activeSubTab === "deadlines" ? (
+            {activeSubTab === "activities" ? (
+              loadingActivities ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                </div>
+              ) : recentActivities.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-slate-400 py-12">
+                  <Activity className="h-8 w-8 mb-2" />
+                  <p className="text-xs">No recent activities found</p>
+                </div>
+              ) : (
+                recentActivities.map((activity: any) => (
+                  <div
+                    key={activity.id}
+                    className="border border-slate-50 dark:border-slate-850 rounded-xl p-3 bg-slate-50/20 dark:bg-slate-900/10 transition-all hover:border-primary/35 flex items-start gap-3"
+                  >
+                    <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-650 dark:text-slate-350 flex items-center justify-center shrink-0">
+                      {getActivityIcon(activity.type)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-slate-700 dark:text-slate-300 leading-normal">
+                        <span className="font-extrabold text-slate-850 dark:text-slate-100 mr-1">
+                          {activity.user?.name || "System"}
+                        </span>
+                        {activity.message}
+                      </p>
+                      <p className="text-[10px] text-slate-400 font-semibold mt-1 flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )
+            ) : activeSubTab === "deadlines" ? (
               upcomingDeadlines.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-slate-400 py-12">
                   <Calendar className="h-8 w-8 mb-2" />
