@@ -43,6 +43,7 @@ const ChangePasswordForm = () => {
             disabled={isPending}
           />
           <Button
+            type="button"
             variant="ghost"
             onClick={() => setShowOldPassword(!showOldPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
@@ -75,6 +76,7 @@ const ChangePasswordForm = () => {
             disabled={isPending}
           />
           <Button
+            type="button"
             variant="ghost"
             onClick={() => setShowNewPassword(!showNewPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
@@ -107,6 +109,7 @@ const ChangePasswordForm = () => {
             disabled={isPending}
           />
           <Button
+            type="button"
             variant="ghost"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
