@@ -48,7 +48,7 @@ const NotificationsManager = () => {
             )}
             <button
               onClick={clearAllNotifications}
-              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-950 text-rose-500 dark:text-rose-400 rounded-xl transition-all"
+              className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold border border-border dark:border-slate-700/60 hover:bg-muted dark:hover:bg-slate-900/60 text-rose-500 dark:text-rose-400 rounded-xl transition-all"
             >
               <Trash2 className="h-4 w-4" />
               Clear all logs
@@ -58,9 +58,9 @@ const NotificationsManager = () => {
       </div>
 
       {/* Main notifications container */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xs overflow-hidden">
+      <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md border border-border dark:border-slate-700/60 rounded-2xl shadow-2xs overflow-hidden">
         {/* Navigation Filters */}
-        <div className="flex border-b border-slate-100 dark:border-slate-800/80 px-4 py-2.5 gap-2">
+        <div className="flex border-b border-border dark:border-slate-700/60 px-4 py-2.5 gap-2">
           {(["ALL", "UNREAD", "READ"] as const).map((tab) => {
             const count =
               tab === "ALL"
@@ -77,8 +77,8 @@ const NotificationsManager = () => {
                 onClick={() => setFilter(tab)}
                 className={`relative px-4 py-2 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
                   isActive
-                    ? "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
-                    : "text-slate-450 hover:text-slate-700 dark:hover:text-slate-300"
+                    ? "bg-muted dark:bg-slate-800 text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50 dark:hover:bg-slate-800/40"
                 }`}
               >
                 <span className="capitalize">{tab.toLowerCase()}</span>
@@ -107,7 +107,7 @@ const NotificationsManager = () => {
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-50 dark:divide-slate-850/50">
+          <div className="divide-y divide-border dark:divide-slate-800/50">
             {filteredNotifications.map((notif, index) => {
               const formattedTime = formatDistanceToNow(new Date(notif.timestamp), {
                 addSuffix: true,
@@ -116,9 +116,9 @@ const NotificationsManager = () => {
               return (
                 <div
                   key={notif.id || index}
-                  className={`p-4 flex gap-4 transition-all duration-200 hover:bg-slate-50/50 dark:hover:bg-slate-900/10 ${
+                  className={`p-4 flex gap-4 transition-all duration-200 hover:bg-muted/40 dark:hover:bg-slate-850/20 ${
                     !notif.isRead
-                      ? "bg-slate-50/30 dark:bg-slate-900/5 border-l-4 border-primary"
+                      ? "bg-primary/5 dark:bg-primary/5 border-l-4 border-primary"
                       : "border-l-4 border-transparent"
                   }`}
                 >
@@ -146,7 +146,7 @@ const NotificationsManager = () => {
                       {/* Right-aligned remove single notification action */}
                       <button
                         onClick={() => clearNotification(index)}
-                        className="text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-850 transition-colors shrink-0"
+                        className="text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 p-1 rounded-md hover:bg-muted dark:hover:bg-slate-800 transition-colors shrink-0"
                         title="Dismiss notification"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
