@@ -48,6 +48,7 @@ export default function ProjectListPage({
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(12);
 
   // Dialog
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -62,7 +63,7 @@ export default function ProjectListPage({
         searchTerm,
         status: statusFilter,
         page,
-        limit: 12,
+        limit,
         sortBy,
         sortOrder,
       });
@@ -79,12 +80,17 @@ export default function ProjectListPage({
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, statusFilter, page, sortBy, sortOrder]);
+  }, [searchTerm, statusFilter, page, limit, sortBy, sortOrder]);
 
   useEffect(() => {
     fetchProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+  }, [searchTerm, statusFilter, sortBy, sortOrder, page, limit]);
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1);
+  };
 
   useEffect(() => {
     if (!socket) return;
@@ -236,37 +242,120 @@ export default function ProjectListPage({
       )}
 
       {/* Pagination Row */}
-      {!loading && projects.length > 0 && (
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-1 pt-4">
-          <div className="text-sm text-muted-foreground font-medium">
-            Showing {from} to {to} of {meta.total}{" "}
-            {meta.total === 1 ? "project" : "projects"}
-          </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setPage(page - 1)}
-              disabled={page <= 1}
-              className="flex items-center gap-1 border border-border text-foreground rounded-lg px-3 py-1.5 text-xs font-semibold hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-background"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-              Previous
-            </button>
+      {(() => {
+        const getPageNumbers = () => {
+          const pages = [];
+          const maxVisiblePages = 5;
 
-            <span className="border border-primary bg-primary/10 text-primary rounded-lg px-3.5 py-1.5 text-xs font-bold transition-all shadow-sm">
-              {meta.page}
-            </span>
+          if (totalPages <= maxVisiblePages + 2) {
+            for (let i = 1; i <= totalPages; i++) {
+              pages.push(i);
+            }
+          } else {
+            pages.push(1);
 
-            <button
-              onClick={() => setPage(page + 1)}
-              disabled={page >= totalPages}
-              className="flex items-center gap-1 border border-border text-foreground rounded-lg px-3 py-1.5 text-xs font-semibold hover:bg-muted transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-background"
-            >
-              Next
-              <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-      )}
+            if (page > 3) {
+              pages.push("...");
+            }
+
+            const start = Math.max(2, page - 1);
+            const end = Math.min(totalPages - 1, page + 1);
+
+            for (let i = start; i <= end; i++) {
+              pages.push(i);
+            }
+
+            if (page < totalPages - 2) {
+              pages.push("...");
+            }
+
+            pages.push(totalPages);
+          }
+          return pages;
+        };
+
+        return (
+          !loading && projects.length > 0 && (
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-1 pt-6 gap-4 border-t border-border/60 dark:border-slate-800/80 mt-6">
+              <div className="flex items-center gap-4">
+                <div className="text-xs text-muted-foreground font-semibold">
+                  Showing {from} to {to} of {meta.total} {meta.total === 1 ? "project" : "projects"}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground font-semibold">Rows per page:</span>
+                  <Select
+                    value={meta.limit.toString()}
+                    onValueChange={(val) => handleLimitChange(Number(val))}
+                  >
+                    <SelectTrigger className="w-[70px] h-8 bg-background border-border dark:border-slate-800 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[4, 8, 12, 24, 48].map((size) => (
+                        <SelectItem key={size} value={size.toString()} className="text-xs cursor-pointer">
+                          {size}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 flex-wrap">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs px-2.5 border border-border dark:border-slate-800 hover:bg-muted dark:hover:bg-slate-800/80 cursor-pointer"
+                  onClick={() => setPage(page - 1)}
+                  disabled={page <= 1}
+                >
+                  Previous
+                </Button>
+
+                {getPageNumbers().map((pageNum, idx) => {
+                  if (pageNum === "...") {
+                    return (
+                      <span
+                        key={`ellipsis-${idx}`}
+                        className="px-1.5 text-xs text-muted-foreground select-none"
+                      >
+                        ...
+                      </span>
+                    );
+                  }
+
+                  const isCurrent = pageNum === page;
+                  return (
+                    <Button
+                      key={`page-${pageNum}`}
+                      variant={isCurrent ? "default" : "outline"}
+                      size="sm"
+                      className={`h-8 w-8 text-xs p-0 border border-border dark:border-slate-800 font-semibold cursor-pointer ${
+                        isCurrent
+                          ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                          : "hover:bg-muted dark:hover:bg-slate-800/80"
+                      }`}
+                      onClick={() => setPage(Number(pageNum))}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs px-2.5 border border-border dark:border-slate-800 hover:bg-muted dark:hover:bg-slate-800/80 cursor-pointer"
+                  onClick={() => setPage(page + 1)}
+                  disabled={page >= totalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )
+        );
+      })()}
 
       {/* Create Dialog */}
       <ProjectFormDialog
