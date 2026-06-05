@@ -116,8 +116,8 @@ export default function ProjectMemberManager({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-gray-500" />
-          <h3 className="text-lg font-bold text-gray-900">
+          <Users className="h-5 w-5 text-muted-foreground" />
+          <h3 className="text-lg font-bold text-foreground">
             Team Members ({members.length})
           </h3>
         </div>
@@ -136,29 +136,29 @@ export default function ProjectMemberManager({
           return (
             <div
               key={member.id}
-              className="flex items-center justify-between rounded-xl border border-gray-100 p-4 bg-white shadow-sm"
+              className="flex items-center justify-between rounded-xl border border-border/70 dark:border-slate-800/80 p-4 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md shadow-sm"
             >
               <div className="flex items-center gap-3.5">
-                <div className="h-10 w-10 rounded-full bg-indigo-50/80 text-primary flex items-center justify-center shrink-0">
+                <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                   <span className="text-sm font-bold">
                     {member.user.name.charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-bold text-gray-900 leading-none">
+                    <p className="text-sm font-bold text-foreground leading-none">
                       {member.user.name}
                     </p>
                     {isCreator && (
-                      <Badge className="bg-indigo-50 text-primary text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-indigo-100 hover:bg-indigo-50/80 shadow-none">
+                      <Badge className="bg-primary/10 text-primary text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-primary/20 hover:bg-primary/20 shadow-none">
                         Creator
                       </Badge>
                     )}
-                    <Badge className="bg-gray-50 text-gray-600 text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-gray-100 hover:bg-gray-50/80 shadow-none">
+                    <Badge className="bg-muted text-muted-foreground text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-border hover:bg-muted/80 shadow-none">
                       {member.user.role.replace("_", " ")}
                     </Badge>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     {member.user.email}
                   </p>
                 </div>
@@ -168,7 +168,7 @@ export default function ProjectMemberManager({
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="h-8 w-8 text-gray-400 hover:text-red-600 transition-colors"
+                  className="h-8 w-8 text-muted-foreground hover:text-rose-600 transition-colors"
                   onClick={() => handleRemoveMember(member.userId)}
                   disabled={removingId === member.userId}
                 >

@@ -186,7 +186,7 @@ export default function ProjectDetailPage({
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-xl border border-gray-100 bg-white text-gray-400 shadow-sm">
+      <div className="flex h-64 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-xs">
         <div className="flex flex-col items-center gap-2">
           <span className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           <span className="text-sm font-medium">
@@ -199,12 +199,12 @@ export default function ProjectDetailPage({
 
   if (!project) {
     return (
-      <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-gray-100 bg-white text-gray-400 shadow-sm gap-3">
-        <p className="font-semibold text-gray-700">Project not found</p>
+      <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-xs gap-3">
+        <p className="font-semibold text-foreground">Project not found</p>
         <Link href={backPath}>
           <Button
             variant="outline"
-            className="gap-2 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl"
+            className="gap-2 border-border text-foreground hover:bg-muted rounded-xl"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Projects
@@ -252,7 +252,7 @@ export default function ProjectDetailPage({
               variant="outline"
               size="sm"
               onClick={() => setDeleteDialogOpen(true)}
-              className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="gap-2 text-rose-600 hover:text-rose-700 hover:bg-rose-500/10 border-rose-500/20"
             >
               <Trash2 className="h-4 w-4" />
               Delete
@@ -262,12 +262,12 @@ export default function ProjectDetailPage({
       </div>
 
       {/* Project Info Card */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col justify-between">
+      <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 shadow-sm p-6 flex flex-col justify-between">
         {/* Top Section */}
         <div className="flex items-start gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-3 flex-wrap">
-              <h1 className="text-[20px] font-extrabold text-gray-900 tracking-tight leading-snug truncate">
+              <h1 className="text-[20px] font-extrabold text-foreground tracking-tight leading-snug truncate">
                 {project.name}
               </h1>
               <Badge
@@ -279,7 +279,7 @@ export default function ProjectDetailPage({
               </Badge>
             </div>
             {project.description && (
-              <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
                 {project.description}
               </p>
             )}
@@ -287,17 +287,17 @@ export default function ProjectDetailPage({
         </div>
 
         {/* Bottom Metrics Capsules */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-50">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-border/60">
           {/* Deadline */}
           <div className="flex items-center gap-3">
-            <div className="bg-indigo-50 text-primary p-2.5 rounded-xl">
+            <div className="bg-primary/10 text-primary p-2.5 rounded-xl">
               <Calendar className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none">
+              <p className="text-[10px] font-bold text-muted-foreground/85 uppercase tracking-wider leading-none">
                 Deadline
               </p>
-              <p className="text-[14px] font-extrabold text-gray-900 mt-1 leading-none">
+              <p className="text-[14px] font-extrabold text-foreground mt-1 leading-none">
                 {formattedDeadline}
               </p>
             </div>
@@ -305,14 +305,14 @@ export default function ProjectDetailPage({
 
           {/* Total Tasks */}
           <div className="flex items-center gap-3">
-            <div className="bg-indigo-50 text-primary p-2.5 rounded-xl">
+            <div className="bg-primary/10 text-primary p-2.5 rounded-xl">
               <ClipboardList className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none">
+              <p className="text-[10px] font-bold text-muted-foreground/85 uppercase tracking-wider leading-none">
                 Total Tasks
               </p>
-              <p className="text-[14px] font-extrabold text-gray-900 mt-1 leading-none">
+              <p className="text-[14px] font-extrabold text-foreground mt-1 leading-none">
                 {project._count.tasks}
               </p>
             </div>
@@ -320,14 +320,14 @@ export default function ProjectDetailPage({
 
           {/* Total Members */}
           <div className="flex items-center gap-3">
-            <div className="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl">
+            <div className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 p-2.5 rounded-xl">
               <Users className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none">
+              <p className="text-[10px] font-bold text-muted-foreground/85 uppercase tracking-wider leading-none">
                 Total Members
               </p>
-              <p className="text-[14px] font-extrabold text-gray-900 mt-1 leading-none">
+              <p className="text-[14px] font-extrabold text-foreground mt-1 leading-none">
                 {project._count.members}
               </p>
             </div>
@@ -335,14 +335,14 @@ export default function ProjectDetailPage({
 
           {/* Created By */}
           <div className="flex items-center gap-3">
-            <div className="bg-purple-50 text-purple-600 p-2.5 rounded-xl">
+            <div className="bg-purple-500/10 text-purple-600 dark:text-purple-400 p-2.5 rounded-xl">
               <User className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider leading-none">
+              <p className="text-[10px] font-bold text-muted-foreground/85 uppercase tracking-wider leading-none">
                 Created by
               </p>
-              <p className="text-[14px] font-extrabold text-gray-900 mt-1 leading-none">
+              <p className="text-[14px] font-extrabold text-foreground mt-1 leading-none">
                 {project.createdBy.name}
               </p>
             </div>
@@ -354,60 +354,60 @@ export default function ProjectDetailPage({
       {summary && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {/* Card 1: Total Tasks */}
-          <div className="border-t-[3px] border-t-primary bg-white rounded-xl border-l border-r border-b border-gray-100 p-5 flex items-center gap-4 shadow-sm">
-            <div className="h-10 w-10 rounded-xl bg-indigo-50/80 flex items-center justify-center shrink-0">
+          <div className="border-t-[3px] border-t-primary bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
               <ClipboardList className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-black text-gray-900 leading-none">
+              <p className="text-2xl font-black text-foreground leading-none">
                 {summary.taskStats.total}
               </p>
-              <p className="text-[12px] font-semibold text-gray-400 mt-1">
+              <p className="text-[12px] font-semibold text-muted-foreground mt-1">
                 Total Tasks
               </p>
             </div>
           </div>
 
           {/* Card 2: To Do */}
-          <div className="border-t-[3px] border-t-blue-500 bg-white rounded-xl border-l border-r border-b border-gray-100 p-5 flex items-center gap-4 shadow-sm">
-            <div className="h-10 w-10 rounded-xl bg-blue-50/80 flex items-center justify-center shrink-0">
-              <ListTodo className="h-5 w-5 text-blue-600" />
+          <div className="border-t-[3px] border-t-blue-500 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
+            <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
+              <ListTodo className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-2xl font-black text-gray-900 leading-none">
+              <p className="text-2xl font-black text-foreground leading-none">
                 {summary.taskStats.todo}
               </p>
-              <p className="text-[12px] font-semibold text-gray-400 mt-1">
+              <p className="text-[12px] font-semibold text-muted-foreground mt-1">
                 To Do
               </p>
             </div>
           </div>
 
           {/* Card 3: In Progress */}
-          <div className="border-t-[3px] border-t-amber-500 bg-white rounded-xl border-l border-r border-b border-gray-100 p-5 flex items-center gap-4 shadow-sm">
-            <div className="h-10 w-10 rounded-xl bg-amber-50/80 flex items-center justify-center shrink-0">
-              <Clock className="h-5 w-5 text-amber-600" />
+          <div className="border-t-[3px] border-t-amber-500 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
+            <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+              <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <p className="text-2xl font-black text-gray-900 leading-none">
+              <p className="text-2xl font-black text-foreground leading-none">
                 {summary.taskStats.inProgress}
               </p>
-              <p className="text-[12px] font-semibold text-gray-400 mt-1">
+              <p className="text-[12px] font-semibold text-muted-foreground mt-1">
                 In Progress
               </p>
             </div>
           </div>
 
           {/* Card 4: Completed */}
-          <div className="border-t-[3px] border-t-emerald-500 bg-white rounded-xl border-l border-r border-b border-gray-100 p-5 flex items-center gap-4 shadow-sm">
-            <div className="h-10 w-10 rounded-xl bg-emerald-50/80 flex items-center justify-center shrink-0">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+          <div className="border-t-[3px] border-t-emerald-500 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+              <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <p className="text-2xl font-black text-gray-900 leading-none">
+              <p className="text-2xl font-black text-foreground leading-none">
                 {summary.taskStats.completed}
               </p>
-              <p className="text-[12px] font-semibold text-gray-400 mt-1">
+              <p className="text-[12px] font-semibold text-muted-foreground mt-1">
                 Completed
               </p>
             </div>
@@ -430,42 +430,42 @@ export default function ProjectDetailPage({
       {summary && summary.memberWorkload.length > 0 && (
         <div className="mt-8 pt-4">
           <div className="flex items-center gap-2 mb-4">
-            <Users className="h-5 w-5 text-gray-500" />
-            <h3 className="text-lg font-bold text-gray-900">Member Workload</h3>
+            <Users className="h-5 w-5 text-muted-foreground" />
+            <h3 className="text-lg font-bold text-foreground">Member Workload</h3>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {summary.memberWorkload.map((mw) => (
               <div
                 key={mw.user.id}
-                className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm flex flex-col justify-between"
+                className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md border border-border/70 dark:border-slate-800/80 rounded-xl p-5 shadow-sm flex flex-col justify-between"
               >
                 <div className="flex items-center gap-3.5 mb-5">
-                  <div className="h-10 w-10 rounded-full bg-indigo-50/80 text-primary flex items-center justify-center font-bold text-sm shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
                     {mw.user.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-gray-900 leading-none">
+                    <p className="text-sm font-bold text-foreground leading-none">
                       {mw.user.name}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {mw.user.email}
                     </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-2 pt-4 border-t border-gray-50 text-center">
-                  <div className="border-r border-gray-100">
-                    <span className="text-[18px] font-extrabold text-gray-900">
+                <div className="grid grid-cols-3 gap-2 pt-4 border-t border-border/60 text-center">
+                  <div className="border-r border-border/40">
+                    <span className="text-[18px] font-extrabold text-foreground">
                       {mw.totalTasks}
                     </span>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
                       Total
                     </p>
                   </div>
-                  <div className="border-r border-gray-100">
-                    <span className="text-[18px] font-extrabold text-emerald-600">
+                  <div className="border-r border-border/40">
+                    <span className="text-[18px] font-extrabold text-emerald-600 dark:text-emerald-400">
                       {mw.completedTasks}
                     </span>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
                       Done
                     </p>
                   </div>
@@ -473,7 +473,7 @@ export default function ProjectDetailPage({
                     <span className="text-[18px] font-extrabold text-amber-500">
                       {mw.pendingTasks}
                     </span>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
                       Pending
                     </p>
                   </div>
@@ -488,8 +488,8 @@ export default function ProjectDetailPage({
       <div className="mt-8 pt-4">
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-2">
-            <ListTodo className="h-5 w-5 text-gray-500" />
-            <h3 className="text-lg font-bold text-gray-900">Project Tasks</h3>
+            <ListTodo className="h-5 w-5 text-muted-foreground" />
+            <h3 className="text-lg font-bold text-foreground">Project Tasks</h3>
           </div>
           {canEdit && (
             <Button
@@ -507,7 +507,7 @@ export default function ProjectDetailPage({
         </div>
 
         {tasks.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 border rounded-xl bg-gray-50/50 border-dashed text-gray-400">
+          <div className="flex flex-col items-center justify-center py-12 border border-dashed border-border rounded-xl bg-card/40 text-muted-foreground">
             <ListTodo className="h-8 w-8 mb-2" />
             <p className="font-semibold text-sm">No tasks created yet</p>
             {canEdit && (
