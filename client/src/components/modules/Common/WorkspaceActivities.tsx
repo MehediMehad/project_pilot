@@ -55,19 +55,19 @@ const WorkspaceActivities = () => {
       case "TASK_UPDATED":
       case "PROJECT_CREATED":
       case "PROJECT_UPDATED":
-        return "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/50";
+        return "bg-blue-50/50 dark:bg-blue-950/20 border-blue-150 dark:border-blue-900/40";
       case "COMMENT_CREATED":
       case "COMMENT_UPDATED":
-        return "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50";
+        return "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-150 dark:border-emerald-900/40";
       case "ATTACHMENT_UPLOADED":
-        return "bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900/50";
+        return "bg-purple-50/50 dark:bg-purple-950/20 border-purple-150 dark:border-purple-900/40";
       case "TASK_DELETED":
       case "PROJECT_DELETED":
       case "COMMENT_DELETED":
       case "ATTACHMENT_DELETED":
-        return "bg-rose-50 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/50";
+        return "bg-rose-50/50 dark:bg-rose-950/20 border-rose-150 dark:border-rose-900/40";
       default:
-        return "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800";
+        return "bg-slate-50/50 dark:bg-slate-900/40 border-border dark:border-slate-700/60";
     }
   };
 
@@ -77,7 +77,7 @@ const WorkspaceActivities = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Activities</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Activities Feed</h1>
         <p className="text-muted-foreground text-sm">
           Keep track of everything happening across your workspace projects and tasks.
         </p>
@@ -94,12 +94,12 @@ const WorkspaceActivities = () => {
           <p className="text-sm">No activity logs recorded yet.</p>
         </div>
       ) : (
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-2xs">
-          <div className="relative border-l-2 border-slate-100 dark:border-slate-800 ml-4 space-y-8 py-2">
+        <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md border border-border dark:border-slate-700/60 rounded-2xl p-6 shadow-2xs">
+          <div className="relative border-l-2 border-border dark:border-slate-800 ml-4 space-y-8 py-2">
             {activities.map((activity) => (
               <div key={activity.id} className="relative pl-8 group">
                 {/* Timeline Dot Indicator */}
-                <span className="absolute -left-[17px] top-1 flex h-8 w-8 items-center justify-center rounded-full bg-white dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 group-hover:border-primary transition-colors">
+                <span className="absolute -left-[17px] top-1 flex h-8 w-8 items-center justify-center rounded-full bg-card dark:bg-slate-950 border-2 border-border dark:border-slate-700/60 group-hover:border-primary transition-colors">
                   {getActivityIcon(activity.type)}
                 </span>
 
@@ -108,10 +108,10 @@ const WorkspaceActivities = () => {
                   <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
                     {/* User and Message */}
                     <div className="text-sm">
-                      <span className="font-extrabold text-slate-850 dark:text-slate-150 mr-1.5">
+                      <span className="font-extrabold text-slate-900 dark:text-slate-100 mr-1.5">
                         {activity.user?.name || "System"}
                       </span>
-                      <span className="text-slate-650 dark:text-slate-350">
+                      <span className="text-slate-700 dark:text-slate-300">
                         {activity.message}
                       </span>
                     </div>
@@ -125,15 +125,15 @@ const WorkspaceActivities = () => {
 
                   {/* Meta project / task context */}
                   {(activity.project || activity.task) && (
-                    <div className="flex flex-wrap gap-2 mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-850 text-xs text-slate-500">
+                    <div className="flex flex-wrap gap-2 mt-3 pt-2.5 border-t border-border dark:border-slate-800/80 text-xs text-slate-500">
                       {activity.project && (
-                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-md px-2 py-0.5 font-semibold">
+                        <div className="flex items-center gap-1 bg-card/40 dark:bg-slate-950/40 border border-border dark:border-slate-700/60 rounded-md px-2 py-0.5 font-semibold">
                           <Folder className="h-3.5 w-3.5 text-indigo-500" />
                           <span>Project: {activity.project.name}</span>
                         </div>
                       )}
                       {activity.task && (
-                        <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-md px-2 py-0.5 font-semibold">
+                        <div className="flex items-center gap-1 bg-card/40 dark:bg-slate-950/40 border border-border dark:border-slate-700/60 rounded-md px-2 py-0.5 font-semibold">
                           <CheckSquare className="h-3.5 w-3.5 text-blue-500" />
                           <span>Task: {activity.task.title}</span>
                         </div>
@@ -147,13 +147,13 @@ const WorkspaceActivities = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-slate-50 dark:border-slate-850 pt-5 mt-6">
+            <div className="flex items-center justify-between border-t border-border dark:border-slate-700/60 pt-5 mt-6">
               <span className="text-xs text-slate-500 font-bold">
                 Page {meta.page} of {totalPages}
               </span>
               <div className="flex gap-2">
                 <button
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold border border-slate-200 dark:border-slate-800 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-950 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold border border-border dark:border-slate-700/60 rounded-lg hover:bg-muted dark:hover:bg-slate-900/60 transition-colors disabled:opacity-50 disabled:pointer-events-none"
                   disabled={meta.page <= 1}
                   onClick={() => setMeta((prev) => ({ ...prev, page: prev.page - 1 }))}
                 >
@@ -161,7 +161,7 @@ const WorkspaceActivities = () => {
                   Previous
                 </button>
                 <button
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold border border-slate-200 dark:border-slate-800 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-950 transition-colors disabled:opacity-50 disabled:pointer-events-none"
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-bold border border-border dark:border-slate-700/60 rounded-lg hover:bg-muted dark:hover:bg-slate-900/60 transition-colors disabled:opacity-50 disabled:pointer-events-none"
                   disabled={meta.page >= totalPages}
                   onClick={() => setMeta((prev) => ({ ...prev, page: prev.page + 1 }))}
                 >
