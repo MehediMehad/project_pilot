@@ -13,7 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Calendar as CalendarIcon } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import { createProjectSchema, updateProjectSchema } from "@/zod/project.validation";
 import { createProject, updateProject } from "@/services/project/projectManagement";
 import { IProject, ProjectStatus } from "@/types";
@@ -133,14 +137,44 @@ export default function ProjectFormDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="space-y-2 flex flex-col justify-end">
               <Label htmlFor="project-deadline">Deadline</Label>
-              <Input
-                id="project-deadline"
-                type="date"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="project-deadline"
+                    variant={"outline"}
+                    className={cn(
+                      "w-full h-10 pl-3 text-left font-normal bg-background border-input",
+                      !deadline && "text-muted-foreground"
+                    )}
+                  >
+                    {deadline ? (
+                      format(new Date(deadline), "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={deadline ? new Date(deadline) : undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(2, "0");
+                        const day = String(date.getDate()).padStart(2, "0");
+                        setDeadline(`${year}-${month}-${day}`);
+                      } else {
+                        setDeadline("");
+                      }
+                    }}
+                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  />
+                </PopoverContent>
+              </Popover>
               {errors.deadline && (
                 <p className="text-xs text-red-500">{errors.deadline}</p>
               )}
