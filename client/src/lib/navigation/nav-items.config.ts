@@ -7,7 +7,6 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
     // Build the projects path based on role
     const projectsPath = `${defaultDashboard}/projects`;
     const tasksPath = `${defaultDashboard}/tasks`;
-    const teamPath = `${defaultDashboard}/team`;
     const activitiesPath = `${defaultDashboard}/activities`;
     const notificationsPath = `${defaultDashboard}/notifications`;
 
@@ -36,12 +35,6 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
                     title: "Tasks",
                     href: tasksPath,
                     icon: "ListTodo",
-                    roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],
-                },
-                {
-                    title: "Team Members",
-                    href: teamPath,
-                    icon: "Users",
                     roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],
                 },
                 {
