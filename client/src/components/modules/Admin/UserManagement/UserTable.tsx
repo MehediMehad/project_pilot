@@ -19,6 +19,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Eye, MoreHorizontal, UserCheck, UserX } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface UserTableProps {
   users: IUser[];
@@ -27,6 +34,8 @@ interface UserTableProps {
   onToggleStatus: (user: IUser) => void;
   page: number;
   setPage: (page: number) => void;
+  limit: number;
+  onLimitChange: (limit: number) => void;
 }
 
 export default function UserTable({
@@ -36,6 +45,8 @@ export default function UserTable({
   onToggleStatus,
   page,
   setPage,
+  limit,
+  onLimitChange,
 }: UserTableProps) {
   const actions: UserColumnActions = { onView, onToggleStatus };
   const columns = getUserColumns(actions);
@@ -117,31 +128,120 @@ export default function UserTable({
       </div>
 
       {/* Pagination Controls */}
-      <div className="flex items-center justify-between px-2">
-        <div className="text-sm text-muted-foreground">
-          Showing Page {meta.page} of{" "}
-          {Math.max(1, Math.ceil(meta.total / meta.limit))} ({meta.total} total
-          users)
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage(page - 1)}
-            disabled={page <= 1}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage(page + 1)}
-            disabled={page >= Math.ceil(meta.total / meta.limit)}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
+      {(() => {
+        const totalPages = Math.max(1, Math.ceil(meta.total / meta.limit));
+
+        const getPageNumbers = () => {
+          const pages = [];
+          const maxVisiblePages = 5;
+
+          if (totalPages <= maxVisiblePages + 2) {
+            for (let i = 1; i <= totalPages; i++) {
+              pages.push(i);
+            }
+          } else {
+            pages.push(1);
+
+            if (page > 3) {
+              pages.push("...");
+            }
+
+            const start = Math.max(2, page - 1);
+            const end = Math.min(totalPages - 1, page + 1);
+
+            for (let i = start; i <= end; i++) {
+              pages.push(i);
+            }
+
+            if (page < totalPages - 2) {
+              pages.push("...");
+            }
+
+            pages.push(totalPages);
+          }
+          return pages;
+        };
+
+        return (
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 gap-4">
+            <div className="flex items-center gap-4">
+              <div className="text-xs text-muted-foreground font-semibold">
+                Showing Page {meta.page} of {totalPages} ({meta.total} total users)
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground font-semibold">Rows per page:</span>
+                <Select
+                  value={meta.limit.toString()}
+                  onValueChange={(val) => onLimitChange(Number(val))}
+                >
+                  <SelectTrigger className="w-[70px] h-8 bg-background border-border dark:border-slate-800 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[5, 10, 20, 50, 100].map((size) => (
+                      <SelectItem key={size} value={size.toString()} className="text-xs cursor-pointer">
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1 flex-wrap">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs px-2.5 border-border dark:border-slate-800 hover:bg-muted dark:hover:bg-slate-800/80 cursor-pointer"
+                onClick={() => setPage(page - 1)}
+                disabled={page <= 1}
+              >
+                Previous
+              </Button>
+
+              {getPageNumbers().map((pageNum, idx) => {
+                if (pageNum === "...") {
+                  return (
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="px-1.5 text-xs text-muted-foreground select-none"
+                    >
+                      ...
+                    </span>
+                  );
+                }
+
+                const isCurrent = pageNum === page;
+                return (
+                  <Button
+                    key={`page-${pageNum}`}
+                    variant={isCurrent ? "default" : "outline"}
+                    size="sm"
+                    className={`h-8 w-8 text-xs p-0 border-border dark:border-slate-800 font-semibold cursor-pointer ${
+                      isCurrent
+                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                        : "hover:bg-muted dark:hover:bg-slate-800/80"
+                    }`}
+                    onClick={() => setPage(Number(pageNum))}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-xs px-2.5 border-border dark:border-slate-800 hover:bg-muted dark:hover:bg-slate-800/80 cursor-pointer"
+                onClick={() => setPage(page + 1)}
+                disabled={page >= totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

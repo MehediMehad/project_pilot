@@ -35,6 +35,7 @@ export default function UserManagementPage() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   // Dialog States
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -52,7 +53,7 @@ export default function UserManagementPage() {
         sortBy,
         sortOrder,
         page,
-        limit: 10,
+        limit,
       });
 
       if (res.success) {
@@ -73,7 +74,12 @@ export default function UserManagementPage() {
   useEffect(() => {
     fetchUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm, statusFilter, roleFilter, sortBy, sortOrder, page]);
+  }, [searchTerm, statusFilter, roleFilter, sortBy, sortOrder, page, limit]);
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1);
+  };
 
   // Handle status toggle
   const handleToggleStatus = async (user: IUser) => {
@@ -209,6 +215,8 @@ export default function UserManagementPage() {
           onToggleStatus={handleToggleStatus}
           page={page}
           setPage={setPage}
+          limit={limit}
+          onLimitChange={handleLimitChange}
         />
       )}
 
