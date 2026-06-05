@@ -193,7 +193,7 @@ export default function ProjectMemberManager({
                         {member.user.name}
                       </p>
                       {isCreator && (
-                        <Badge className="bg-primary/10 text-primary text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-primary/20 hover:bg-primary/20 shadow-none">
+                        <Badge className="bg-violet-500/10 text-violet-600 dark:text-violet-400 text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-violet-500/20 hover:bg-violet-500/20 shadow-none">
                           Creator
                         </Badge>
                       )}
