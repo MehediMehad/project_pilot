@@ -681,13 +681,35 @@ const createComment = async (taskId: string, payload: { content: string }, user:
     },
   });
 
-  // Notify task assignee if someone else comments
+  // Find ADMIN/PROJECT_MANAGER project members to notify (excluding commenter)
+  const teamManagers = await prisma.projectMember.findMany({
+    where: {
+      projectId: task.projectId,
+      userId: { not: userData.id },
+      user: {
+        role: {
+          in: [UserRole.ADMIN, UserRole.PROJECT_MANAGER],
+        },
+      },
+    },
+    select: {
+      userId: true,
+    },
+  });
+
+  const recipientIds = new Set<string>(teamManagers.map((m) => m.userId));
+
+  // Add assignee if not commenter
   if (task.assignedToId && task.assignedToId !== userData.id) {
+    recipientIds.add(task.assignedToId);
+  }
+
+  for (const recipientId of recipientIds) {
     await notificationService.sendNotification(
       'New Comment Added',
       `${userData.name} commented on task "${task.title}"`,
       'COMMENT_ADDED',
-      task.assignedToId,
+      recipientId,
     );
   }
 
@@ -853,9 +875,73 @@ const createAttachment = async (taskId: string, req: any, user: IAuthUser) => {
     },
   });
 
-  // Socket.io Real-time attachments & activities broadcast
+  // Create auto comment for attachment upload
+  const autoComment = await prisma.comment.create({
+    data: {
+      content: `Uploaded an attachment: ${file.originalname}`,
+      taskId,
+      userId: userData.id,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          role: true,
+        },
+      },
+    },
+  });
+
+  // Log Activity for auto comment
+  await prisma.activityLog.create({
+    data: {
+      message: `New comment added by ${userData.name} on task "${task.title}"`,
+      type: 'COMMENT_CREATED',
+      userId: userData.id,
+      projectId: task.projectId,
+      taskId: taskId,
+    },
+  });
+
+  // Find ADMIN/PROJECT_MANAGER project members to notify (excluding commenter)
+  const teamManagers = await prisma.projectMember.findMany({
+    where: {
+      projectId: task.projectId,
+      userId: { not: userData.id },
+      user: {
+        role: {
+          in: [UserRole.ADMIN, UserRole.PROJECT_MANAGER],
+        },
+      },
+    },
+    select: {
+      userId: true,
+    },
+  });
+
+  const recipientIds = new Set<string>(teamManagers.map((m) => m.userId));
+
+  // Add assignee if not commenter
+  if (task.assignedToId && task.assignedToId !== userData.id) {
+    recipientIds.add(task.assignedToId);
+  }
+
+  for (const recipientId of recipientIds) {
+    await notificationService.sendNotification(
+      'New Comment Added',
+      `${userData.name} commented on task "${task.title}"`,
+      'COMMENT_ADDED',
+      recipientId,
+    );
+  }
+
+  // Socket.io Real-time attachments, comments & activities broadcast
   if ((global as any).io) {
     (global as any).io.to(`task:${taskId}`).emit('attachment:created', result);
+    (global as any).io.to(`task:${taskId}`).emit('comment:created', autoComment);
     const activity = await prisma.activityLog.findFirst({
       where: { taskId, type: 'ATTACHMENT_UPLOADED' },
       orderBy: { createdAt: 'desc' },
