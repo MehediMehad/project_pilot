@@ -4,6 +4,7 @@ import { IProject, ProjectStatus } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Users, ListTodo } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface ProjectCardProps {
   project: IProject;
@@ -101,11 +102,13 @@ export default function ProjectCard({ project, basePath }: ProjectCardProps) {
           </div>
           <div className="border-l border-border pl-4 py-0.5 flex items-center gap-1.5">
             <span>by </span>
-            <div className="h-5 w-5 rounded-full overflow-hidden bg-muted flex items-center justify-center shrink-0 border border-border/60">
+            <div className="h-5 w-5 rounded-full overflow-hidden bg-muted flex items-center justify-center shrink-0 border border-border/60 relative">
               {project.createdBy.image ? (
-                <img
+                <Image
                   src={project.createdBy.image}
                   alt={project.createdBy.name}
+                  width={20}
+                  height={20}
                   className="h-full w-full object-cover"
                 />
               ) : (

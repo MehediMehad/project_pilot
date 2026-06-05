@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { ITask, TaskPriority, TaskStatus } from "@/types";
 import { UserRole } from "@/lib/auth/auth-utils";
 import { Calendar, User2, Edit2, Trash2, CheckCircle2, Circle, Clock } from "lucide-react";
@@ -170,11 +171,13 @@ export default function TaskCard({
             </div>
             <div className="flex items-center gap-1.5">
               {task.assignedTo ? (
-                <div className="h-5 w-5 rounded-full overflow-hidden bg-muted flex items-center justify-center shrink-0 border border-border/60">
+                <div className="h-5 w-5 rounded-full overflow-hidden bg-muted flex items-center justify-center shrink-0 border border-border/60 relative">
                   {task.assignedTo.image ? (
-                    <img
+                    <Image
                       src={task.assignedTo.image}
                       alt={task.assignedTo.name}
+                      width={20}
+                      height={20}
                       className="h-full w-full object-cover"
                     />
                   ) : (

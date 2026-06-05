@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { IProjectMember, IUser, IProjectSummary } from "@/types";
 import { UserRole } from "@/lib/auth/auth-utils";
 import {
@@ -192,11 +193,13 @@ export default function ProjectMemberManager({
                 className={`flex flex-col sm:flex-row sm:items-center justify-between rounded-xl border border-border/70 dark:border-slate-800/80 p-4 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md shadow-sm gap-4 ${style.cardBorder}`}
               >
                 <div className="flex items-center gap-3.5">
-                  <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 font-bold overflow-hidden ${style.avatarBg}`}>
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 font-bold overflow-hidden relative ${style.avatarBg}`}>
                     {member.user.image ? (
-                      <img
+                      <Image
                         src={member.user.image}
                         alt={member.user.name}
+                        width={40}
+                        height={40}
                         className="h-full w-full object-cover"
                       />
                     ) : (
