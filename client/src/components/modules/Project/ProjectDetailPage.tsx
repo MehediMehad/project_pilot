@@ -103,8 +103,8 @@ export default function ProjectDetailPage({
 
   const canEdit = userRole === "ADMIN" || userRole === "PROJECT_MANAGER";
 
-  const fetchProject = useCallback(async () => {
-    setLoading(true);
+  const fetchProject = useCallback(async (showOverlay = true) => {
+    if (showOverlay) setLoading(true);
     try {
       const [projectRes, summaryRes, tasksRes] = await Promise.all([
         getSingleProject(projectId),
@@ -129,7 +129,7 @@ export default function ProjectDetailPage({
       console.error(error);
       toast.error("Failed to load project");
     } finally {
-      setLoading(false);
+      if (showOverlay) setLoading(false);
     }
   }, [projectId]);
 
@@ -144,7 +144,7 @@ export default function ProjectDetailPage({
     socket.emit("join:project", projectId);
 
     const handleSocketUpdate = () => {
-      fetchProject();
+      fetchProject(false);
     };
 
     socket.on("task:created", handleSocketUpdate);
@@ -349,12 +349,12 @@ export default function ProjectDetailPage({
           </div>
         </div>
       </div>
-
+      {/* bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all */}
       {/* Summary Stats Row */}
       {summary && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {/* Card 1: Total Tasks */}
-          <div className="border-t-[3px] border-t-primary bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
+          <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
               <ClipboardList className="h-5 w-5 text-primary" />
             </div>
@@ -369,7 +369,7 @@ export default function ProjectDetailPage({
           </div>
 
           {/* Card 2: To Do */}
-          <div className="border-t-[3px] border-t-blue-500 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
+          <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
             <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">
               <ListTodo className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
@@ -384,7 +384,7 @@ export default function ProjectDetailPage({
           </div>
 
           {/* Card 3: In Progress */}
-          <div className="border-t-[3px] border-t-amber-500 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
+          <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
             <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
               <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
@@ -399,7 +399,7 @@ export default function ProjectDetailPage({
           </div>
 
           {/* Card 4: Completed */}
-          <div className="border-t-[3px] border-t-emerald-500 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
+          <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all">
             <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
               <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
@@ -422,7 +422,7 @@ export default function ProjectDetailPage({
           members={project.members}
           createdById={project.createdById}
           userRole={userRole}
-          onMembersChanged={fetchProject}
+          onMembersChanged={() => fetchProject(false)}
         />
       </div>
 
@@ -526,7 +526,7 @@ export default function ProjectDetailPage({
                   setEditingTask(t);
                   setTaskDialogOpen(true);
                 }}
-                onDeleteSuccess={fetchProject}
+                onDeleteSuccess={() => fetchProject(false)}
               />
             ))}
           </div>
@@ -537,7 +537,7 @@ export default function ProjectDetailPage({
       <TaskFormDialog
         open={taskDialogOpen}
         onOpenChange={setTaskDialogOpen}
-        onSuccess={fetchProject}
+        onSuccess={() => fetchProject(false)}
         task={editingTask}
         preSelectedProjectId={projectId}
       />
@@ -547,7 +547,7 @@ export default function ProjectDetailPage({
         <ProjectFormDialog
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
-          onSuccess={fetchProject}
+          onSuccess={() => fetchProject(false)}
           project={project}
         />
       )}
