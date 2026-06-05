@@ -953,51 +953,88 @@ export default function TaskDetailsDialog({
               </DialogTitle>
             </DialogHeader>
             <div className="flex-1 overflow-auto flex items-center justify-center p-4 min-h-[300px]">
-              {previewAttachment.fileType?.startsWith("image/") ? (
-                <img
-                  src={previewAttachment.fileUrl}
-                  alt={previewAttachment.fileName}
-                  className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-lg"
-                />
-              ) : previewAttachment.fileType?.startsWith("video/") ? (
-                <video
-                  src={previewAttachment.fileUrl}
-                  controls
-                  className="max-w-full max-h-[75vh] rounded-lg shadow-lg"
-                />
-              ) : previewAttachment.fileType?.startsWith("audio/") ? (
-                <audio
-                  src={previewAttachment.fileUrl}
-                  controls
-                  className="w-full max-w-md"
-                />
-              ) : previewAttachment.fileType === "application/pdf" ? (
-                <iframe
-                  src={previewAttachment.fileUrl}
-                  title={previewAttachment.fileName}
-                  className="w-full h-[75vh] rounded-lg border shadow-xs"
-                />
-              ) : (
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <FileIcon className="h-16 w-16 text-slate-400" />
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      Preview not available for this file type
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">
-                      {previewAttachment.fileName}
-                    </p>
+              {(() => {
+                const fileType = previewAttachment.fileType || "";
+                const fileName = previewAttachment.fileName.toLowerCase();
+                const isDocOrPdf = [
+                  "application/pdf",
+                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                  "application/msword",
+                  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                  "application/vnd.ms-excel",
+                  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                  "application/vnd.ms-powerpoint"
+                ].includes(fileType) || 
+                fileName.endsWith(".pdf") ||
+                fileName.endsWith(".docx") ||
+                fileName.endsWith(".doc") ||
+                fileName.endsWith(".xlsx") ||
+                fileName.endsWith(".xls") ||
+                fileName.endsWith(".pptx") ||
+                fileName.endsWith(".ppt");
+
+                if (fileType.startsWith("image/")) {
+                  return (
+                    <img
+                      src={previewAttachment.fileUrl}
+                      alt={previewAttachment.fileName}
+                      className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-lg"
+                    />
+                  );
+                }
+
+                if (fileType.startsWith("video/")) {
+                  return (
+                    <video
+                      src={previewAttachment.fileUrl}
+                      controls
+                      className="max-w-full max-h-[75vh] rounded-lg shadow-lg"
+                    />
+                  );
+                }
+
+                if (fileType.startsWith("audio/")) {
+                  return (
+                    <audio
+                      src={previewAttachment.fileUrl}
+                      controls
+                      className="w-full max-w-md"
+                    />
+                  );
+                }
+
+                if (isDocOrPdf) {
+                  return (
+                    <iframe
+                      src={`https://docs.google.com/gview?url=${encodeURIComponent(previewAttachment.fileUrl)}&embedded=true`}
+                      title={previewAttachment.fileName}
+                      className="w-full h-[75vh] rounded-lg border shadow-xs"
+                    />
+                  );
+                }
+
+                return (
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <FileIcon className="h-16 w-16 text-slate-400" />
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        Preview not available for this file type
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        {previewAttachment.fileName}
+                      </p>
+                    </div>
+                    <a
+                      href={previewAttachment.fileUrl}
+                      download
+                      className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90 transition"
+                    >
+                      <Download className="h-4 w-4" />
+                      Download File
+                    </a>
                   </div>
-                  <a
-                    href={previewAttachment.fileUrl}
-                    download
-                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90 transition"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download File
-                  </a>
-                </div>
-              )}
+                );
+              })()}
             </div>
           </DialogContent>
         </Dialog>
