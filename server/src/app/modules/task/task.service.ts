@@ -337,11 +337,26 @@ const updateTask = async (
   }
 
   // TEAM_MEMBER can only update tasks assigned to them
-  if (userData.role === UserRole.TEAM_MEMBER && task.assignedToId !== userData.id) {
-    throw new ApiError(
-      httpStatus.FORBIDDEN,
-      'You are not authorized to update this task as it is not assigned to you',
-    );
+  if (userData.role === UserRole.TEAM_MEMBER) {
+    if (task.assignedToId !== userData.id) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        'You are not authorized to update this task as it is not assigned to you',
+      );
+    }
+    // Block update of restricted fields for TEAM_MEMBER
+    if (
+      payload.priority !== undefined ||
+      payload.assignedToId !== undefined ||
+      payload.title !== undefined ||
+      payload.description !== undefined ||
+      payload.dueDate !== undefined
+    ) {
+      throw new ApiError(
+        httpStatus.FORBIDDEN,
+        'Team members are not authorized to update priority or task details',
+      );
+    }
   }
 
   // Completed tasks cannot be reassigned

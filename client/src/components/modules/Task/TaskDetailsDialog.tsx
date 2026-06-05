@@ -440,44 +440,6 @@ export default function TaskDetailsDialog({
                 {task.title}
               </DialogTitle>
             </div>
-
-            {/* <div className="flex flex-wrap items-center gap-3 shrink-0">
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
-                  Status
-                </span>
-                <select
-                  value={task.status}
-                  onChange={(e) =>
-                    handleUpdateStatus(e.target.value as TaskStatus)
-                  }
-                  disabled={isUpdatingState}
-                  className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${statusStyles[task.status]}`}
-                >
-                  <option value="TODO">To Do</option>
-                  <option value="IN_PROGRESS">In Progress</option>
-                  <option value="COMPLETED">Completed</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
-                  Priority
-                </span>
-                <select
-                  value={task.priority}
-                  onChange={(e) =>
-                    handleUpdatePriority(e.target.value as TaskPriority)
-                  }
-                  disabled={isUpdatingState}
-                  className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${priorityStyles[task.priority]}`}
-                >
-                  <option value="LOW">Low Priority</option>
-                  <option value="MEDIUM">Medium Priority</option>
-                  <option value="HIGH">High Priority</option>
-                </select>
-              </div>
-            </div> */}
           </div>
         </div>
 
@@ -505,11 +467,10 @@ export default function TaskDetailsDialog({
               <div className="flex border-b border-border gap-2">
                 <button
                   onClick={() => setActiveTab("comments")}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${
-                    activeTab === "comments"
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "comments"
                       ? "border-primary text-primary"
                       : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                  }`}
+                    }`}
                 >
                   <MessageSquare className="h-4 w-4" />
                   Comments
@@ -519,11 +480,10 @@ export default function TaskDetailsDialog({
                 </button>
                 <button
                   onClick={() => setActiveTab("attachments")}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${
-                    activeTab === "attachments"
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "attachments"
                       ? "border-primary text-primary"
                       : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                  }`}
+                    }`}
                 >
                   <Paperclip className="h-4 w-4" />
                   Attachments
@@ -533,11 +493,10 @@ export default function TaskDetailsDialog({
                 </button>
                 <button
                   onClick={() => setActiveTab("activity")}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${
-                    activeTab === "activity"
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "activity"
                       ? "border-primary text-primary"
                       : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-                  }`}
+                    }`}
                 >
                   <Clock className="h-4 w-4" />
                   Activity
@@ -819,7 +778,7 @@ export default function TaskDetailsDialog({
                           <div className="absolute left-0 mt-0.5 shrink-0 z-10">
                             {getActivityIcon(log.type)}
                           </div>
-                          
+
                           {/* Detail card */}
                           <div className="flex-1 ml-10 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 flex items-center justify-between gap-3 shadow-xs">
                             <div className="flex items-center gap-3">
@@ -870,7 +829,7 @@ export default function TaskDetailsDialog({
                   onChange={(e) =>
                     handleUpdateStatus(e.target.value as TaskStatus)
                   }
-                  disabled={isUpdatingState}
+                  disabled={isUpdatingState || (userRole === "TEAM_MEMBER" && task.assignedToId !== currentUserId)}
                   className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${statusStyles[task.status]}`}
                 >
                   <option value="TODO">To Do</option>
@@ -889,7 +848,7 @@ export default function TaskDetailsDialog({
                   onChange={(e) =>
                     handleUpdatePriority(e.target.value as TaskPriority)
                   }
-                  disabled={isUpdatingState}
+                  disabled={isUpdatingState || userRole === "TEAM_MEMBER"}
                   className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${priorityStyles[task.priority]}`}
                 >
                   <option value="LOW">Low Priority</option>

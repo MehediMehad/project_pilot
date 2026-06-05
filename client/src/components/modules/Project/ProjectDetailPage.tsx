@@ -9,6 +9,7 @@ import {
   getProjectSummary,
 } from "@/services/project/projectManagement";
 import { getAllTasks } from "@/services/task/taskManagement";
+import { getUserInfo } from "@/services/auth/user-info.service";
 import ProjectMemberManager from "./ProjectMemberManager";
 import ProjectFormDialog from "./ProjectFormDialog";
 import TaskCard from "../Task/TaskCard";
@@ -85,11 +86,20 @@ export default function ProjectDetailPage({
   const [summary, setSummary] = useState<IProjectSummary | null>(null);
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ITask | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    getUserInfo().then((user) => {
+      if (user?.id) {
+        setCurrentUserId(user.id);
+      }
+    });
+  }, []);
 
   const canEdit = userRole === "ADMIN" || userRole === "PROJECT_MANAGER";
 
@@ -511,6 +521,7 @@ export default function ProjectDetailPage({
                 key={task.id}
                 task={task}
                 userRole={userRole}
+                currentUserId={currentUserId}
                 onEdit={(t) => {
                   setEditingTask(t);
                   setTaskDialogOpen(true);

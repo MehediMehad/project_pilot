@@ -165,7 +165,7 @@ export default function TaskCard({
               value={status}
               onChange={(e) => handleStatusChange(e.target.value as TaskStatus)}
               onClick={(e) => e.stopPropagation()}
-              disabled={isPending}
+              disabled={isPending || (userRole === "TEAM_MEMBER" && task.assignedToId !== currentUserId)}
               className="text-xs bg-background border rounded-md px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer disabled:opacity-50"
             >
               <option value="TODO">To Do</option>
