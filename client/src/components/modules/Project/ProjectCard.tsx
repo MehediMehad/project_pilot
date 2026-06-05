@@ -99,8 +99,21 @@ export default function ProjectCard({ project, basePath }: ProjectCardProps) {
               Due: {formattedDeadline}
             </span>
           </div>
-          <div className="border-l border-border pl-4 py-0.5">
+          <div className="border-l border-border pl-4 py-0.5 flex items-center gap-1.5">
             <span>by </span>
+            <div className="h-5 w-5 rounded-full overflow-hidden bg-muted flex items-center justify-center shrink-0 border border-border/60">
+              {project.createdBy.image ? (
+                <img
+                  src={project.createdBy.image}
+                  alt={project.createdBy.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-[10px] font-bold">
+                  {project.createdBy.name.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
             <span className="text-foreground font-semibold">
               {project.createdBy.name}
             </span>

@@ -169,7 +169,23 @@ export default function TaskCard({
               <span>{formattedDate}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <User2 className="h-3.5 w-3.5" />
+              {task.assignedTo ? (
+                <div className="h-5 w-5 rounded-full overflow-hidden bg-muted flex items-center justify-center shrink-0 border border-border/60">
+                  {task.assignedTo.image ? (
+                    <img
+                      src={task.assignedTo.image}
+                      alt={task.assignedTo.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-[10px] font-bold">
+                      {task.assignedTo.name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <User2 className="h-3.5 w-3.5" />
+              )}
               <span className="font-medium text-foreground truncate max-w-[80px]">
                 {task.assignedTo ? task.assignedTo.name : "Unassigned"}
               </span>
