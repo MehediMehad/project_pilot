@@ -21,10 +21,14 @@ async function uploadToCloudinary(file: Express.Multer.File) {
     api_secret: config.cloudinary.api_secret,
   });
 
+  const ext = path.extname(file.originalname);
+  const baseName = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9-_]/g, '_');
+  const publicId = `${baseName}-${Date.now()}${ext}`;
+
   // Upload a resource (image, video, raw files like pdf, docx)
   const uploadResult = await cloudinary.uploader
     .upload(file.path, {
-      public_id: `${file.originalname}-${Date.now()}`,
+      public_id: publicId,
       resource_type: 'auto',
     })
     .catch((error) => {
