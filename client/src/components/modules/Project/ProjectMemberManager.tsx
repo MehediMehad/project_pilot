@@ -39,17 +39,21 @@ const roleStyles: Record<
 > = {
   ADMIN: {
     cardBorder: "border-l-[4px] border-l-rose-500/80 dark:border-l-rose-500",
-    badge: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 hover:bg-rose-500/20 shadow-none",
+    badge:
+      "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 hover:bg-rose-500/20 shadow-none",
     avatarBg: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
   },
   PROJECT_MANAGER: {
     cardBorder: "border-l-[4px] border-l-amber-500/80 dark:border-l-amber-500",
-    badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/20 shadow-none",
+    badge:
+      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/20 shadow-none",
     avatarBg: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
   },
   TEAM_MEMBER: {
-    cardBorder: "border-l-[4px] border-l-emerald-500/80 dark:border-l-emerald-500",
-    badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20 shadow-none",
+    cardBorder:
+      "border-l-[4px] border-l-emerald-500/80 dark:border-l-emerald-500",
+    badge:
+      "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20 shadow-none",
     avatarBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
   },
 };
@@ -177,11 +181,16 @@ export default function ProjectMemberManager({
             const isCreator = member.userId === createdById;
             const style = roleStyles[member.user.role] || {
               cardBorder: "border-l-[4px] border-l-primary/60",
-              badge: "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 shadow-none",
+              badge:
+                "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 shadow-none",
               avatarBg: "bg-primary/10 text-primary",
             };
-            const label = roleLabels[member.user.role] || member.user.role.replace("_", " ");
-            const userWorkload = workload.find((w) => w.user.id === member.userId) || {
+            const label =
+              roleLabels[member.user.role] ||
+              member.user.role.replace("_", " ");
+            const userWorkload = workload.find(
+              (w) => w.user.id === member.userId,
+            ) || {
               totalTasks: 0,
               completedTasks: 0,
               pendingTasks: 0,
@@ -193,7 +202,9 @@ export default function ProjectMemberManager({
                 className={`flex flex-col sm:flex-row sm:items-center justify-between rounded-xl border border-border/70 dark:border-slate-800/80 p-4 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md shadow-sm gap-4 ${style.cardBorder}`}
               >
                 <div className="flex items-center gap-3.5">
-                  <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 font-bold overflow-hidden relative ${style.avatarBg}`}>
+                  <div
+                    className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 font-bold overflow-hidden relative ${style.avatarBg}`}
+                  >
                     {member.user.image ? (
                       <Image
                         src={member.user.image}
@@ -218,7 +229,9 @@ export default function ProjectMemberManager({
                           Creator
                         </Badge>
                       )}
-                      <Badge className={`text-[10px] font-bold rounded-full px-2.5 py-0.5 border ${style.badge}`}>
+                      <Badge
+                        className={`text-[10px] font-bold rounded-full px-2.5 py-0.5 border ${style.badge}`}
+                      >
                         {label}
                       </Badge>
                     </div>
@@ -231,19 +244,31 @@ export default function ProjectMemberManager({
                 <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-border/40">
                   {/* Task stats pills */}
                   <div className="flex items-center gap-4 text-xs font-semibold">
-                    <div className="flex flex-col items-center min-w-[36px]">
-                      <span className="text-sm font-extrabold text-foreground">{userWorkload.totalTasks}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</span>
+                    <div className="flex flex-col items-center min-w-9">
+                      <span className="text-sm font-extrabold text-foreground">
+                        {userWorkload.totalTasks}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                        Total
+                      </span>
                     </div>
                     <div className="h-6 w-px bg-border/60" />
-                    <div className="flex flex-col items-center min-w-[36px]">
-                      <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">{userWorkload.completedTasks}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Done</span>
+                    <div className="flex flex-col items-center min-w-9">
+                      <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
+                        {userWorkload.completedTasks}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                        Done
+                      </span>
                     </div>
                     <div className="h-6 w-px bg-border/60" />
-                    <div className="flex flex-col items-center min-w-[36px]">
-                      <span className="text-sm font-extrabold text-amber-500">{userWorkload.pendingTasks}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Pending</span>
+                    <div className="flex flex-col items-center min-w-9">
+                      <span className="text-sm font-extrabold text-amber-500">
+                        {userWorkload.pendingTasks}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                        Pending
+                      </span>
                     </div>
                   </div>
 
@@ -323,50 +348,58 @@ export default function ProjectMemberManager({
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                 </div>
-              ) : (() => {
-                const nonMembers = searchResults.filter((user) => !memberUserIds.has(user.id));
-                if (nonMembers.length === 0) {
-                  return (
-                    <p className="text-center text-sm text-muted-foreground py-8">
-                      {searchResults.length > 0 ? "All searched users are already members" : "No users found"}
-                    </p>
+              ) : (
+                (() => {
+                  const nonMembers = searchResults.filter(
+                    (user) => !memberUserIds.has(user.id),
                   );
-                }
-                return nonMembers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 dark:bg-slate-950/20 p-3.5 transition-all hover:bg-muted/30"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                        <span className="text-xs font-semibold text-primary">
-                          {user.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-foreground leading-none">{user.name}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleAddMember(user.id)}
-                      disabled={addingId === user.id}
-                      className="gap-1 rounded-lg border-border hover:bg-primary hover:text-white"
+                  if (nonMembers.length === 0) {
+                    return (
+                      <p className="text-center text-sm text-muted-foreground py-8">
+                        {searchResults.length > 0
+                          ? "All searched users are already members"
+                          : "No users found"}
+                      </p>
+                    );
+                  }
+                  return nonMembers.map((user) => (
+                    <div
+                      key={user.id}
+                      className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 dark:bg-slate-950/20 p-3.5 transition-all hover:bg-muted/30"
                     >
-                      {addingId === user.id ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Plus className="h-3.5 w-3.5" />
-                      )}
-                      Add
-                    </Button>
-                  </div>
-                ));
-              })()}
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <span className="text-xs font-semibold text-primary">
+                            {user.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-foreground leading-none">
+                            {user.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleAddMember(user.id)}
+                        disabled={addingId === user.id}
+                        className="gap-1 rounded-lg border-border hover:bg-primary hover:text-white"
+                      >
+                        {addingId === user.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Plus className="h-3.5 w-3.5" />
+                        )}
+                        Add
+                      </Button>
+                    </div>
+                  ));
+                })()
+              )}
             </div>
           </div>
         </DialogContent>
