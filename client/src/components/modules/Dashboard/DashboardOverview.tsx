@@ -270,7 +270,7 @@ export default function DashboardOverview({
       {/* 2. Status Breakdown and Project Progress */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Status & Priority */}
-        <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm flex flex-col">
+        <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md text-card-foreground border border-border/70 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm flex flex-col">
           <h3 className="text-base font-bold text-foreground mb-5 flex items-center gap-2">
             <TrendingUp className="h-4.5 w-4.5 text-primary" />
             Task Status & Priority Breakdown
@@ -411,7 +411,7 @@ export default function DashboardOverview({
         </div>
 
         {/* Project Progress */}
-        <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm flex flex-col">
+        <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md text-card-foreground border border-border/70 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-5 border-b border-border pb-3">
             <h3 className="text-base font-bold text-foreground flex items-center gap-2">
               <FolderKanban className="h-4.5 w-4.5 text-primary" />
@@ -555,7 +555,7 @@ export default function DashboardOverview({
       {/* 3. Team Workloads and Task Action Center */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Team Workload */}
-        <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm flex flex-col">
+        <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md text-card-foreground border border-border/70 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-5 border-b border-border pb-3">
             <h3 className="text-base font-bold text-foreground flex items-center gap-2">
               <Users className="h-4.5 w-4.5 text-primary" />
@@ -651,7 +651,7 @@ export default function DashboardOverview({
                       <th className="pb-3 text-right pr-1">Progress</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-50 dark:divide-slate-850/50">
+                  <tbody className="divide-y divide-slate-50 dark:divide-primary/20">
                     {memberWorkload.map((mw: any) => {
                       const percentage =
                         mw.totalTasks > 0
@@ -708,7 +708,7 @@ export default function DashboardOverview({
         </div>
 
         {/* Recent Activities & Task Action (Tabs) */}
-        <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm flex flex-col">
+        <div className="bg-card/65 dark:bg-slate-900/50 backdrop-blur-md text-card-foreground border border-border/70 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm flex flex-col">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-3 mb-5 gap-3">
             <h3 className="text-base font-bold text-foreground flex items-center gap-2">
               <Activity className="h-4.5 w-4.5 text-primary animate-pulse" />
