@@ -760,7 +760,7 @@ export default function DashboardOverview({
                 recentActivities.map((activity: any) => (
                   <div
                     key={activity.id}
-                    className="border dark:border-slate-850 rounded-xl p-3 bg-slate-50/20 dark:bg-slate-900/10 transition-all hover:border-primary/35 flex items-start gap-3"
+                    className="border dark:border-primary/20 rounded-xl p-3 transition-all hover:border-primary/35 flex items-start gap-3"
                   >
                     <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-650 dark:text-slate-350 flex items-center justify-center shrink-0">
                       {getActivityIcon(activity.type)}
@@ -796,7 +796,7 @@ export default function DashboardOverview({
                     <div
                       key={task.id}
                       onClick={() => setSelectedTask(task)}
-                      className="border dark:border-slate-850 rounded-xl p-3.5 bg-slate-50/20 dark:bg-slate-900/10 hover:border-primary/40 dark:hover:border-primary/40 cursor-pointer transition-all hover:translate-x-1 flex items-start gap-3.5"
+                      className="border dark:border-primary/20 rounded-xl p-3.5 hover:border-primary/40 dark:hover:border-primary/40 cursor-pointer transition-all hover:translate-x-1 flex items-start gap-3.5"
                     >
                       <div className="h-8.5 w-8.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 text-primary flex items-center justify-center shrink-0">
                         <Calendar className="h-4.5 w-4.5" />
@@ -838,7 +838,7 @@ export default function DashboardOverview({
                 <div
                   key={task.id}
                   onClick={() => setSelectedTask(task)}
-                  className="border dark:border-slate-850 rounded-xl p-3.5 bg-slate-50/20 dark:bg-slate-900/10 hover:border-primary/40 dark:hover:border-primary/40 cursor-pointer transition-all hover:translate-x-1 flex items-start gap-3.5"
+                  className="border dark:border-primary/20 rounded-xl p-3.5 hover:border-primary/40 dark:hover:border-primary/40 cursor-pointer transition-all hover:translate-x-1 flex items-start gap-3.5"
                 >
                   <div className="h-8.5 w-8.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-450 flex items-center justify-center shrink-0">
                     <AlertTriangle className="h-4.5 w-4.5" />
