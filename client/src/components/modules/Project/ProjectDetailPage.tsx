@@ -349,7 +349,6 @@ export default function ProjectDetailPage({
           </div>
         </div>
       </div>
-      {/* bg-card/65 dark:bg-slate-900/50 backdrop-blur-md rounded-xl border border-border/70 dark:border-slate-800/80 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-all */}
       {/* Summary Stats Row */}
       {summary && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

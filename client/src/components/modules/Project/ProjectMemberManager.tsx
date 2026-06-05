@@ -20,6 +20,39 @@ import {
 import { toast } from "sonner";
 import { Loader2, Plus, Search, Trash2, UserPlus, Users } from "lucide-react";
 
+const roleWeight: Record<string, number> = {
+  ADMIN: 1,
+  PROJECT_MANAGER: 2,
+  TEAM_MEMBER: 3,
+};
+
+const roleLabels: Record<string, string> = {
+  ADMIN: "Admin",
+  PROJECT_MANAGER: "Project Manager",
+  TEAM_MEMBER: "Team Member",
+};
+
+const roleStyles: Record<
+  string,
+  { cardBorder: string; badge: string; avatarBg: string }
+> = {
+  ADMIN: {
+    cardBorder: "border-l-[4px] border-l-rose-500/80 dark:border-l-rose-500",
+    badge: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 hover:bg-rose-500/20 shadow-none",
+    avatarBg: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
+  },
+  PROJECT_MANAGER: {
+    cardBorder: "border-l-[4px] border-l-amber-500/80 dark:border-l-amber-500",
+    badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/20 shadow-none",
+    avatarBg: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  },
+  TEAM_MEMBER: {
+    cardBorder: "border-l-[4px] border-l-emerald-500/80 dark:border-l-emerald-500",
+    badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20 shadow-none",
+    avatarBg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  },
+};
+
 interface ProjectMemberManagerProps {
   projectId: string;
   members: IProjectMember[];
@@ -128,57 +161,71 @@ export default function ProjectMemberManager({
 
       {/* Members List */}
       <div className="space-y-3">
-        {members.map((member) => {
-          const isCreator = member.userId === createdById;
-          return (
-            <div
-              key={member.id}
-              className="flex items-center justify-between rounded-xl border border-border/70 dark:border-slate-800/80 p-4 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md shadow-sm"
-            >
-              <div className="flex items-center gap-3.5">
-                <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <span className="text-sm font-bold">
-                    {member.user.name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-bold text-foreground leading-none">
-                      {member.user.name}
-                    </p>
-                    {isCreator && (
-                      <Badge className="bg-primary/10 text-primary text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-primary/20 hover:bg-primary/20 shadow-none">
-                        Creator
-                      </Badge>
-                    )}
-                    <Badge className="bg-muted text-muted-foreground text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-border hover:bg-muted/80 shadow-none">
-                      {member.user.role.replace("_", " ")}
-                    </Badge>
+        {(() => {
+          const sortedMembers = [...members].sort((a, b) => {
+            const wA = roleWeight[a.user.role] || 99;
+            const wB = roleWeight[b.user.role] || 99;
+            if (wA !== wB) return wA - wB;
+            return a.user.name.localeCompare(b.user.name);
+          });
+          return sortedMembers.map((member) => {
+            const isCreator = member.userId === createdById;
+            const style = roleStyles[member.user.role] || {
+              cardBorder: "border-l-[4px] border-l-primary/60",
+              badge: "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 shadow-none",
+              avatarBg: "bg-primary/10 text-primary",
+            };
+            const label = roleLabels[member.user.role] || member.user.role.replace("_", " ");
+            return (
+              <div
+                key={member.id}
+                className={`flex items-center justify-between rounded-xl border border-border/70 dark:border-slate-800/80 p-4 bg-card/65 dark:bg-slate-900/50 backdrop-blur-md shadow-sm ${style.cardBorder}`}
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 font-bold ${style.avatarBg}`}>
+                    <span className="text-sm font-bold">
+                      {member.user.name.charAt(0).toUpperCase()}
+                    </span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {member.user.email}
-                  </p>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-bold text-foreground leading-none">
+                        {member.user.name}
+                      </p>
+                      {isCreator && (
+                        <Badge className="bg-primary/10 text-primary text-[10px] font-bold rounded-full px-2.5 py-0.5 border border-primary/20 hover:bg-primary/20 shadow-none">
+                          Creator
+                        </Badge>
+                      )}
+                      <Badge className={`text-[10px] font-bold rounded-full px-2.5 py-0.5 border ${style.badge}`}>
+                        {label}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {member.user.email}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {canManageMembers && !isCreator && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8 text-muted-foreground hover:text-rose-600 transition-colors"
-                  onClick={() => handleRemoveMember(member.userId)}
-                  disabled={removingId === member.userId}
-                >
-                  {removingId === member.userId ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4" />
-                  )}
-                </Button>
-              )}
-            </div>
-          );
-        })}
+                {canManageMembers && !isCreator && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 text-muted-foreground hover:text-rose-600 transition-colors"
+                    onClick={() => handleRemoveMember(member.userId)}
+                    disabled={removingId === member.userId}
+                  >
+                    {removingId === member.userId ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                )}
+              </div>
+            );
+          });
+        })()}
       </div>
 
       {/* Add Member Dialog */}
