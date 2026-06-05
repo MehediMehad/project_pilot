@@ -11,7 +11,7 @@ export interface UserColumnActions {
 export const getUserColumns = (actions: UserColumnActions) => [
   {
     header: "Profile",
-    accessor: "profilePhoto",
+    accessor: "image",
     render: (value: unknown, row: IUser) => {
       const photoUrl = value as string | null | undefined;
       return (
@@ -66,11 +66,10 @@ export const getUserColumns = (actions: UserColumnActions) => [
       return (
         <button
           onClick={() => actions.onToggleStatus(row)}
-          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none cursor-pointer ${
-            isActive
+          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none cursor-pointer ${isActive
               ? "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400"
               : "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400"
-          }`}
+            }`}
         >
           <span
             className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-green-600" : "bg-red-600"}`}

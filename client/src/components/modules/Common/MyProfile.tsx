@@ -22,7 +22,7 @@ const MyProfile = ({ userInfo }: MyProfileProps) => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const profilePhoto = userInfo.profilePhoto;
+  const profilePhoto = userInfo.image;
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

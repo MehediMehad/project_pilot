@@ -39,9 +39,9 @@ export default function UserViewDetailDialog({
 
         <div className="flex flex-col items-center gap-4 py-6 border-b">
           <Avatar className="h-20 w-20 border-2 border-primary/20">
-            {user.profilePhoto ? (
+            {user.image ? (
               <AvatarImage
-                src={user.profilePhoto}
+                src={user.image}
                 alt={user.name}
                 className="object-cover"
               />

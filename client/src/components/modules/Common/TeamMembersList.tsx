@@ -76,8 +76,8 @@ const TeamMembersList = () => {
               {/* Card top details */}
               <div className="flex items-start gap-4">
                 <Avatar className="h-14 w-14 border-2 border-slate-50 dark:border-slate-800 shadow-2xs">
-                  {member.profilePhoto ? (
-                    <AvatarImage src={member.profilePhoto} alt={member.name} />
+                  {member.image ? (
+                    <AvatarImage src={member.image} alt={member.name} />
                   ) : (
                     <AvatarFallback className="bg-primary/5 text-primary text-base font-bold">
                       {getInitials(member.name)}

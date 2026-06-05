@@ -6,7 +6,7 @@ export interface IUser {
   email: string;
   role: UserRole;
   status: "ACTIVE" | "BLOCKED";
-  profilePhoto?: string | null;
+  image?: string | null;
   createdAt: string;
   updatedAt: string;
 }
