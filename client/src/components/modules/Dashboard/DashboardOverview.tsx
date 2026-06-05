@@ -270,8 +270,8 @@ export default function DashboardOverview({
       {/* 2. Status Breakdown and Project Progress */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Status & Priority */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white mb-5 flex items-center gap-2">
+        <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm flex flex-col">
+          <h3 className="text-base font-bold text-foreground mb-5 flex items-center gap-2">
             <TrendingUp className="h-4.5 w-4.5 text-primary" />
             Task Status & Priority Breakdown
           </h3>
@@ -411,30 +411,28 @@ export default function DashboardOverview({
         </div>
 
         {/* Project Progress */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col">
-          <div className="flex items-center justify-between mb-5 border-b border-slate-100 dark:border-slate-800 pb-3">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm flex flex-col">
+          <div className="flex items-center justify-between mb-5 border-b border-border pb-3">
+            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
               <FolderKanban className="h-4.5 w-4.5 text-primary" />
               Project Progress Summary
             </h3>
-            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200/40 dark:border-slate-700/40">
+            <div className="flex bg-muted rounded-lg p-0.5 border border-border/40">
               <button
                 onClick={() => setActiveProjectTab("chart")}
-                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${
-                  activeProjectTab === "chart"
-                     ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
-                     : "text-slate-500 hover:text-slate-880 dark:hover:text-slate-200"
-                }`}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${activeProjectTab === "chart"
+                  ? "bg-background text-primary shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Chart
               </button>
               <button
                 onClick={() => setActiveProjectTab("list")}
-                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${
-                  activeProjectTab === "list"
-                     ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
-                     : "text-slate-500 hover:text-slate-880 dark:hover:text-slate-200"
-                }`}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${activeProjectTab === "list"
+                  ? "bg-background text-primary shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 List
               </button>
@@ -557,30 +555,28 @@ export default function DashboardOverview({
       {/* 3. Team Workloads and Task Action Center */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Team Workload */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col">
-          <div className="flex items-center justify-between mb-5 border-b border-slate-100 dark:border-slate-800 pb-3">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm flex flex-col">
+          <div className="flex items-center justify-between mb-5 border-b border-border pb-3">
+            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
               <Users className="h-4.5 w-4.5 text-primary" />
               Member Workload Summary
             </h3>
-            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200/40 dark:border-slate-700/40">
+            <div className="flex bg-muted rounded-lg p-0.5 border border-border/40">
               <button
                 onClick={() => setActiveWorkloadTab("chart")}
-                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${
-                  activeWorkloadTab === "chart"
-                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-                }`}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${activeWorkloadTab === "chart"
+                  ? "bg-background text-primary shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Chart
               </button>
               <button
                 onClick={() => setActiveWorkloadTab("list")}
-                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${
-                  activeWorkloadTab === "list"
-                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
-                    : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-                }`}
+                className={`text-[10px] font-bold px-2.5 py-1 rounded-md cursor-pointer transition-all ${activeWorkloadTab === "list"
+                  ? "bg-background text-primary shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Table
               </button>
@@ -712,40 +708,37 @@ export default function DashboardOverview({
         </div>
 
         {/* Recent Activities & Task Action (Tabs) */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3 mb-5 gap-3">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 shadow-sm flex flex-col">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-3 mb-5 gap-3">
+            <h3 className="text-base font-bold text-foreground flex items-center gap-2">
               <Activity className="h-4.5 w-4.5 text-primary animate-pulse" />
               Recent Activities & Task Action
             </h3>
-            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 self-start sm:self-auto">
+            <div className="flex bg-muted rounded-lg p-0.5 self-start sm:self-auto">
               <button
                 onClick={() => setActiveSubTab("activities")}
-                className={`text-[11px] font-bold px-3 py-1.5 rounded-md cursor-pointer transition-all ${
-                  activeSubTab === "activities"
-                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
-                    : "text-slate-500 hover:text-slate-850 dark:hover:text-slate-200"
-                }`}
+                className={`text-[11px] font-bold px-3 py-1.5 rounded-md cursor-pointer transition-all ${activeSubTab === "activities"
+                  ? "bg-background text-primary shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Recent Activities
               </button>
               <button
                 onClick={() => setActiveSubTab("deadlines")}
-                className={`text-[11px] font-bold px-3 py-1.5 rounded-md cursor-pointer transition-all ${
-                  activeSubTab === "deadlines"
-                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
-                    : "text-slate-500 hover:text-slate-850 dark:hover:text-slate-200"
-                }`}
+                className={`text-[11px] font-bold px-3 py-1.5 rounded-md cursor-pointer transition-all ${activeSubTab === "deadlines"
+                  ? "bg-background text-primary shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 Deadlines
               </button>
               <button
                 onClick={() => setActiveSubTab("highPriority")}
-                className={`text-[11px] font-bold px-3 py-1.5 rounded-md cursor-pointer transition-all ${
-                  activeSubTab === "highPriority"
-                    ? "bg-white dark:bg-slate-950 text-primary shadow-xs"
-                    : "text-slate-500 hover:text-slate-850 dark:hover:text-slate-200"
-                }`}
+                className={`text-[11px] font-bold px-3 py-1.5 rounded-md cursor-pointer transition-all ${activeSubTab === "highPriority"
+                  ? "bg-background text-primary shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+                  }`}
               >
                 High Priority
               </button>
@@ -767,7 +760,7 @@ export default function DashboardOverview({
                 recentActivities.map((activity: any) => (
                   <div
                     key={activity.id}
-                    className="border border-slate-50 dark:border-slate-850 rounded-xl p-3 bg-slate-50/20 dark:bg-slate-900/10 transition-all hover:border-primary/35 flex items-start gap-3"
+                    className="border dark:border-slate-850 rounded-xl p-3 bg-slate-50/20 dark:bg-slate-900/10 transition-all hover:border-primary/35 flex items-start gap-3"
                   >
                     <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-650 dark:text-slate-350 flex items-center justify-center shrink-0">
                       {getActivityIcon(activity.type)}
@@ -797,13 +790,13 @@ export default function DashboardOverview({
                 upcomingDeadlines.map((task: any) => {
                   const remainingDays = Math.ceil(
                     (new Date(task.dueDate).getTime() - new Date().getTime()) /
-                      (1000 * 60 * 60 * 24)
+                    (1000 * 60 * 60 * 24)
                   );
                   return (
                     <div
                       key={task.id}
                       onClick={() => setSelectedTask(task)}
-                      className="border border-slate-50 dark:border-slate-850 rounded-xl p-3.5 bg-slate-50/20 dark:bg-slate-900/10 hover:border-primary/40 dark:hover:border-primary/40 cursor-pointer transition-all hover:translate-x-1 flex items-start gap-3.5"
+                      className="border dark:border-slate-850 rounded-xl p-3.5 bg-slate-50/20 dark:bg-slate-900/10 hover:border-primary/40 dark:hover:border-primary/40 cursor-pointer transition-all hover:translate-x-1 flex items-start gap-3.5"
                     >
                       <div className="h-8.5 w-8.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 text-primary flex items-center justify-center shrink-0">
                         <Calendar className="h-4.5 w-4.5" />
@@ -845,7 +838,7 @@ export default function DashboardOverview({
                 <div
                   key={task.id}
                   onClick={() => setSelectedTask(task)}
-                  className="border border-slate-50 dark:border-slate-850 rounded-xl p-3.5 bg-slate-50/20 dark:bg-slate-900/10 hover:border-primary/40 dark:hover:border-primary/40 cursor-pointer transition-all hover:translate-x-1 flex items-start gap-3.5"
+                  className="border dark:border-slate-850 rounded-xl p-3.5 bg-slate-50/20 dark:bg-slate-900/10 hover:border-primary/40 dark:hover:border-primary/40 cursor-pointer transition-all hover:translate-x-1 flex items-start gap-3.5"
                 >
                   <div className="h-8.5 w-8.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-450 flex items-center justify-center shrink-0">
                     <AlertTriangle className="h-4.5 w-4.5" />

@@ -15,7 +15,7 @@ const ForgotPasswordForm = () => {
   return (
     <form action={formAction} className="space-y-6">
       {state?.success && (
-        <Alert className="border-green-500 bg-green-50 text-green-900">
+        <Alert className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
           <CheckCircle className="h-4 w-4" />
           <AlertDescription>{state.message}</AlertDescription>
         </Alert>
