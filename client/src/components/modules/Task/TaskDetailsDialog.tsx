@@ -468,8 +468,8 @@ export default function TaskDetailsDialog({
                 <button
                   onClick={() => setActiveTab("comments")}
                   className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "comments"
-                      ? "border-primary text-primary"
-                      : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                     }`}
                 >
                   <MessageSquare className="h-4 w-4" />
@@ -481,8 +481,8 @@ export default function TaskDetailsDialog({
                 <button
                   onClick={() => setActiveTab("attachments")}
                   className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "attachments"
-                      ? "border-primary text-primary"
-                      : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                     }`}
                 >
                   <Paperclip className="h-4 w-4" />
@@ -494,8 +494,8 @@ export default function TaskDetailsDialog({
                 <button
                   onClick={() => setActiveTab("activity")}
                   className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 -mb-0.5 ${activeTab === "activity"
-                      ? "border-primary text-primary"
-                      : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
                     }`}
                 >
                   <Clock className="h-4 w-4" />
@@ -575,8 +575,18 @@ export default function TaskDetailsDialog({
                                   <span className="text-[9px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold uppercase tracking-wider">
                                     {comment.user.role.replace("_", " ")}
                                   </span>
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
+                                    {new Date(
+                                      comment.createdAt,
+                                    ).toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </span>
                                 </div>
-                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
+                                {/* <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
                                   {new Date(
                                     comment.createdAt,
                                   ).toLocaleDateString("en-US", {
@@ -585,7 +595,7 @@ export default function TaskDetailsDialog({
                                     hour: "2-digit",
                                     minute: "2-digit",
                                   })}
-                                </span>
+                                </span> */}
                               </div>
 
                               {isEditing ? (
