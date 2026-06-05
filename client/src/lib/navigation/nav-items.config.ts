@@ -38,7 +38,7 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
                     roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],
                 },
                 {
-                    title: "Activities Feed",
+                    title: "Activities",
                     href: activitiesPath,
                     icon: "Activity",
                     roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],

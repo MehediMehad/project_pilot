@@ -77,7 +77,7 @@ const WorkspaceActivities = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Activities Feed</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Activities</h1>
         <p className="text-muted-foreground text-sm">
           Keep track of everything happening across your workspace projects and tasks.
         </p>
