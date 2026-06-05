@@ -16,6 +16,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, RefreshCw, ChevronLeft, ChevronRight, ListTodo } from "lucide-react";
 import { getUserInfo } from "@/services/auth/user-info.service";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TaskListPageProps {
   userRole: UserRole;
@@ -202,77 +209,93 @@ export default function TaskListPage({ userRole, currentUserId: propCurrentUserI
           {/* Status filter */}
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">Status:</span>
-            <select
+            <Select
               value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
+              onValueChange={(value) => {
+                setStatusFilter(value);
                 setPage(1);
               }}
-              className="text-xs bg-background border rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
             >
-              <option value="ALL">All Status</option>
-              <option value="TODO">To Do</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="COMPLETED">Completed</option>
-            </select>
+              <SelectTrigger className="w-[110px] h-8 text-xs bg-background text-foreground">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Status</SelectItem>
+                <SelectItem value="TODO">To Do</SelectItem>
+                <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                <SelectItem value="COMPLETED">Completed</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Priority filter */}
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">Priority:</span>
-            <select
+            <Select
               value={priorityFilter}
-              onChange={(e) => {
-                setPriorityFilter(e.target.value);
+              onValueChange={(value) => {
+                setPriorityFilter(value);
                 setPage(1);
               }}
-              className="text-xs bg-background border rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
             >
-              <option value="ALL">All Priorities</option>
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-            </select>
+              <SelectTrigger className="w-[125px] h-8 text-xs bg-background text-foreground">
+                <SelectValue placeholder="All Priorities" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Priorities</SelectItem>
+                <SelectItem value="LOW">Low</SelectItem>
+                <SelectItem value="MEDIUM">Medium</SelectItem>
+                <SelectItem value="HIGH">High</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Member filter */}
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">Assignee:</span>
-            <select
+            <Select
               value={assignedToFilter}
-              onChange={(e) => {
-                setAssignedToFilter(e.target.value);
+              onValueChange={(value) => {
+                setAssignedToFilter(value);
                 setPage(1);
               }}
-              className="text-xs bg-background border rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer max-w-[140px]"
             >
-              <option value="ALL">All Members</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="w-[130px] h-8 text-xs bg-background text-foreground">
+                <SelectValue placeholder="All Members" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Members</SelectItem>
+                {users.map((user) => (
+                  <SelectItem key={user.id} value={user.id}>
+                    {user.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Sort By */}
           <div className="flex items-center gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">Sort By:</span>
-            <select
+            <Select
               value={`${sortBy}:${sortOrder}`}
-              onChange={(e) => {
-                const [field, order] = e.target.value.split(":");
+              onValueChange={(value) => {
+                const [field, order] = value.split(":");
                 setSortBy(field);
                 setSortOrder(order);
                 setPage(1);
               }}
-              className="text-xs bg-background border rounded-md px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
             >
-              <option value="createdAt:desc">Latest Created</option>
-              <option value="dueDate:asc">Nearest Deadline</option>
-              <option value="priority:asc">Highest Priority</option>
-              <option value="updatedAt:desc">Recently Updated</option>
-            </select>
+              <SelectTrigger className="w-[145px] h-8 text-xs bg-background text-foreground">
+                <SelectValue placeholder="Latest Created" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="createdAt:desc">Latest Created</SelectItem>
+                <SelectItem value="dueDate:asc">Nearest Deadline</SelectItem>
+                <SelectItem value="priority:asc">Highest Priority</SelectItem>
+                <SelectItem value="updatedAt:desc">Recently Updated</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <Button

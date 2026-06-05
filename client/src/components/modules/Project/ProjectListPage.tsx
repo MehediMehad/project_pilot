@@ -9,6 +9,13 @@ import ProjectFormDialog from "./ProjectFormDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Search,
   Plus,
   FolderKanban,
@@ -135,45 +142,53 @@ export default function ProjectListPage({
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-6">
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
               Status
             </span>
-            <select
+            <Select
               value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
+              onValueChange={(value) => {
+                setStatusFilter(value);
                 setPage(1);
               }}
-              className="flex h-9 w-[140px] rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground font-medium hover:border-accent outline-none transition-all shadow-sm cursor-pointer"
             >
-              <option value="ALL">All Status</option>
-              <option value="ACTIVE">Active</option>
-              <option value="ON_HOLD">On Hold</option>
-              <option value="COMPLETED">Completed</option>
-            </select>
+              <SelectTrigger className="w-[140px] h-9 bg-card text-foreground">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Status</SelectItem>
+                <SelectItem value="ACTIVE">Active</SelectItem>
+                <SelectItem value="ON_HOLD">On Hold</SelectItem>
+                <SelectItem value="COMPLETED">Completed</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
               Sort By
             </span>
-            <select
+            <Select
               value={`${sortBy}:${sortOrder}`}
-              onChange={(e) => {
-                const [field, order] = e.target.value.split(":");
+              onValueChange={(value) => {
+                const [field, order] = value.split(":");
                 setSortBy(field);
                 setSortOrder(order);
                 setPage(1);
               }}
-              className="flex h-9 w-[160px] rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground font-medium hover:border-accent outline-none transition-all shadow-sm cursor-pointer"
             >
-              <option value="createdAt:desc">Latest Created</option>
-              <option value="createdAt:asc">Oldest Created</option>
-              <option value="deadline:asc">Nearest Deadline</option>
-              <option value="name:asc">Alphabetical (A-Z)</option>
-            </select>
+              <SelectTrigger className="w-[160px] h-9 bg-card text-foreground">
+                <SelectValue placeholder="Latest Created" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="createdAt:desc">Latest Created</SelectItem>
+                <SelectItem value="createdAt:asc">Oldest Created</SelectItem>
+                <SelectItem value="deadline:asc">Nearest Deadline</SelectItem>
+                <SelectItem value="name:asc">Alphabetical (A-Z)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

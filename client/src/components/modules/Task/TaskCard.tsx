@@ -9,6 +9,13 @@ import { updateTask, deleteTask } from "@/services/task/taskManagement";
 import { toast } from "sonner";
 import TaskDetailsDialog from "./TaskDetailsDialog";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TaskCardProps {
   task: ITask;
@@ -165,17 +172,22 @@ export default function TaskCard({
           {/* Actions */}
           <div className="flex items-center gap-1.5">
             {/* Quick status selector */}
-            <select
-              value={status}
-              onChange={(e) => handleStatusChange(e.target.value as TaskStatus)}
-              onClick={(e) => e.stopPropagation()}
-              disabled={isPending || (userRole === "TEAM_MEMBER" && task.assignedToId !== currentUserId)}
-              className="text-xs bg-background border rounded-md px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer disabled:opacity-50"
-            >
-              <option value="TODO">To Do</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="COMPLETED">Completed</option>
-            </select>
+            <div onClick={(e) => e.stopPropagation()}>
+              <Select
+                value={status}
+                onValueChange={(value) => handleStatusChange(value as TaskStatus)}
+                disabled={isPending || (userRole === "TEAM_MEMBER" && task.assignedToId !== currentUserId)}
+              >
+                <SelectTrigger className="h-7 text-xs bg-background text-foreground px-2">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="TODO">To Do</SelectItem>
+                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                  <SelectItem value="COMPLETED">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             {isManagerOrAdmin && (
               <>

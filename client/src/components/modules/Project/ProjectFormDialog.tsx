@@ -17,6 +17,13 @@ import { Loader2 } from "lucide-react";
 import { createProjectSchema, updateProjectSchema } from "@/zod/project.validation";
 import { createProject, updateProject } from "@/services/project/projectManagement";
 import { IProject, ProjectStatus } from "@/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ProjectFormDialogProps {
   open: boolean;
@@ -141,16 +148,19 @@ export default function ProjectFormDialog({
 
             <div className="space-y-2">
               <Label htmlFor="project-status">Status</Label>
-              <select
-                id="project-status"
+              <Select
                 value={status}
-                onChange={(e) => setStatus(e.target.value as ProjectStatus)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                onValueChange={(value) => setStatus(value as ProjectStatus)}
               >
-                <option value="ACTIVE">Active</option>
-                <option value="ON_HOLD">On Hold</option>
-                <option value="COMPLETED">Completed</option>
-              </select>
+                <SelectTrigger id="project-status" className="w-full h-10 bg-background text-foreground">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="ON_HOLD">On Hold</SelectItem>
+                  <SelectItem value="COMPLETED">Completed</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

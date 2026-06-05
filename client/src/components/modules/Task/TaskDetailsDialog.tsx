@@ -53,6 +53,13 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { useSocket } from "@/contexts/SocketContext";
 import { DeleteConfirmDialog } from "@/components/ui/DeleteConfirmDialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TaskDetailsDialogProps {
   task: ITask;
@@ -849,18 +856,20 @@ export default function TaskDetailsDialog({
                   <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
                     Status
                   </span>
-                  <select
+                  <Select
                     value={task.status}
-                    onChange={(e) =>
-                      handleUpdateStatus(e.target.value as TaskStatus)
-                    }
+                    onValueChange={(value) => handleUpdateStatus(value as TaskStatus)}
                     disabled={isUpdatingState || (userRole === "TEAM_MEMBER" && task.assignedToId !== currentUserId)}
-                    className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${statusStyles[task.status]}`}
                   >
-                    <option value="TODO">To Do</option>
-                    <option value="IN_PROGRESS">In Progress</option>
-                    <option value="COMPLETED">Completed</option>
-                  </select>
+                    <SelectTrigger className={`text-xs font-semibold rounded-full border px-3 h-8 cursor-pointer disabled:opacity-50 transition-all ${statusStyles[task.status]}`}>
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="TODO">To Do</SelectItem>
+                      <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                      <SelectItem value="COMPLETED">Completed</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Interactive Priority Selector */}
@@ -868,18 +877,20 @@ export default function TaskDetailsDialog({
                   <span className="text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">
                     Priority
                   </span>
-                  <select
+                  <Select
                     value={task.priority}
-                    onChange={(e) =>
-                      handleUpdatePriority(e.target.value as TaskPriority)
-                    }
+                    onValueChange={(value) => handleUpdatePriority(value as TaskPriority)}
                     disabled={isUpdatingState || userRole === "TEAM_MEMBER"}
-                    className={`text-xs font-semibold rounded-full border px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer disabled:opacity-50 transition-all ${priorityStyles[task.priority]}`}
                   >
-                    <option value="LOW">Low Priority</option>
-                    <option value="MEDIUM">Medium Priority</option>
-                    <option value="HIGH">High Priority</option>
-                  </select>
+                    <SelectTrigger className={`text-xs font-semibold rounded-full border px-3 h-8 cursor-pointer disabled:opacity-50 transition-all ${priorityStyles[task.priority]}`}>
+                      <SelectValue placeholder="Priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="LOW">Low Priority</SelectItem>
+                      <SelectItem value="MEDIUM">Medium Priority</SelectItem>
+                      <SelectItem value="HIGH">High Priority</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <h5 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center gap-1.5">

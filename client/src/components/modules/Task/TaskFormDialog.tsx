@@ -18,6 +18,13 @@ import { createTaskSchema, updateTaskSchema } from "@/zod/task.validation";
 import { createTask, updateTask } from "@/services/task/taskManagement";
 import { getAllProjects, getProjectMembers } from "@/services/project/projectManagement";
 import { IProject, IProjectMember, ITask, TaskPriority, TaskStatus } from "@/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TaskFormDialogProps {
   open: boolean;
@@ -201,23 +208,25 @@ export default function TaskFormDialog({
           {!preSelectedProjectId && !isEdit && (
             <div className="space-y-2">
               <Label htmlFor="task-project">Project</Label>
-              <select
-                id="task-project"
-                value={projectId}
-                onChange={(e) => {
-                  setProjectId(e.target.value);
+              <Select
+                value={projectId || undefined}
+                onValueChange={(value) => {
+                  setProjectId(value);
                   setAssignedToId(""); // reset assignee on project change
                 }}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 disabled={isLoadingProjects}
               >
-                <option value="">Select a project</option>
-                {projects.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="task-project" className="w-full h-10 bg-background text-foreground">
+                  <SelectValue placeholder="Select a project" />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {errors.projectId && (
                 <p className="text-xs text-red-500">{errors.projectId}</p>
               )}
@@ -241,20 +250,23 @@ export default function TaskFormDialog({
 
             <div className="space-y-2">
               <Label htmlFor="task-assignee">Assignee</Label>
-              <select
-                id="task-assignee"
-                value={assignedToId}
-                onChange={(e) => setAssignedToId(e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              <Select
+                value={assignedToId || "UNASSIGNED"}
+                onValueChange={(value) => setAssignedToId(value === "UNASSIGNED" ? "" : value)}
                 disabled={isLoadingMembers || !projectId}
               >
-                <option value="">Unassigned</option>
-                {members.map((m) => (
-                  <option key={m.userId} value={m.userId}>
-                    {m.user.name} ({m.user.role.replace("_", " ")})
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="task-assignee" className="w-full h-10 bg-background text-foreground">
+                  <SelectValue placeholder="Unassigned" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="UNASSIGNED">Unassigned</SelectItem>
+                  {members.map((m) => (
+                    <SelectItem key={m.userId} value={m.userId}>
+                      {m.user.name} ({m.user.role.replace("_", " ")})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -262,30 +274,36 @@ export default function TaskFormDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="task-priority">Priority</Label>
-              <select
-                id="task-priority"
+              <Select
                 value={priority}
-                onChange={(e) => setPriority(e.target.value as TaskPriority)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                onValueChange={(value) => setPriority(value as TaskPriority)}
               >
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
-              </select>
+                <SelectTrigger id="task-priority" className="w-full h-10 bg-background text-foreground">
+                  <SelectValue placeholder="Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="LOW">Low</SelectItem>
+                  <SelectItem value="MEDIUM">Medium</SelectItem>
+                  <SelectItem value="HIGH">High</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="task-status">Status</Label>
-              <select
-                id="task-status"
+              <Select
                 value={status}
-                onChange={(e) => setStatus(e.target.value as TaskStatus)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                onValueChange={(value) => setStatus(value as TaskStatus)}
               >
-                <option value="TODO">To Do</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="COMPLETED">Completed</option>
-              </select>
+                <SelectTrigger id="task-status" className="w-full h-10 bg-background text-foreground">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="TODO">To Do</SelectItem>
+                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                  <SelectItem value="COMPLETED">Completed</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

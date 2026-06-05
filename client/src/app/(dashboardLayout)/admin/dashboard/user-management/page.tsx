@@ -9,6 +9,13 @@ import { getAllUsers, changeUserStatus } from "@/services/admin/userManagement";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { IPaginationMeta, IUser } from "@/types";
 
 export default function UserManagementPage() {
@@ -120,56 +127,68 @@ export default function UserManagementPage() {
             <span className="text-xs text-muted-foreground font-semibold uppercase">
               Status
             </span>
-            <select
+            <Select
               value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value);
+              onValueChange={(value) => {
+                setStatusFilter(value);
                 setPage(1);
               }}
-              className="flex h-9 w-[130px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
-              <option value="ALL">All Status</option>
-              <option value="ACTIVE">Active</option>
-              <option value="BLOCKED">Blocked</option>
-            </select>
+              <SelectTrigger className="w-[130px] h-9 bg-background text-foreground">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Status</SelectItem>
+                <SelectItem value="ACTIVE">Active</SelectItem>
+                <SelectItem value="BLOCKED">Blocked</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground font-semibold uppercase">
               Role
             </span>
-            <select
+            <Select
               value={roleFilter}
-              onChange={(e) => {
-                setRoleFilter(e.target.value);
+              onValueChange={(value) => {
+                setRoleFilter(value);
                 setPage(1);
               }}
-              className="flex h-9 w-[130px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
             >
-              <option value="ALL">All Roles</option>
-              <option value="USER">User</option>
-              <option value="ADMIN">Admin</option>
-            </select>
+              <SelectTrigger className="w-[130px] h-9 bg-background text-foreground">
+                <SelectValue placeholder="All Roles" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Roles</SelectItem>
+                <SelectItem value="USER">User</SelectItem>
+                <SelectItem value="ADMIN">Admin</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground font-semibold uppercase">
               Sort By
             </span>
-            <select
+            <Select
               value={`${sortBy}:${sortOrder}`}
-              onChange={(e) => {
-                const [field, order] = e.target.value.split(":");
+              onValueChange={(value) => {
+                const [field, order] = value.split(":");
                 setSortBy(field);
                 setSortOrder(order);
                 setPage(1);
               }}
-              className="flex h-9 w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
             >
-              <option value="createdAt:desc">Latest Created</option>
-              <option value="name:asc">Name (A-Z)</option>
-              <option value="name:desc">Name (Z-A)</option>
-            </select>
+              <SelectTrigger className="w-[150px] h-9 bg-background text-foreground">
+                <SelectValue placeholder="Latest Created" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="createdAt:desc">Latest Created</SelectItem>
+                <SelectItem value="name:asc">Name (A-Z)</SelectItem>
+                <SelectItem value="name:desc">Name (Z-A)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
