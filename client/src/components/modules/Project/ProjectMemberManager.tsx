@@ -80,9 +80,6 @@ export default function ProjectMemberManager({
       if (res.success) {
         toast.success(res.message || "Member added!");
         onMembersChanged();
-        setAddDialogOpen(false);
-        setSearchTerm("");
-        setSearchResults([]);
       } else {
         toast.error(res.message || "Failed to add member");
       }
@@ -186,18 +183,21 @@ export default function ProjectMemberManager({
 
       {/* Add Member Dialog */}
       <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[550px] bg-card/95 dark:bg-slate-900/95 backdrop-blur-lg border border-border/80 dark:border-slate-800/90 rounded-2xl shadow-2xl text-foreground">
           <DialogHeader>
-            <DialogTitle>Add Team Member</DialogTitle>
+            <DialogTitle className="text-xl font-extrabold text-foreground flex items-center gap-2">
+              <UserPlus className="h-5 w-5 text-primary" />
+              Add Team Member
+            </DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 pt-2">
+          <div className="space-y-4 pt-3">
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by name or email..."
-                  className="pl-9"
+                  className="pl-9 bg-muted/30 dark:bg-slate-950/20 border-border/80 rounded-xl py-5 "
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearchUsers()}
@@ -206,7 +206,8 @@ export default function ProjectMemberManager({
               <Button
                 onClick={handleSearchUsers}
                 disabled={searching}
-                size="sm"
+                size="lg"
+                className="rounded-xl px-4 cursor-pointer"
               >
                 {searching ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -216,60 +217,55 @@ export default function ProjectMemberManager({
               </Button>
             </div>
 
-            <div className="max-h-[300px] overflow-y-auto space-y-2">
+            <div className="max-h-[350px] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
               {searching ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-6 w-6 animate-spin text-primary" />
                 </div>
-              ) : searchResults.length === 0 ? (
-                <p className="text-center text-sm text-muted-foreground py-8">
-                  No users found
-                </p>
-              ) : (
-                searchResults.map((user) => {
-                  const isAlreadyMember = memberUserIds.has(user.id);
+              ) : (() => {
+                const nonMembers = searchResults.filter((user) => !memberUserIds.has(user.id));
+                if (nonMembers.length === 0) {
                   return (
-                    <div
-                      key={user.id}
-                      className="flex items-center justify-between rounded-lg border p-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <span className="text-xs font-semibold text-primary">
-                            {user.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">{user.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {user.email}
-                          </p>
-                        </div>
-                      </div>
-                      {isAlreadyMember ? (
-                        <Badge variant="secondary" className="text-[10px]">
-                          Member
-                        </Badge>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleAddMember(user.id)}
-                          disabled={addingId === user.id}
-                          className="gap-1"
-                        >
-                          {addingId === user.id ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            <Plus className="h-3 w-3" />
-                          )}
-                          Add
-                        </Button>
-                      )}
-                    </div>
+                    <p className="text-center text-sm text-muted-foreground py-8">
+                      {searchResults.length > 0 ? "All searched users are already members" : "No users found"}
+                    </p>
                   );
-                })
-              )}
+                }
+                return nonMembers.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 dark:bg-slate-950/20 p-3.5 transition-all hover:bg-muted/30"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-semibold text-primary">
+                          {user.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-foreground leading-none">{user.name}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleAddMember(user.id)}
+                      disabled={addingId === user.id}
+                      className="gap-1 rounded-lg border-border hover:bg-primary hover:text-white"
+                    >
+                      {addingId === user.id ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Plus className="h-3.5 w-3.5" />
+                      )}
+                      Add
+                    </Button>
+                  </div>
+                ));
+              })()}
             </div>
           </div>
         </DialogContent>
