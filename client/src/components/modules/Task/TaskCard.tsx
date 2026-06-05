@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ITask, TaskPriority, TaskStatus } from "@/types";
 import { UserRole } from "@/lib/auth/auth-utils";
 import { Calendar, User2, Edit2, Trash2, CheckCircle2, Circle, Clock } from "lucide-react";
@@ -34,8 +34,15 @@ export default function TaskCard({
 }: TaskCardProps) {
   const [isPending, setIsPending] = useState(false);
   const [status, setStatus] = useState<TaskStatus>(task.status);
+  const [priority, setPriority] = useState<TaskPriority>(task.priority);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+
+  // Sync prop changes
+  useEffect(() => {
+    setStatus(task.status);
+    setPriority(task.priority);
+  }, [task.status, task.priority]);
 
   // Status colors
   const statusColors = {
@@ -123,9 +130,9 @@ export default function TaskCard({
           {/* Top Info */}
           <div className="flex items-center justify-between">
             <span
-              className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${priorityColors[task.priority]}`}
+              className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${priorityColors[priority]}`}
             >
-              {task.priority} Priority
+              {priority} Priority
             </span>
             <span
               className={`text-xs px-2.5 py-0.5 rounded-full font-medium flex items-center gap-1.5 ${statusBgColors[status]}`}
@@ -222,11 +229,13 @@ export default function TaskCard({
       </div>
 
       <TaskDetailsDialog
-        task={{ ...task, status }}
+        task={{ ...task, status, priority }}
         isOpen={isDetailsOpen}
         onOpenChange={setIsDetailsOpen}
         userRole={userRole}
         currentUserId={currentUserId}
+        onStatusChange={setStatus}
+        onPriorityChange={setPriority}
       />
 
       <DeleteConfirmDialog

@@ -68,6 +68,7 @@ interface TaskDetailsDialogProps {
   userRole: UserRole;
   currentUserId?: string;
   onStatusChange?: (newStatus: TaskStatus) => void;
+  onPriorityChange?: (newPriority: TaskPriority) => void;
 }
 
 export default function TaskDetailsDialog({
@@ -77,6 +78,7 @@ export default function TaskDetailsDialog({
   userRole,
   currentUserId,
   onStatusChange,
+  onPriorityChange,
 }: TaskDetailsDialogProps) {
   const [task, setTask] = useState<ITask>(initialTask);
   const { socket } = useSocket();
@@ -106,12 +108,12 @@ export default function TaskDetailsDialog({
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   const [attachmentToDelete, setAttachmentToDelete] = useState<string | null>(null);
 
-  // Sync initialTask changes
+  // Sync initialTask changes only when dialog opens or task ID changes
   useEffect(() => {
-    if (initialTask) {
+    if (isOpen && initialTask) {
       setTask(initialTask);
     }
-  }, [initialTask]);
+  }, [isOpen, initialTask?.id]);
 
   // Fetch comments, attachments, and activity logs
   useEffect(() => {
@@ -138,6 +140,7 @@ export default function TaskDetailsDialog({
       if (updatedTask && updatedTask.id === task.id) {
         setTask(updatedTask);
         if (onStatusChange) onStatusChange(updatedTask.status);
+        if (onPriorityChange) onPriorityChange(updatedTask.priority);
       }
     };
 
@@ -159,7 +162,7 @@ export default function TaskDetailsDialog({
       socket.off("activity:created", handleActivityCreated);
       socket.off("task:details_updated", handleTaskDetailsUpdated);
     };
-  }, [isOpen, task?.id, socket, onStatusChange]);
+  }, [isOpen, task?.id, socket, onStatusChange, onPriorityChange]);
 
   const fetchComments = async () => {
     setIsLoadingComments(true);
@@ -284,6 +287,7 @@ export default function TaskDetailsDialog({
       });
       if (res.success) {
         setTask((prev) => ({ ...prev, priority: newPriority }));
+        if (onPriorityChange) onPriorityChange(newPriority);
         toast.success("Task priority updated!");
         fetchActivityLogs();
       } else {
