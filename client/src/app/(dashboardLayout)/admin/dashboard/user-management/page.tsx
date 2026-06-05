@@ -161,8 +161,8 @@ export default function UserManagementPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="ALL">All Roles</SelectItem>
-                <SelectItem value="USER">User</SelectItem>
-                <SelectItem value="ADMIN">Admin</SelectItem>
+                <SelectItem value="TEAM_MEMBER">Team Member</SelectItem>
+                <SelectItem value="PROJECT_MANAGER">Project Manager</SelectItem>
               </SelectContent>
             </Select>
           </div>

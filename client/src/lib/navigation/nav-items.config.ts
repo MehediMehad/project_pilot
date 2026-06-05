@@ -78,5 +78,11 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
 }
 
 export const getNavItemsByRole = async (role: UserRole): Promise<NavSection[]> => {
-    return getCommonNavItems(role);
+    const commonItems = getCommonNavItems(role);
+    return commonItems
+        .map((section) => ({
+            ...section,
+            items: section.items.filter((item) => item.roles.includes(role)),
+        }))
+        .filter((section) => section.items.length > 0);
 }

@@ -38,7 +38,7 @@ export default function UserFormDialog({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"USER" | "ADMIN">("USER");
+  const [role, setRole] = useState<"PROJECT_MANAGER" | "TEAM_MEMBER">("TEAM_MEMBER");
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -73,7 +73,7 @@ export default function UserFormDialog({
         setName("");
         setEmail("");
         setPassword("");
-        setRole("USER");
+        setRole("TEAM_MEMBER");
         setProfilePhoto(null);
         onOpenChange(false);
         onSuccess();
@@ -140,14 +140,14 @@ export default function UserFormDialog({
             <Label htmlFor="role">Role</Label>
             <Select
               value={role}
-              onValueChange={(value) => setRole(value as "USER" | "ADMIN")}
+              onValueChange={(value) => setRole(value as "PROJECT_MANAGER" | "TEAM_MEMBER")}
             >
               <SelectTrigger id="role" className="w-full h-10 bg-background text-foreground">
                 <SelectValue placeholder="Role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="USER">User</SelectItem>
-                <SelectItem value="ADMIN">Admin</SelectItem>
+                <SelectItem value="TEAM_MEMBER">Team Member</SelectItem>
+                <SelectItem value="PROJECT_MANAGER">Project Manager</SelectItem>
               </SelectContent>
             </Select>
             {errors.role && (
