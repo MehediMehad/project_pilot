@@ -13,17 +13,23 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
     return [
         {
             items: [
-                {
-                    title: "Home",
-                    href: "/",
-                    icon: "Home",
-                    roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],
-                },
+                // {
+                //     title: "Home",
+                //     href: "/",
+                //     icon: "Home",
+                //     roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],
+                // },
                 {
                     title: "Dashboard",
                     href: defaultDashboard,
                     icon: "LayoutDashboard",
                     roles: ["PROJECT_MANAGER", "TEAM_MEMBER", "ADMIN"],
+                },
+                {
+                    title: "User Management",
+                    href: "/admin/dashboard/user-management",
+                    icon: "UserCog",
+                    roles: ["ADMIN"],
                 },
                 {
                     title: "Projects",
@@ -48,12 +54,6 @@ export const getCommonNavItems = (role: UserRole): NavSection[] => {
                     href: notificationsPath,
                     icon: "Bell",
                     roles: ["ADMIN", "PROJECT_MANAGER", "TEAM_MEMBER"],
-                },
-                {
-                    title: "User Management",
-                    href: "/admin/dashboard/user-management",
-                    icon: "UserCog",
-                    roles: ["ADMIN"],
                 },
                 {
                     title: "My Profile",
