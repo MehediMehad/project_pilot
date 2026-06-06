@@ -147,6 +147,9 @@ export function SocketProvider({ children, token: propToken }: SocketProviderPro
       }
     };
 
+    // Load notifications immediately regardless of socket connection
+    loadNotifications();
+
     socketInstance.on("connect", () => {
       console.log("✅ Socket connected:", socketInstance.id);
       setIsConnected(true);

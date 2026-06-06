@@ -82,9 +82,8 @@ export default function NotificationDropdown() {
           )}
           {/* Connection status indicator */}
           <span
-            className={`absolute bottom-0 right-0 h-2 w-2 rounded-full ring-2 ring-background ${
-              isConnected ? "bg-green-500 animate-pulse" : "bg-yellow-500"
-            }`}
+            className={`absolute bottom-0 right-0 h-2 w-2 rounded-full ring-2 ring-background ${isConnected ? "bg-green-500 animate-pulse" : "bg-yellow-500"
+              }`}
           />
         </Button>
       </DropdownMenuTrigger>
@@ -144,11 +143,10 @@ export default function NotificationDropdown() {
                       await markAsRead(notification.id);
                     }
                   }}
-                  className={`flex items-start gap-3 p-3 my-0.5 mx-1 rounded-lg cursor-pointer transition-all hover:bg-muted dark:hover:bg-slate-900/60 border-l-2 ${
-                    !notification.isRead
+                  className={`flex items-start gap-3 p-3 my-0.5 mx-1 rounded-lg cursor-pointer transition-all hover:bg-muted dark:hover:bg-slate-900/60 border-l-2 ${!notification.isRead
                       ? "bg-primary/5 border-l-primary"
                       : "border-l-transparent text-muted-foreground"
-                  }`}
+                    }`}
                 >
                   <div className="mt-0.5 shrink-0">
                     {getNotificationIcon(notification.type)}
