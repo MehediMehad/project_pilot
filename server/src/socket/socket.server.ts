@@ -23,6 +23,7 @@ export function initializeSocket(httpServer: HttpServer) {
     cors: {
       origin: [
         'http://localhost:3000',
+        'https://project-pilot-client-six.vercel.app',
         'http://localhost:3001',
         process.env.FRONTEND_URL || 'http://localhost:3000',
       ],
