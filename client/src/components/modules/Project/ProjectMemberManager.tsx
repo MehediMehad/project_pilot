@@ -362,42 +362,71 @@ export default function ProjectMemberManager({
                       </p>
                     );
                   }
-                  return nonMembers.map((user) => (
-                    <div
-                      key={user.id}
-                      className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 dark:bg-slate-950/20 p-3.5 transition-all hover:bg-muted/30"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <span className="text-xs font-semibold text-primary">
-                            {user.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-foreground leading-none">
-                            {user.name}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {user.email}
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleAddMember(user.id)}
-                        disabled={addingId === user.id}
-                        className="gap-1 rounded-lg border-border hover:bg-primary hover:text-white"
+                  return nonMembers.map((user) => {
+                    const style = roleStyles[user.role] || {
+                      cardBorder: "border-l-[4px] border-l-primary/60",
+                      badge:
+                        "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 shadow-none",
+                      avatarBg: "bg-primary/10 text-primary",
+                    };
+                    const label =
+                      roleLabels[user.role] ||
+                      user.role.replace("_", " ");
+
+                    return (
+                      <div
+                        key={user.id}
+                        className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/20 dark:bg-slate-950/20 p-3.5 transition-all hover:bg-muted/30"
                       >
-                        {addingId === user.id ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          <Plus className="h-3.5 w-3.5" />
-                        )}
-                        Add
-                      </Button>
-                    </div>
-                  ));
+                        <div className="flex items-center gap-3">
+                          <div className={`h-9 w-9 rounded-full flex items-center justify-center shrink-0 font-bold overflow-hidden relative ${style.avatarBg}`}>
+                            {user.image ? (
+                              <Image
+                                src={user.image}
+                                alt={user.name}
+                                width={36}
+                                height={36}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-xs font-semibold">
+                                {user.name.charAt(0).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-sm font-bold text-foreground leading-none">
+                                {user.name}
+                              </p>
+                              <Badge
+                                className={`text-[10px] font-bold rounded-full px-2.5 py-0.5 border ${style.badge}`}
+                              >
+                                {label}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {user.email}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAddMember(user.id)}
+                          disabled={addingId === user.id}
+                          className="gap-1 rounded-lg border-border hover:bg-primary hover:text-white"
+                        >
+                          {addingId === user.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Plus className="h-3.5 w-3.5" />
+                          )}
+                          Add
+                        </Button>
+                      </div>
+                    );
+                  });
                 })()
               )}
             </div>
