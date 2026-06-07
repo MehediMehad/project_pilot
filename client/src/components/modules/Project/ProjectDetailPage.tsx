@@ -86,12 +86,16 @@ export default function ProjectDetailPage({
   const [summary, setSummary] = useState<IProjectSummary | null>(null);
   const [tasks, setTasks] = useState<ITask[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(
+    undefined,
+  );
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<ITask | null>(null);
-  const [preSelectedAssigneeId, setPreSelectedAssigneeId] = useState<string | undefined>(undefined);
+  const [preSelectedAssigneeId, setPreSelectedAssigneeId] = useState<
+    string | undefined
+  >(undefined);
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -104,35 +108,44 @@ export default function ProjectDetailPage({
 
   const canEdit = userRole === "ADMIN" || userRole === "PROJECT_MANAGER";
 
-  const fetchProject = useCallback(async (showOverlay = true) => {
-    if (showOverlay) setLoading(true);
-    try {
-      const [projectRes, summaryRes, tasksRes] = await Promise.all([
-        getSingleProject(projectId),
-        getProjectSummary(projectId),
-        getAllTasks({ projectId, limit: 100 }),
-      ]);
+  const fetchProject = useCallback(
+    async (showOverlay = true) => {
+      if (showOverlay) setLoading(true);
+      try {
+        const [projectRes, summaryRes, tasksRes] = await Promise.all([
+          getSingleProject(projectId),
+          getProjectSummary(projectId),
+          getAllTasks({ projectId, limit: 1000 }),
+        ]);
 
-      if (projectRes.success) {
-        setProject(projectRes.data);
-      } else {
-        toast.error(projectRes.message || "Failed to fetch project");
-      }
+        if (projectRes.success) {
+          setProject(projectRes.data);
+        } else {
+          toast.error(projectRes.message || "Failed to fetch project");
+        }
 
-      if (summaryRes.success) {
-        setSummary(summaryRes.data);
-      }
+        if (summaryRes.success) {
+          setSummary(summaryRes.data);
+        }
 
-      if (tasksRes.success && tasksRes.data) {
-        setTasks(tasksRes.data.data);
+        if (tasksRes.success && tasksRes.data) {
+          // Sort tasks by due date
+          tasksRes.data.data.sort((a, b) => {
+            return (
+              new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+            );
+          });
+          setTasks(tasksRes.data.data);
+        }
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load project");
+      } finally {
+        if (showOverlay) setLoading(false);
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load project");
-    } finally {
-      if (showOverlay) setLoading(false);
-    }
-  }, [projectId]);
+    },
+    [projectId],
+  );
 
   useEffect(() => {
     fetchProject();
@@ -443,7 +456,9 @@ export default function ProjectDetailPage({
             <ListTodo className="h-8 w-8 mb-2" />
             <p className="font-semibold text-sm">No tasks created yet</p>
             {canEdit && (
-              <p className="text-xs mt-1">Get started by adding a task to this project.</p>
+              <p className="text-xs mt-1">
+                Get started by adding a task to this project.
+              </p>
             )}
           </div>
         ) : (
